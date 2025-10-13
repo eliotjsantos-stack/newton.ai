@@ -76,7 +76,7 @@ export default function Newton() {
                     : 'bg-white border-gray-200 shadow-sm'
                 }`}
               >
-                <div className="text-gray-900 leading-relaxed whitespace-pre-wrap">
+                <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none">
                   {message.content}
                 </div>
               </div>
