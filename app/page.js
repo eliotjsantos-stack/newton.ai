@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export default function Newton() {
   const [messages, setMessages] = useState([]);
@@ -76,8 +77,8 @@ export default function Newton() {
                     : 'bg-white border-gray-200 shadow-sm'
                 }`}
               >
-                <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none">
-                  {message.content}
+                <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none prose-headings:font-semibold prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1">
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
                 </div>
               </div>
             ))}
