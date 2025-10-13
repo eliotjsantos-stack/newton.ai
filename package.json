@@ -10,11 +10,14 @@
   },
   "dependencies": {
     "ai": "^5.0.68",
+    "katex": "^0.16.25",
     "next": "15.5.4",
     "openai": "^6.3.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
