@@ -5,6 +5,15 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+// Add this function at the top
+function fixMathNotation(text) {
+  // Convert display math: [ equation ] to \[ equation \]
+  text = text.replace(/\[\s*([^\]]+?)\s*\]/g, '\\[$1\\]');
+  // Convert inline math: ( variable ) to \( variable \)
+  text = text.replace(/\(\s*([a-zA-Z0-9^{}+\-*/=\s]+?)\s*\)/g, '\\($1\\)');
+  return text;
+}
+
 export default function Newton() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -41,7 +50,8 @@ export default function Newton() {
         
         setMessages(prev => {
           const newMessages = [...prev];
-          newMessages[newMessages.length - 1].content = assistantMessage;
+          // Apply the fix when updating the message
+          newMessages[newMessages.length - 1].content = fixMathNotation(assistantMessage);
           return newMessages;
         });
       }
