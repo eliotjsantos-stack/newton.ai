@@ -8,9 +8,13 @@ import rehypeKatex from 'rehype-katex';
 // Add this function at the top
 function fixMathNotation(text) {
   // Convert display math: [ equation ] to \[ equation \]
-  text = text.replace(/\[\s*([^\]]+?)\s*\]/g, '\\[$1\\]');
-  // Convert inline math: ( variable ) to \( variable \)
-  text = text.replace(/\(\s*([a-zA-Z0-9^{}+\-*/=\s]+?)\s*\)/g, '\\($1\\)');
+  // Only match if there's actual LaTeX content inside (contains backslash or common math symbols)
+  text = text.replace(/\[\s*([^\]]*(?:\\|[\^_{}])[^\]]*)\s*\]/g, '\\[$1\\]');
+  
+  // Convert inline math: ( variable ) with LaTeX content to \( variable \)
+  // Only match if there's LaTeX commands (backslash) or math operators inside
+  text = text.replace(/\(\s*([^)]*(?:\\|[+\-*/=^_{}])[^)]*)\s*\)/g, '\\($1\\)');
+  
   return text;
 }
 
