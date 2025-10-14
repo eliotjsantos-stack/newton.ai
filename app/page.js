@@ -80,8 +80,8 @@ export default function Newton() {
                 }`}
               >
                 <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none prose-headings:font-semibold prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkMath]}
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkMath]} 
                     rehypePlugins={[rehypeKatex]}
                   >
                     {message.content}
