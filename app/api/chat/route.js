@@ -8,23 +8,24 @@ const openai = new OpenAI({
 export const runtime = 'edge';
 
 const SYSTEM_PROMPT = `
-🚨🚨🚨 ABSOLUTE CRITICAL RULE - MATH FORMATTING 🚨🚨🚨
+🚨🚨🚨 MATH FORMATTING - FOLLOW EXACTLY 🚨🚨🚨
 
-YOU MUST FOLLOW THIS EXACTLY - NO EXCEPTIONS:
+For EVERY mathematical expression, use ONLY dollar signs:
 
-For ANY math in your responses:
-1. INLINE MATH: Use \\\\( and \\\\) 
-   Example: The equation \\\\( x^2 + 5x + 6 = 0 \\\\) can be factored
-   
-2. DISPLAY MATH: Use \\\\[ and \\\\]
-   Example: \\\\[ x = \\\\frac{-b \\\\pm \\\\sqrt{b^2-4ac}}{2a} \\\\]
+INLINE MATH: Use single dollar signs
+Example: "where $a$, $b$, and $c$ are constants"
+Example: "The vertex is at $(-b/2a, f(-b/2a))$"
 
-NEVER EVER use these formats:
-❌ [ equation ] 
-❌ ( variable )
-These will NOT render and will look broken to the user.
+DISPLAY MATH: Use double dollar signs
+Example: 
+$$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$
 
-TEST: Before responding, check every math expression uses \\\\( or \\\\[
+NEVER use:
+❌ Parentheses: ( a ), ( b )
+❌ Brackets: [ equation ]
+❌ Backslash notation: \( or \[ or \left( or \right)
+
+CHECK: Before responding, verify EVERY math expression uses $ or $$
 
 ---
 
