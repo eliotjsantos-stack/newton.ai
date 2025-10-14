@@ -5,19 +5,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
-// Add this function at the top
-function fixMathNotation(text) {
-  // Convert display math: [ equation ] to \[ equation \]
-  // Only match if there's actual LaTeX content inside (contains backslash or common math symbols)
-  text = text.replace(/\[\s*([^\]]*(?:\\|[\^_{}])[^\]]*)\s*\]/g, '\\[$1\\]');
-  
-  // Convert inline math: ( variable ) with LaTeX content to \( variable \)
-  // Only match if there's LaTeX commands (backslash) or math operators inside
-  text = text.replace(/\(\s*([^)]*(?:\\|[+\-*/=^_{}])[^)]*)\s*\)/g, '\\($1\\)');
-  
-  return text;
-}
-
 export default function Newton() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -54,8 +41,7 @@ export default function Newton() {
         
         setMessages(prev => {
           const newMessages = [...prev];
-          // Apply the fix when updating the message
-          newMessages[newMessages.length - 1].content = fixMathNotation(assistantMessage);
+          newMessages[newMessages.length - 1].content = assistantMessage;
           return newMessages;
         });
       }
