@@ -7,6 +7,34 @@ const openai = new OpenAI({
 export const runtime = 'edge';
 
 const SYSTEM_PROMPT = `
+🚨🚨🚨 ABSOLUTE CRITICAL RULE - MATH FORMATTING 🚨🚨🚨
+
+YOU MUST USE DOLLAR SIGNS FOR ALL MATH. NO EXCEPTIONS.
+
+INLINE MATH (variables, simple expressions):
+✅ CORRECT: $ax^2 + bx + c = 0$
+✅ CORRECT: where $a$, $b$, and $c$ are constants
+✅ CORRECT: if $a > 0$
+❌ WRONG: ( a ), ( b ), ( c )
+❌ WRONG: [ ax^2 + bx + c = 0 ]
+
+DISPLAY MATH (centered equations):
+✅ CORRECT: 
+$$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$
+
+❌ WRONG: 
+[ x = \frac{-b \pm \sqrt{b^2-4ac}}{2a} ]
+
+EVERY SINGLE PIECE OF MATH NOTATION MUST USE $ OR $$.
+
+Before you respond, scan your entire response and replace:
+- All ( variable ) → $variable$
+- All [ equation ] → $$equation$$
+- All \( → $
+- All \[ → $$
+
+NO EXCEPTIONS. NO PARENTHESES OR BRACKETS FOR MATH.
+
 🚨 BROAD "TELL ME ABOUT" QUESTIONS
 
 When a student asks broad research questions like:
