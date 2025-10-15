@@ -5,6 +5,37 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+function fixMathNotation(text) {
+  // Fix display math: [ equation ] → $$equation$$
+  text = text.replace(/\[\s*([^\]]+)\s*\]/g, '$$$$1$$');
+  
+  // Fix lists of variables: ( a, b, ) and ( c ) → $a, b,$ and $c$
+  text = text.replace(/\(\s*([a-zA-Z]\s*,\s*[a-zA-Z]\s*,?\s*)\)/g, '$$1$');
+  
+  // Fix ALL single letter/variable in parentheses: (x), (a), (b), (c)
+  text = text.replace(/\(\s*([a-zA-Z])\s*\)/g, '$$1$');
+  
+  // Fix math comparisons: (a > 0), (a < 0), (a = 0), (a ≠ 0)
+  text = text.replace(/\(\s*([a-zA-Z])\s*([<>=≠∈]+)\s*([0-9a-zA-Z]+)\s*\)/g, '$$$1 $2 $3$$');
+  
+  // Fix expressions with operators: (x - p), (2a), (ac)
+  text = text.replace(/\(([a-zA-Z0-9]{1,3})\)/g, '$$1$');
+  
+  // Fix any parentheses containing math operators: ^, +, -, *, /, =
+  text = text.replace(/\(([^)]*[\^\+\-\*\/=_][^)]*)\)/g, (match, content) => {
+    // Don't convert if it looks like a normal sentence
+    if (content.length > 30 || content.includes(' the ') || content.includes(' a ') || content.includes(' is ')) {
+      return match;
+    }
+    return `$${content}$`;
+  });
+  
+  // Fix fractions and complex expressions with \frac, \sqrt, etc
+  text = text.replace(/\(([^)]*\\[a-z]+[^)]*)\)/g, '$$1$');
+  
+  return text;
+}
+
 export default function Newton() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -41,7 +72,8 @@ export default function Newton() {
         
         setMessages(prev => {
           const newMessages = [...prev];
-          newMessages[newMessages.length - 1].content = assistantMessage;
+          // Apply math notation fix
+          newMessages[newMessages.length - 1].content = fixMathNotation(assistantMessage);
           return newMessages;
         });
       }
