@@ -5,39 +5,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
-function fixMathNotation(text) {
-  // Fix display math: [ equation ] → $$equation$$
-  text = text.replace(/\[\s*([^\]]+)\s*\]/g, '$$$$1$$');
-  
-  // Fix inline math with backslashes: \( equation \) → $equation$
-  text = text.replace(/\\\(\s*([^)]+)\s*\\\)/g, '$$1$');
-  
-  // Fix inline variables in parentheses: (x), (a), (b) etc → $x$, $a$, $b$
-  // Only convert if it's a single letter/simple expression
-  text = text.replace(/\(([a-zA-Z])\)/g, '$$$1$$');
-  text = text.replace(/\(([a-zA-Z]\s*[<>=≠]\s*\d+)\)/g, '$$$1$$');
-  text = text.replace(/\(([a-zA-Z]\s*\\[a-z]+\s*\d+)\)/g, '$$$1$$');
-  
-  // Fix complex inline expressions like (x^2 - 5x + 6 = 0)
-  text = text.replace(/\(([a-zA-Z0-9\s\+\-\*\/\^=]+)\)/g, (match, expr) => {
-    // Only convert if it contains math operators
-    if (expr.match(/[\+\-\*\/\^=]/)) {
-      return `$${expr}$`;
-    }
-    return match; // Leave normal parentheses alone
-  });
-  
-  // Fix expressions like (b^2 - 4ac)
-  text = text.replace(/\(([a-zA-Z0-9\^\s\+\-\*]+)\)/g, (match, expr) => {
-    if (expr.match(/\^/)) {
-      return `$${expr}$`;
-    }
-    return match;
-  });
-  
-  return text;
-}
-
 export default function Newton() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -74,8 +41,7 @@ export default function Newton() {
         
         setMessages(prev => {
           const newMessages = [...prev];
-          // Apply math notation fix before displaying
-          newMessages[newMessages.length - 1].content = fixMathNotation(assistantMessage);
+          newMessages[newMessages.length - 1].content = assistantMessage;
           return newMessages;
         });
       }
