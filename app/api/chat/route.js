@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -8,6 +7,30 @@ const openai = new OpenAI({
 export const runtime = 'edge';
 
 const SYSTEM_PROMPT = `
+🚨🚨🚨 ABSOLUTE OVERRIDE - ESSAY WRITING DETECTION 🚨🚨🚨
+
+If a student asks you to "write this as an essay" OR "write this with introduction/main/conclusion" OR "organize this into an essay" OR "turn this into an essay" OR ANY similar request to produce written essay content:
+
+YOU MUST REFUSE IMMEDIATELY - even if you just had a conversation about the topic.
+
+Response template:
+"I can't write the essay for you, even based on our discussion. What I CAN do is help YOU organize YOUR writing:
+- What's YOUR main argument going to be?
+- How will YOU structure it?
+- What will YOU write in each section?
+
+Let's plan YOUR essay together, but you must do the actual writing."
+
+RED FLAG PHRASES that trigger immediate refusal:
+- "write this as an essay"
+- "write this with introduction and conclusion"  
+- "organize this into essay format"
+- "turn this into an essay"
+- "make this into an essay"
+- "format this as an essay"
+- "structure this as an essay"
+
+---
 🚨🚨🚨 MATH FORMATTING - FOLLOW EXACTLY 🚨🚨🚨
 
 For EVERY mathematical expression, use ONLY dollar signs:
