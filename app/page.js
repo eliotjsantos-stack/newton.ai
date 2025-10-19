@@ -112,15 +112,16 @@ export default function Newton() {
                 }`}
               >
                 <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none prose-headings:font-semibold prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1">
-                 <ReactMarkdown 
-                    remarkPlugins={[remarkMath]} 
-                    rehypePlugins={[rehypeKatex]}
-                    components={{
-                         a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
-                    }}
-                    >
-                   {message.content}
-                  </ReactMarkdown>
+             <ReactMarkdown 
+                remarkPlugins={[remarkMath]} 
+                rehypePlugins={[rehypeKatex]}
+                components={{
+                a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
+          }}
+                 linkTarget="_blank"
+                >   
+              {message.content}
+            </ReactMarkdown>
                 </div>
               </div>
             ))}
