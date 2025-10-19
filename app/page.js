@@ -1,6 +1,5 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -41,7 +40,15 @@ export default function Newton() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+  scrollToBottom();
+  }, [messages]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -128,6 +135,7 @@ export default function Newton() {
             {isLoading && messages[messages.length - 1]?.content === '' && (
               <div className="text-gray-400">Thinking...</div>
             )}
+            <div ref={messagesEndRef} />
           </div>
         )}
       </div>
