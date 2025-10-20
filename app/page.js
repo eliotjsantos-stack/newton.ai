@@ -6,34 +6,23 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
 function fixMathNotation(text) {
-  // Fix display math: [ equation ] → $$equation$$
-  text = text.replace(/\[\s*([^\]]+)\s*\]/g, '$$$$1$$');
+  // Don't process anything that's already inside $ or $$ delimiters
+  // Split by existing math notation to preserve it
+  const parts = text.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/);
   
-  // Fix lists of variables: ( a, b, ) and ( c ) → $a, b,$ and $c$
-  text = text.replace(/\(\s*([a-zA-Z]\s*,\s*[a-zA-Z]\s*,?\s*)\)/g, '$$1$');
-  
-  // Fix ALL single letter/variable in parentheses: (x), (a), (b), (c)
-  text = text.replace(/\(\s*([a-zA-Z])\s*\)/g, '$$1$');
-  
-  // Fix math comparisons: (a > 0), (a < 0), (a = 0), (a ≠ 0)
-  text = text.replace(/\(\s*([a-zA-Z])\s*([<>=≠∈]+)\s*([0-9a-zA-Z]+)\s*\)/g, '$$$1 $2 $3$$');
-  
-  // Fix expressions with operators: (x - p), (2a), (ac)
-  text = text.replace(/\(([a-zA-Z0-9]{1,3})\)/g, '$$1$');
-  
-  // Fix any parentheses containing math operators: ^, +, -, *, /, =
-  text = text.replace(/\(([^)]*[\^\+\-\*\/=_][^)]*)\)/g, (match, content) => {
-    // Don't convert if it looks like a normal sentence
-    if (content.length > 30 || content.includes(' the ') || content.includes(' a ') || content.includes(' is ')) {
-      return match;
-    }
-    return `$${content}$`;
-  });
-  
-  // Fix fractions and complex expressions with \frac, \sqrt, etc
-  text = text.replace(/\(([^)]*\\[a-z]+[^)]*)\)/g, '$$1$');
-  
-  return text;
+  return parts.map((part, index) => {
+    // If this part is already math notation (odd indices), return as-is
+    if (index % 2 === 1) return part;
+    
+    // Only process non-math text parts
+    // Fix single letter variables in text: (a), (b), (c)
+    part = part.replace(/\(([a-zA-Z])\)/g, '$$$1$$');
+    
+    // Fix display math brackets: [ equation ]
+    part = part.replace(/\[\s*([^\]]+)\s*\]/g, '$$$$$$1$$$$');
+    
+    return part;
+  }).join('');
 }
 
 export default function Newton() {
