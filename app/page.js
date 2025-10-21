@@ -153,3 +153,4 @@ export default function Newton() {
     </div>
   );
 }// Force redeploy Wed 15 Oct 2025 19:48:38 BST
+// Deploy sidebar Tue 21 Oct 2025 21:41:46 JST
