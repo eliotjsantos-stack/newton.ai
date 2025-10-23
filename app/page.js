@@ -24,6 +24,29 @@ function generateChatTitle(messages) {
   return title.length < firstUserMessage.content.length ? title + '...' : title;
 }
 
+const subjectKeywords = {
+  'Maths': ['equation', 'algebra', 'calculus', 'geometry', 'trigonometry', 'math', 'solve', 'calculate', 'formula', 'derivative', 'integral', 'graph', 'function', 'quadratic', 'polynomial', 'fraction', 'decimal', 'percentage', 'angle', 'triangle', 'circle', 'theorem', 'proof', 'statistics', 'probability'],
+  'Science': ['biology', 'chemistry', 'physics', 'cell', 'atom', 'molecule', 'energy', 'force', 'gravity', 'photosynthesis', 'evolution', 'ecosystem', 'chemical', 'reaction', 'element', 'compound', 'electron', 'proton', 'neutron', 'DNA', 'organ', 'tissue', 'species', 'experiment', 'hypothesis'],
+  'English': ['essay', 'paragraph', 'grammar', 'sentence', 'verb', 'noun', 'adjective', 'metaphor', 'literature', 'novel', 'poem', 'poetry', 'shakespeare', 'writing', 'reading', 'comprehension', 'analysis', 'theme', 'character', 'plot', 'author'],
+  'History': ['war', 'ancient', 'medieval', 'renaissance', 'revolution', 'empire', 'dynasty', 'civilization', 'century', 'BC', 'AD', 'historical', 'treaty', 'battle', 'monarch', 'president', 'independence', 'democracy', 'communism', 'fascism'],
+  'Languages': ['french', 'spanish', 'german', 'italian', 'mandarin', 'japanese', 'translate', 'vocabulary', 'conjugate', 'verb conjugation', 'pronunciation', 'grammar', 'accent', 'fluent', 'bilingual']
+};
+
+function detectSubject(question) {
+  const lowerQuestion = question.toLowerCase();
+  const scores = {};
+  
+  for (const [subject, keywords] of Object.entries(subjectKeywords)) {
+    scores[subject] = keywords.filter(keyword => lowerQuestion.includes(keyword)).length;
+  }
+  
+  const maxScore = Math.max(...Object.values(scores));
+  if (maxScore === 0) return null;
+  
+  const detectedSubject = Object.keys(scores).find(subject => scores[subject] === maxScore);
+  return detectedSubject;
+}
+
 export default function Newton() {
   const defaultSubjects = ['General', 'Maths', 'Science', 'English', 'History', 'Languages'];
 
@@ -48,29 +71,38 @@ export default function Newton() {
       if (saved) return JSON.parse(saved);
     }
     return defaultSubjects.reduce((acc, subject) => {
-      acc[subject] = [{ id: Date.now().toString(), messages: [], date: new Date().toISOString() }];
+      acc[subject] = [{ id: 'initial', messages: [], date: new Date().toISOString() }];
       return acc;
     }, {});
   });
 
   const [currentChatId, setCurrentChatId] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('newton-current-chat-id');
-      if (saved) return saved;
-    }
-    const firstSubject = defaultSubjects[0];
-    return chatsBySubject[firstSubject]?.[0]?.id || Date.now().toString();
-  });
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('newton-current-chat-id');
+    if (saved && saved !== 'null') return saved;
+  }
+  return null;
+});
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [openMenuSubject, setOpenMenuSubject] = useState(null);
   const [openChatMenu, setOpenChatMenu] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [expandedSubject, setExpandedSubject] = useState(currentSubject);
-  
-  const messagesEndRef = useRef(null);
+  const [expandedSubject, setExpandedSubject] = useState(null);
+  const [suggestedSubject, setSuggestedSubject] = useState(null);
+  const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
+  const [mounted, setMounted] = useState(false); 
 
+  const messagesEndRef = useRef(null);
+useEffect(() => {
+  setMounted(true);
+}, []);
+useEffect(() => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('newton-current-chat-id');
+  }
+}, []);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('newton-current-subject', currentSubject);
@@ -89,18 +121,31 @@ export default function Newton() {
     }
   }, [chatsBySubject]);
 
+//  useEffect(() => {
+//   if (typeof window !== 'undefined') {
+//      localStorage.setItem('newton-current-chat-id', currentChatId);
+//    }
+//  }, [currentChatId]);
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('newton-current-chat-id', currentChatId);
+    if (input.trim().length > 10) {
+      const detected = detectSubject(input);
+      if (detected && detected !== currentSubject && !dismissedSuggestion) {
+        setSuggestedSubject(detected);
+      } else {
+        setSuggestedSubject(null);
+      }
+    } else {
+      setSuggestedSubject(null);
     }
-  }, [currentChatId]);
+  }, [input, currentSubject, dismissedSuggestion]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const currentChat = chatsBySubject[currentSubject]?.find(chat => chat.id === currentChatId);
-  const messages = currentChat?.messages || [];
+  const currentChat = currentChatId ? chatsBySubject[currentSubject]?.find(chat => chat.id === currentChatId) : null;
+const messages = currentChat?.messages || [];
 
   useEffect(() => {
     scrollToBottom();
@@ -220,6 +265,19 @@ export default function Newton() {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
+    setDismissedSuggestion(false);
+    setSuggestedSubject(null);
+    if (!currentChatId) {
+    const newChatId = Date.now().toString();
+    setChatsBySubject(prev => ({
+      ...prev,
+      [currentSubject]: [
+        { id: newChatId, messages: [], date: new Date().toISOString() },
+        ...prev[currentSubject]
+      ]
+    }));
+    setCurrentChatId(newChatId);
+  }
     const userMessage = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
@@ -257,12 +315,19 @@ export default function Newton() {
       setIsLoading(false);
     }
   };
+if (!mounted) {
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-gray-400">Loading...</div>
+    </div>
+  );
+}
+
 
   return (
     <div className="min-h-screen bg-white flex">
-      {/* Sidebar */}
       {sidebarOpen && (
-        <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col">
+        <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col fixed left-0 top-0 bottom-0 z-10">
           <div className="p-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Subjects</h2>
             <button
@@ -277,7 +342,6 @@ export default function Newton() {
           <div className="flex-1 overflow-y-auto p-2">
             {subjects.map((subject) => (
               <div key={subject} className="mb-1">
-                {/* Subject Header */}
                 <div
                   className={`group relative flex items-center justify-between p-3 rounded-lg transition ${
                     currentSubject === subject
@@ -346,7 +410,6 @@ export default function Newton() {
                   )}
                 </div>
 
-                {/* Chats List (Accordion) */}
                 {expandedSubject === subject && (
                   <div className="ml-4 mt-1 space-y-1">
                     {chatsBySubject[subject]?.map((chat) => (
@@ -364,12 +427,12 @@ export default function Newton() {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium truncate">
-                              {generateChatTitle(chat.messages)}
+                            <p className="text-xs font-medium truncate" suppressHydrationWarning>
+                              {typeof window !== 'undefined' ? generateChatTitle(chat.messages) : 'Chat'}
                             </p>
-                            <p className="text-xs opacity-70 mt-1">
-                              {new Date(chat.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                            </p>
+                            <p className="text-xs opacity-70 mt-1" suppressHydrationWarning>
+  {new Date(chat.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+</p>
                           </div>
                           
                           <button
@@ -415,8 +478,7 @@ export default function Newton() {
         </div>
       )}
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col" onClick={() => { setOpenMenuSubject(null); setOpenChatMenu(null); }}>
+      <div className={`flex-1 flex flex-col ${sidebarOpen ? 'ml-80' : 'ml-0'} transition-all`} onClick={() => { setOpenMenuSubject(null); setOpenChatMenu(null); }}>
         <div className="text-center py-8 px-4 border-b border-gray-200 relative">
           {!sidebarOpen && (
             <button
@@ -435,45 +497,83 @@ export default function Newton() {
           </p>
         </div>
 
-        <div className="flex-1 max-w-4xl w-full mx-auto px-4 pb-32 overflow-y-auto">
-          {messages.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
-              Start a conversation about {currentSubject}...
-            </div>
-          ) : (
-            <div className="space-y-6 py-6">
-              {messages.map((message, i) => (
-                <div
-                  key={i}
-                  className={`p-5 rounded-2xl border ${
-                    message.role === 'user'
-                      ? 'bg-gray-50 border-gray-200'
-                      : 'bg-white border-gray-200 shadow-sm'
-                  }`}
-                >
-                  <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none prose-headings:font-semibold prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1">
-                    <ReactMarkdown 
-                      remarkPlugins={[remarkMath, remarkGfm]} 
-                      rehypePlugins={[rehypeKatex]}
-                      components={{
-                        a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
-                      }}
-                    >
-                      {message.content}
-                    </ReactMarkdown>
+       <div className="flex-1 max-w-4xl w-full mx-auto px-4 pb-32 overflow-y-auto">
+          <div suppressHydrationWarning>
+            {messages.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                Start a conversation about {currentSubject}...
+              </div>
+            ) : (
+              <div className="space-y-6 py-6">
+                {messages.map((message, i) => (
+                  <div
+                    key={i}
+                    className={`p-5 rounded-2xl border ${
+                      message.role === 'user'
+                        ? 'bg-gray-50 border-gray-200'
+                        : 'bg-white border-gray-200 shadow-sm'
+                    }`}
+                  >
+                    <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none prose-headings:font-semibold prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkMath, remarkGfm]} 
+                        rehypePlugins={[rehypeKatex]}
+                        components={{
+                          a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
                   </div>
-                </div>
-              ))}
-              {isLoading && messages[messages.length - 1]?.content === '' && (
-                <div className="text-gray-400">Thinking...</div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-          )}
+                ))}
+                {isLoading && messages[messages.length - 1]?.content === '' && (
+                  <div className="text-gray-400">Thinking...</div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className={`fixed bottom-0 right-0 ${sidebarOpen ? 'left-80' : 'left-0'} bg-white border-t border-gray-200 p-4 transition-all`}>
           <div className="max-w-4xl mx-auto">
+            {suggestedSubject && (
+              <div className="mb-2">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">💡</span>
+                    <span className="text-sm text-gray-700">
+                      This looks like a <strong>{suggestedSubject}</strong> question.
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setCurrentSubject(suggestedSubject);
+                        setExpandedSubject(suggestedSubject);
+                        const firstChat = chatsBySubject[suggestedSubject]?.[0];
+                        if (firstChat) setCurrentChatId(firstChat.id);
+                        setSuggestedSubject(null);
+                      }}
+                      className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                    >
+                      Switch to {suggestedSubject}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSuggestedSubject(null);
+                        setDismissedSuggestion(true);
+                      }}
+                      className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
+                    >
+                      Stay in {currentSubject}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="flex gap-3 items-center">
               <input
                 type="text"
