@@ -59,13 +59,23 @@ function GraphRenderer({ code }) {
         };
         
         const layout = {
-          title: title,
-          xaxis: { title: 'x', zeroline: true, gridcolor: '#e5e7eb' },
-          yaxis: { title: 'y', zeroline: true, gridcolor: '#e5e7eb' },
-          plot_bgcolor: '#f9fafb',
-          paper_bgcolor: 'white',
-          font: { family: 'system-ui' }
-        };
+    title: title,
+    xaxis: { 
+      title: 'x', 
+      zeroline: true, 
+      gridcolor: '#e5e7eb',
+      scaleanchor: 'y',
+      scaleratio: 1
+    },
+    yaxis: { 
+      title: 'y', 
+      zeroline: true, 
+      gridcolor: '#e5e7eb'
+    },
+    plot_bgcolor: '#f9fafb',
+    paper_bgcolor: 'white',
+    font: { family: 'system-ui' }
+};
         
         PlotlyLib.newPlot(containerRef.current, [trace], layout, { responsive: true });
       }).catch(err => {
