@@ -6,6 +6,84 @@ import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 
+// Graph Renderer Component  
+function GraphRenderer({ code }) {
+  const containerRef = useRef(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    try {
+      import('plotly.js-basic-dist').then((Plotly) => {
+        const PlotlyLib = Plotly.default || Plotly;
+        
+        // Generate x values
+        const x = [];
+        for (let i = -10; i <= 10; i += 0.1) {
+          x.push(i);
+        }
+        
+        // Extract the equation from the code
+        const yMatch = code.match(/return\s+(.+?);/);
+        let y = [];
+        
+        if (yMatch) {
+          const expression = yMatch[1].trim();
+          
+          y = x.map(val => {
+            try {
+              // Create a safe function to evaluate the expression
+              const func = new Function('val', 'Math', `return ${expression}`);
+              return func(val, Math);
+            } catch (e) {
+              console.error('Function error:', e);
+              return 0;
+            }
+          });
+        } else {
+          setError('Could not parse equation');
+          return;
+        }
+        
+        // Extract title
+        const titleMatch = code.match(/title:\s*['"`](.+?)['"`]/);
+        const title = titleMatch ? titleMatch[1] : 'Graph';
+        
+        const trace = {
+          x: x,
+          y: y,
+          type: 'scatter',
+          mode: 'lines',
+          line: { color: '#2563eb', width: 3 }
+        };
+        
+        const layout = {
+          title: title,
+          xaxis: { title: 'x', zeroline: true, gridcolor: '#e5e7eb' },
+          yaxis: { title: 'y', zeroline: true, gridcolor: '#e5e7eb' },
+          plot_bgcolor: '#f9fafb',
+          paper_bgcolor: 'white',
+          font: { family: 'system-ui' }
+        };
+        
+        PlotlyLib.newPlot(containerRef.current, [trace], layout, { responsive: true });
+      }).catch(err => {
+        console.error('Plotly error:', err);
+        setError(err.message);
+      });
+    } catch (err) {
+      console.error('Graph render error:', err);
+      setError(err.message);
+    }
+  }, [code]);
+
+  if (error) {
+    return <div className="text-red-600 text-sm p-4">Error: {error}</div>;
+  }
+
+  return <div ref={containerRef} className="w-full h-96" />;
+}
 function fixMathNotation(text) {
   const parts = text.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/);
   return parts.map((part, index) => {
@@ -515,16 +593,73 @@ if (!mounted) {
                     }`}
                   >
                     <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none prose-headings:font-semibold prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1">
-                      <ReactMarkdown 
-                        remarkPlugins={[remarkMath, remarkGfm]} 
-                        rehypePlugins={[rehypeKatex]}
-                        components={{
-                          a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
-                    </div>
+  {(() => {
+    const content = message.content;
+    const graphMatch = content.match(/<GRAPH>([\s\S]*?)<\/GRAPH>/);
+    
+    if (graphMatch) {
+      const graphContent = graphMatch[1];
+      const titleMatch = graphContent.match(/<TITLE>(.*?)<\/TITLE>/);
+      const codeMatch = graphContent.match(/<CODE>([\s\S]*?)<\/CODE>/);
+      
+      const beforeGraph = content.substring(0, graphMatch.index);
+      const afterGraph = content.substring(graphMatch.index + graphMatch[0].length);
+      
+      return (
+        <>
+          {beforeGraph && (
+            <ReactMarkdown 
+              remarkPlugins={[remarkMath, remarkGfm]} 
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
+              }}
+            >
+              {beforeGraph}
+            </ReactMarkdown>
+          )}
+          
+          {codeMatch && (
+            <div className="my-4 border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
+                <span className="text-sm font-medium text-gray-700">
+                  {titleMatch ? titleMatch[1] : 'Interactive Graph'}
+                </span>
+              </div>
+              <div className="p-4 bg-white">
+                <GraphRenderer code={codeMatch[1]} />
+              </div>
+            </div>
+          )}
+          
+          {afterGraph && (
+            <ReactMarkdown 
+              remarkPlugins={[remarkMath, remarkGfm]} 
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
+              }}
+            >
+              {afterGraph}
+            </ReactMarkdown>
+          )}
+        </>
+      );
+    }
+    
+    return (
+      <ReactMarkdown 
+        remarkPlugins={[remarkMath, remarkGfm]} 
+        rehypePlugins={[rehypeKatex]}
+        components={{
+          a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    );
+  })()}
+</div>
                   </div>
                 ))}
                 {isLoading && messages[messages.length - 1]?.content === '' && (
