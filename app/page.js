@@ -58,12 +58,23 @@ function GraphRenderer({ code }) {
           line: { color: '#2563eb', width: 3 }
         };
         
-    const layout = {
+    // Calculate y range for smart scaling
+const yMin = Math.min(...y);
+const yMax = Math.max(...y);
+const yRange = yMax - yMin;
+const xRange = 20; // x goes from -10 to 10
+
+// Use equal aspect ratio if y range is similar to x range (linear, circles)
+// Use auto-scale if y range is much larger (parabolas, exponentials)
+const useEqualAspect = yRange < xRange * 2;
+
+const layout = {
   title: title,
   xaxis: { 
     title: 'x', 
     zeroline: true, 
-    gridcolor: '#e5e7eb'
+    gridcolor: '#e5e7eb',
+    ...(useEqualAspect && { scaleanchor: 'y', scaleratio: 1 })
   },
   yaxis: { 
     title: 'y', 
