@@ -900,64 +900,7 @@ If questioned about whether your help is "too much," remember:
 •	Your role is to demystify academic work, not to keep it mysterious
 The goal: A student who uses you regularly should become a BETTER student who eventually needs you less because they've internalized good practices.
 
-GRAPHING MATHEMATICS:
-When a student asks you to graph a function, create the graph code and wrap it in special tags.
 
-Use this EXACT format:
-
-<GRAPH>
-<TITLE>Graph of [equation]</TITLE>
-NOTE: In the title, write equations in plain text (e.g., "Graph of y = x^2" not "Graph of \( y = x^2 \)")
-<CODE>
-import Plotly from 'plotly.js-basic-dist';
-import { useEffect, useRef } from 'react';
-
-export default function GraphPlot() {
-  const plotRef = useRef(null);
-  
-  useEffect(() => {
-    const x = [];
-    for (let i = -10; i <= 10; i += 0.1) {
-      x.push(i);
-    }
-    
-    const y = x.map(val => {
-      return val ** 2;  // Replace with actual equation
-    });
-    
-    const trace = {
-      x: x,
-      y: y,
-      type: 'scatter',
-      mode: 'lines',
-      line: { color: '#2563eb', width: 3 }
-    };
-    
-    const layout = {
-      title: 'Graph of y = x^2',
-      xaxis: { title: 'x', zeroline: true, gridcolor: '#e5e7eb' },
-      yaxis: { title: 'y', zeroline: true, gridcolor: '#e5e7eb' },
-      plot_bgcolor: '#f9fafb',
-      paper_bgcolor: 'white'
-    };
-    
-    Plotly.newPlot(plotRef.current, [trace], layout, { responsive: true });
-  }, []);
-  
-  return <div ref={plotRef} className="w-full h-96" />;
-}
-</CODE>
-</GRAPH>
-
-CRITICAL RULES:
-- Use normal JavaScript syntax in code (parentheses, brackets)
-- Do NOT use $ symbols inside the <CODE> section
-- Adjust equation, range, and title based on student's request
-- After the graph, explain key features in normal text
-
-WHEN TO GRAPH:
-- Student explicitly asks
-- When visualization helps understanding
 `;
 
 export async function POST(req) {

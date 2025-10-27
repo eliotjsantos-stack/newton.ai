@@ -6,103 +6,8 @@ import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 
-// Graph Renderer Component  
-function GraphRenderer({ code }) {
-  const containerRef = useRef(null);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    
-    try {
-      import('plotly.js-basic-dist').then((Plotly) => {
-        const PlotlyLib = Plotly.default || Plotly;
-        
-        // Generate x values
-        const x = [];
-        for (let i = -10; i <= 10; i += 0.1) {
-          x.push(i);
-        }
-        
-        // Extract the equation from the code
-        const yMatch = code.match(/return\s+(.+?);/);
-        let y = [];
-        
-        if (yMatch) {
-          const expression = yMatch[1].trim();
-          
-          y = x.map(val => {
-            try {
-              // Create a safe function to evaluate the expression
-              const func = new Function('val', 'Math', `return ${expression}`);
-              return func(val, Math);
-            } catch (e) {
-              console.error('Function error:', e);
-              return 0;
-            }
-          });
-        } else {
-          setError('Could not parse equation');
-          return;
-        }
-        
-        // Extract title
-        const titleMatch = code.match(/title:\s*['"`](.+?)['"`]/);
-        const title = titleMatch ? titleMatch[1] : 'Graph';
-        
-        const trace = {
-          x: x,
-          y: y,
-          type: 'scatter',
-          mode: 'lines',
-          line: { color: '#2563eb', width: 3 }
-        };
-        
-    // Calculate y range for smart scaling
-const yMin = Math.min(...y);
-const yMax = Math.max(...y);
-const yRange = yMax - yMin;
-const xRange = 20; // x goes from -10 to 10
 
-// Use equal aspect ratio if y range is similar to x range (linear, circles)
-// Use auto-scale if y range is much larger (parabolas, exponentials)
-const useEqualAspect = yRange < xRange * 2;
-
-const layout = {
-  title: title,
-  xaxis: { 
-    title: 'x', 
-    zeroline: true, 
-    gridcolor: '#e5e7eb',
-    ...(useEqualAspect && { scaleanchor: 'y', scaleratio: 1 })
-  },
-  yaxis: { 
-    title: 'y', 
-    zeroline: true, 
-    gridcolor: '#e5e7eb'
-  },
-  plot_bgcolor: '#f9fafb',
-  paper_bgcolor: 'white',
-  font: { family: 'system-ui' }
-};
-        
-        PlotlyLib.newPlot(containerRef.current, [trace], layout, { responsive: true });
-      }).catch(err => {
-        console.error('Plotly error:', err);
-        setError(err.message);
-      });
-    } catch (err) {
-      console.error('Graph render error:', err);
-      setError(err.message);
-    }
-  }, [code]);
-
-  if (error) {
-    return <div className="text-red-600 text-sm p-4">Error: {error}</div>;
-  }
-
-  return <div ref={containerRef} className="w-full h-96" />;
-}
 function fixMathNotation(text) {
   const parts = text.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/);
   return parts.map((part, index) => {
@@ -371,28 +276,33 @@ const messages = currentChat?.messages || [];
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    setDismissedSuggestion(false);
-    setSuggestedSubject(null);
-    if (!currentChatId) {
-    const newChatId = Date.now().toString();
-    setChatsBySubject(prev => ({
-      ...prev,
-      [currentSubject]: [
-        { id: newChatId, messages: [], date: new Date().toISOString() },
-        ...prev[currentSubject]
-      ]
-    }));
-    setCurrentChatId(newChatId);
+  e.preventDefault();
+  
+  const trimmedInput = input.trim();
+  console.log('Submit clicked, input:', trimmedInput);
+  
+  if (!trimmedInput || isLoading) {
+    console.log('Blocked: empty or loading');
+    return;
   }
-    const userMessage = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
 
-    try {
+  setDismissedSuggestion(false);
+  setSuggestedSubject(null);
+
+  // If no chat selected, create new one
+  if (!currentChatId) {
+    console.log('Creating new chat');
+    // ...
+  }
+
+  const userMessage = { role: 'user', content: trimmedInput };
+  console.log('Adding user message:', userMessage);
+  setMessages(prev => [...prev, userMessage]);
+  setInput('');
+  setIsLoading(true);
+
+  try {
+    console.log('Fetching API...');
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -423,7 +333,7 @@ const messages = currentChat?.messages || [];
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 if (!mounted) {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
