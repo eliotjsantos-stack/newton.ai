@@ -30,7 +30,7 @@ const subjectKeywords = {
   'Maths': ['equation', 'algebra', 'calculus', 'geometry', 'trigonometry', 'math', 'solve', 'calculate', 'formula', 'derivative', 'integral', 'graph', 'function', 'quadratic', 'polynomial', 'fraction', 'decimal', 'percentage', 'angle', 'triangle', 'circle', 'theorem', 'proof', 'statistics', 'probability'],
   'Science': ['biology', 'chemistry', 'physics', 'cell', 'atom', 'molecule', 'energy', 'force', 'gravity', 'photosynthesis', 'evolution', 'ecosystem', 'chemical', 'reaction', 'element', 'compound', 'electron', 'proton', 'neutron', 'DNA', 'organ', 'tissue', 'species', 'experiment', 'hypothesis'],
   'English': ['essay', 'paragraph', 'grammar', 'sentence', 'verb', 'noun', 'adjective', 'metaphor', 'literature', 'novel', 'poem', 'poetry', 'shakespeare', 'writing', 'reading', 'comprehension', 'analysis', 'theme', 'character', 'plot', 'author'],
-  'History': ['war', 'ancient', 'medieval', 'renaissance', 'revolution', 'empire', 'dynasty', 'civilization', 'century', 'BC', 'AD', 'historical', 'treaty', 'battle', 'monarch', 'president', 'independence', 'democracy', 'communism', 'fascism'],
+  'History': ['essay', 'war', 'ancient', 'medieval', 'renaissance', 'revolution', 'empire', 'dynasty', 'civilization', 'century', 'BC', 'AD', 'historical', 'treaty', 'battle', 'monarch', 'president', 'independence', 'democracy', 'communism', 'fascism'],
   'Languages': ['french', 'spanish', 'german', 'italian', 'mandarin', 'japanese', 'translate', 'vocabulary', 'conjugate', 'verb conjugation', 'pronunciation', 'grammar', 'accent', 'fluent', 'bilingual']
 };
 
@@ -538,55 +538,7 @@ if (!mounted) {
     const content = message.content;
     const graphMatch = content.match(/<GRAPH>([\s\S]*?)<\/GRAPH>/);
     
-    if (graphMatch) {
-      const graphContent = graphMatch[1];
-      const titleMatch = graphContent.match(/<TITLE>(.*?)<\/TITLE>/);
-      const codeMatch = graphContent.match(/<CODE>([\s\S]*?)<\/CODE>/);
-      
-      const beforeGraph = content.substring(0, graphMatch.index);
-      const afterGraph = content.substring(graphMatch.index + graphMatch[0].length);
-      
-      return (
-        <>
-          {beforeGraph && (
-            <ReactMarkdown 
-              remarkPlugins={[remarkMath, remarkGfm]} 
-              rehypePlugins={[rehypeKatex]}
-              components={{
-                a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
-              }}
-            >
-              {beforeGraph}
-            </ReactMarkdown>
-          )}
-          
-          {codeMatch && (
-            <div className="my-4 border border-gray-200 rounded-lg overflow-hidden">
-              <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
-                <span className="text-sm font-medium text-gray-700">
-                  {titleMatch ? titleMatch[1] : 'Interactive Graph'}
-                </span>
-              </div>
-              <div className="p-4 bg-white">
-                <GraphRenderer code={codeMatch[1]} />
-              </div>
-            </div>
-          )}
-          
-          {afterGraph && (
-            <ReactMarkdown 
-              remarkPlugins={[remarkMath, remarkGfm]} 
-              rehypePlugins={[rehypeKatex]}
-              components={{
-                a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
-              }}
-            >
-              {afterGraph}
-            </ReactMarkdown>
-          )}
-        </>
-      );
-    }
+    
     
     return (
       <ReactMarkdown 
