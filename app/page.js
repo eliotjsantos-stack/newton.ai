@@ -265,11 +265,22 @@ const messages = currentChat?.messages || [];
   };
 
   const deleteChat = (chatId) => {
-    const chats = chatsBySubject[currentSubject];
-    if (chats.length === 1) {
-      alert('Cannot delete the last chat!');
-      return;
+  const chats = chatsBySubject[currentSubject];
+  
+  if (chats.length === 1) {
+    // If it's the last chat, just clear it instead of deleting
+    if (confirm('Clear this chat?')) {
+      setChatsBySubject(prev => ({
+        ...prev,
+        [currentSubject]: [{
+          id: chatId,
+          messages: [],
+          date: new Date().toISOString()
+        }]
+      }));
     }
+  } else {
+    // If there are multiple chats, delete normally
     if (confirm('Delete this chat?')) {
       setChatsBySubject(prev => ({
         ...prev,
@@ -280,8 +291,9 @@ const messages = currentChat?.messages || [];
         setCurrentChatId(remainingChats[0].id);
       }
     }
-    setOpenChatMenu(null);
-  };
+  }
+  setOpenChatMenu(null);
+};
 
   const addSubject = () => {
     const newSubjectName = prompt('Enter new subject name:');
