@@ -78,7 +78,7 @@ export default function LandingPage() {
           {/* Guardian Badge */}
           <div className="border-t border-neutral-200 pt-8">
             <p className="text-sm text-neutral-500">
-              "Students fear AI is eroding their study ability" — <span className="text-black">The Guardian</span>
+              &ldquo;Students fear AI is eroding their study ability&rdquo; — <span className="text-black">The Guardian</span>
             </p>
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function LandingPage() {
                       <span className="text-sm font-medium text-white">N</span>
                     </div>
                     <div className="bg-neutral-100 rounded-2xl px-4 py-3 flex-1">
-                      <p className="text-neutral-900 text-sm">I can't write your essay - that wouldn't help you learn. But let's explore Macbeth together. What themes interest you?</p>
+                      <p className="text-neutral-900 text-sm">I can&apos;t write your essay - that wouldn&apos;t help you learn. But let&apos;s explore Macbeth together. What themes interest you?</p>
                     </div>
                   </div>
                 </div>
@@ -169,7 +169,7 @@ export default function LandingPage() {
                     </div>
                     <div className="bg-white p-4 rounded-xl border border-neutral-200">
                       <p className="text-sm text-neutral-600 mb-2">Physics • 5 conversations</p>
-                      <p className="text-xs text-neutral-500">Last: Newton's laws</p>
+                      <p className="text-xs text-neutral-500">Last: Newton&apos;s laws</p>
                     </div>
                   </div>
                 </div>
@@ -192,7 +192,7 @@ export default function LandingPage() {
               </div>
               <div className="bg-neutral-50 p-8 rounded-3xl border border-neutral-200">
                 <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <p className="text-sm text-neutral-900 mb-4">"Let's think about this step by step. What happens when we multiply both sides by 2?"</p>
+                  <p className="text-sm text-neutral-900 mb-4">&ldquo;Let&apos;s think about this step by step. What happens when we multiply both sides by 2?&rdquo;</p>
                   <p className="text-xs text-neutral-500">Guides without solving</p>
                 </div>
               </div>
