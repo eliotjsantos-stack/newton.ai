@@ -94,9 +94,12 @@ export default function Newton() {
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [suggestedSubject, setSuggestedSubject] = useState(null);
   const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
-  const [mounted, setMounted] = useState(false); 
+  const [mounted, setMounted] = useState(false);
+  const [userScrolledUp, setUserScrolledUp] = useState(false);
 
   const messagesEndRef = useRef(null);
+const scrollContainerRef = useRef(null);
+const isUserScrollingRef = useRef(false);
 useEffect(() => {
   setMounted(true);
 }, []);
@@ -142,17 +145,19 @@ useEffect(() => {
     }
   }, [input, currentSubject, dismissedSuggestion]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+ const scrollToBottom = () => {
+  messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+};
 
-  const currentChat = currentChatId ? chatsBySubject[currentSubject]?.find(chat => chat.id === currentChatId) : null;
+const currentChat = currentChatId ? chatsBySubject[currentSubject]?.find(chat => chat.id === currentChatId) : null;
 const messages = currentChat?.messages || [];
 
-  useEffect(() => {
+useEffect(() => {
+  // Only auto-scroll if user is at the bottom
+  if (!isUserScrollingRef.current) {
     scrollToBottom();
-  }, [messages]);
-
+  }
+}, [messages]);
   const setMessages = (newMessages) => {
     setChatsBySubject(prev => ({
       ...prev,
@@ -516,7 +521,16 @@ if (!mounted) {
           </p>
         </div>
 
-       <div className="flex-1 max-w-4xl w-full mx-auto px-4 pb-32 overflow-y-auto">
+     <div 
+  ref={scrollContainerRef}
+  className="flex-1 max-w-4xl w-full mx-auto px-4 pb-32 overflow-y-auto"
+  onScroll={(e) => {
+    const container = e.target;
+    const isAtBottom = Math.abs(container.scrollHeight - container.scrollTop - container.clientHeight) < 10;
+    isUserScrollingRef.current = !isAtBottom;
+  }}
+>
+
           <div suppressHydrationWarning>
             {messages.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
