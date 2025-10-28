@@ -47,7 +47,7 @@ export default function About() {
           <h2 className="text-3xl font-semibold text-black mb-8">The problem</h2>
           <div className="space-y-6 text-lg text-neutral-600 leading-relaxed font-light">
             <p>
-              In October 2024, The Guardian published research showing that students fear AI is eroding their ability to study and think independently.
+              Recent research published by The Guardian shows that students fear AI is eroding their ability to study and think independently.
             </p>
             <p>
               The problem is clear: tools like ChatGPT will write your essay, solve your homework, and complete your assignments. Students are getting answers without developing understanding.
@@ -103,7 +103,7 @@ export default function About() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-semibold text-black mb-12">Built at Bedales</h2>
           <p className="text-lg text-neutral-600 font-light leading-relaxed mb-8">
-            Newton was created by a Bedales student who saw classmates using AI to avoid learning instead of enhance it. Built in October 2024, Newton represents a different approach: AI that teaches rather than replaces thinking.
+            Newton was created by a Bedales student who saw classmates using AI to avoid learning instead of enhance it. Newton represents a different approach: AI that teaches rather than replaces thinking.
           </p>
           <div className="pt-8 border-t border-neutral-200">
             <p className="text-sm text-neutral-500 mb-4">Questions about Newton?</p>
