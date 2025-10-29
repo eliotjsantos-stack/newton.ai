@@ -98,14 +98,28 @@ export default function Newton() {
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const isUserScrollingRef = useRef(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const currentChat = mounted && chatsBySubject[currentSubject]?.find(c => c.id === currentChatId);
+  const currentChat = currentChatId ? chatsBySubject[currentSubject]?.find(chat => chat.id === currentChatId) : null;
   const messages = currentChat?.messages || [];
 
+  // Auto-scroll functionality
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (!isUserScrollingRef.current) {
+      scrollToBottom();
+    }
+  }, [messages]);
+
+  // Subject detection from messages
   useEffect(() => {
     if (messages.length > 0 && !dismissedSuggestion) {
       const userMessages = messages.filter(m => m.role === 'user');
@@ -118,6 +132,20 @@ export default function Newton() {
       }
     }
   }, [messages, currentSubject, dismissedSuggestion]);
+
+  // Subject detection from input
+  useEffect(() => {
+    if (input.trim().length > 10) {
+      const detected = detectSubject(input);
+      if (detected && detected !== currentSubject && !dismissedSuggestion) {
+        setSuggestedSubject(detected);
+      } else {
+        setSuggestedSubject(null);
+      }
+    } else {
+      setSuggestedSubject(null);
+    }
+  }, [input, currentSubject, dismissedSuggestion]);
 
   useEffect(() => {
     if (mounted) {
@@ -143,105 +171,28 @@ export default function Newton() {
     }
   }, [currentChatId, mounted]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const sendMessage = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage = { role: 'user', content: input.trim() };
-    let activeChatId = currentChatId;
-
-    if (!activeChatId || !chatsBySubject[currentSubject]?.find(c => c.id === activeChatId)) {
-      activeChatId = Date.now().toString();
-      setChatsBySubject(prev => ({
-        ...prev,
-        [currentSubject]: [
-          { id: activeChatId, messages: [userMessage], date: new Date().toISOString() },
-          ...(prev[currentSubject] || [])
-        ]
-      }));
-      setCurrentChatId(activeChatId);
-    } else {
-      setChatsBySubject(prev => ({
-        ...prev,
-        [currentSubject]: prev[currentSubject].map(chat =>
-          chat.id === activeChatId
-            ? { ...chat, messages: [...chat.messages, userMessage], date: new Date().toISOString() }
-            : chat
-        )
-      }));
-    }
-
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            ...messages,
-            userMessage
-          ]
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to get response');
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let assistantMessage = '';
-
-      setChatsBySubject(prev => ({
-        ...prev,
-        [currentSubject]: prev[currentSubject].map(chat =>
-          chat.id === activeChatId
-            ? { ...chat, messages: [...chat.messages, { role: 'assistant', content: '' }] }
-            : chat
-        )
-      }));
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value);
-        assistantMessage += chunk;
-
-        setChatsBySubject(prev => ({
-          ...prev,
-          [currentSubject]: prev[currentSubject].map(chat =>
-            chat.id === activeChatId
-              ? {
-                  ...chat,
-                  messages: chat.messages.map((msg, idx) =>
-                    idx === chat.messages.length - 1 && msg.role === 'assistant'
-                      ? { ...msg, content: assistantMessage }
-                      : msg
-                  )
-                }
-              : chat
-          )
-        }));
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const setMessages = (newMessages) => {
+    setChatsBySubject(prev => ({
+      ...prev,
+      [currentSubject]: prev[currentSubject].map(chat =>
+        chat.id === currentChatId
+          ? {
+              ...chat,
+              messages: typeof newMessages === 'function' ? newMessages(chat.messages) : newMessages,
+              date: new Date().toISOString()
+            }
+          : chat
+      )
+    }));
   };
 
-  const startNewChat = () => {
+  const createNewChat = () => {
     const newChatId = Date.now().toString();
     setChatsBySubject(prev => ({
       ...prev,
       [currentSubject]: [
         { id: newChatId, messages: [], date: new Date().toISOString() },
-        ...(prev[currentSubject] || [])
+        ...prev[currentSubject]
       ]
     }));
     setCurrentChatId(newChatId);
@@ -249,27 +200,103 @@ export default function Newton() {
     setSuggestedSubject(null);
   };
 
+  const deleteChat = (chatId) => {
+    const chats = chatsBySubject[currentSubject];
+    
+    if (chats.length === 1) {
+      if (confirm('Clear this chat?')) {
+        setChatsBySubject(prev => ({
+          ...prev,
+          [currentSubject]: [{
+            id: chatId,
+            messages: [],
+            date: new Date().toISOString()
+          }]
+        }));
+      }
+    } else {
+      if (confirm('Delete this chat?')) {
+        setChatsBySubject(prev => ({
+          ...prev,
+          [currentSubject]: prev[currentSubject].filter(chat => chat.id !== chatId)
+        }));
+        if (currentChatId === chatId) {
+          const remainingChats = chats.filter(chat => chat.id !== chatId);
+          setCurrentChatId(remainingChats[0].id);
+        }
+      }
+    }
+    setOpenChatMenu(null);
+  };
+
+  const addSubject = () => {
+    const newSubjectName = prompt('Enter new subject name:');
+    if (newSubjectName && !subjects.includes(newSubjectName)) {
+      setSubjects([...subjects, newSubjectName]);
+      const newChatId = Date.now().toString();
+      setChatsBySubject(prev => ({
+        ...prev,
+        [newSubjectName]: [{ id: newChatId, messages: [], date: new Date().toISOString() }]
+      }));
+      setCurrentSubject(newSubjectName);
+      setCurrentChatId(newChatId);
+      setExpandedSubject(newSubjectName);
+    }
+  };
+
+  const renameSubject = (oldName) => {
+    const newName = prompt('Rename subject:', oldName);
+    if (newName && newName !== oldName && !subjects.includes(newName)) {
+      setSubjects(subjects.map(s => s === oldName ? newName : s));
+      setChatsBySubject(prev => {
+        const newChats = {...prev};
+        newChats[newName] = newChats[oldName];
+        delete newChats[oldName];
+        return newChats;
+      });
+      if (currentSubject === oldName) setCurrentSubject(newName);
+      if (expandedSubject === oldName) setExpandedSubject(newName);
+    }
+    setOpenMenuSubject(null);
+  };
+
+  const deleteSubject = (subjectName) => {
+    if (subjects.length === 1) {
+      alert('Cannot delete the last subject!');
+      return;
+    }
+    if (confirm(`Delete "${subjectName}" and all its chats?`)) {
+      setSubjects(subjects.filter(s => s !== subjectName));
+      setChatsBySubject(prev => {
+        const newChats = {...prev};
+        delete newChats[subjectName];
+        return newChats;
+      });
+      if (currentSubject === subjectName) {
+        const newSubject = subjects.find(s => s !== subjectName);
+        setCurrentSubject(newSubject);
+        setCurrentChatId(chatsBySubject[newSubject][0].id);
+        setExpandedSubject(newSubject);
+      }
+    }
+    setOpenMenuSubject(null);
+  };
+
+  const toggleSubject = (subject) => {
+    if (expandedSubject === subject) {
+      setExpandedSubject(null);
+    } else {
+      setExpandedSubject(subject);
+      setCurrentSubject(subject);
+      const firstChat = chatsBySubject[subject]?.[0];
+      if (firstChat) setCurrentChatId(firstChat.id);
+    }
+  };
+
   const switchChat = (chatId) => {
     setCurrentChatId(chatId);
     setDismissedSuggestion(false);
     setSuggestedSubject(null);
-  };
-
-  const deleteChat = (subj, chatId) => {
-    setChatsBySubject(prev => {
-      const updated = {
-        ...prev,
-        [subj]: prev[subj].filter(chat => chat.id !== chatId)
-      };
-      if (updated[subj].length === 0) {
-        updated[subj] = [{ id: Date.now().toString(), messages: [], date: new Date().toISOString() }];
-      }
-      return updated;
-    });
-    if (currentChatId === chatId) {
-      const remaining = chatsBySubject[subj].filter(c => c.id !== chatId);
-      setCurrentChatId(remaining[0]?.id || null);
-    }
   };
 
   const switchSubject = (subject) => {
@@ -312,7 +339,77 @@ export default function Newton() {
     }
   };
 
-  if (!mounted) return null;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const trimmedInput = input.trim();
+    
+    if (!trimmedInput || isLoading) {
+      return;
+    }
+
+    setDismissedSuggestion(false);
+    setSuggestedSubject(null);
+
+    const userMessage = { role: 'user', content: trimmedInput };
+    
+    if (!currentChatId) {
+      const newChatId = Date.now().toString();
+      setChatsBySubject(prev => ({
+        ...prev,
+        [currentSubject]: [
+          { id: newChatId, messages: [userMessage], date: new Date().toISOString() },
+          ...prev[currentSubject]
+        ]
+      }));
+      setCurrentChatId(newChatId);
+    } else {
+      setMessages(prev => [...prev, userMessage]);
+    }
+
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...messages, userMessage] }),
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantMessage = '';
+
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value);
+        assistantMessage += chunk;
+        
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1].content = fixMathNotation(assistantMessage);
+          return newMessages;
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-gray-400">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-white">
@@ -328,7 +425,7 @@ export default function Newton() {
           </Link>
           
           <button
-            onClick={startNewChat}
+            onClick={createNewChat}
             className="w-full px-4 py-2.5 bg-black text-white rounded-full text-sm hover:bg-neutral-800 transition"
           >
             New chat
@@ -345,24 +442,64 @@ export default function Newton() {
             return (
               <div key={subject} className="border-b border-neutral-200">
                 <button
-                  onClick={() => {
-                    switchSubject(subject);
-                    setExpandedSubject(isExpanded ? null : subject);
-                  }}
+                  onClick={() => toggleSubject(subject)}
                   className={`w-full px-4 py-3 text-left flex items-center justify-between hover:bg-neutral-100 transition ${
                     currentSubject === subject ? 'bg-neutral-100' : ''
                   }`}
                 >
-                  <span className="text-sm font-medium text-black">{subject}</span>
-                  {hasChats && (
-                    <svg
-                      className={`w-4 h-4 text-neutral-600 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{isExpanded ? '▼' : '▶'}</span>
+                    <span className="text-sm font-medium text-black">{subject}</span>
+                    <span className="text-xs text-neutral-500">
+                      ({chats.length})
+                    </span>
+                  </div>
+                  
+                  <div className="flex gap-1">
+                    {isExpanded && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          createNewChat();
+                        }}
+                        className="p-1 px-2 rounded hover:bg-neutral-200 text-sm"
+                        title="New chat"
+                      >
+                        +
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuSubject(openMenuSubject === subject ? null : subject);
+                      }}
+                      className="p-1 px-2 rounded hover:bg-neutral-200 text-lg"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                      ⋯
+                    </button>
+                  </div>
+                  
+                  {openMenuSubject === subject && (
+                    <div className="absolute right-0 top-12 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          renameSubject(subject);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-neutral-100 text-black text-sm rounded-t-lg"
+                      >
+                        Rename
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteSubject(subject);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 text-sm rounded-b-lg"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   )}
                 </button>
 
@@ -371,7 +508,10 @@ export default function Newton() {
                     {chats.filter(c => c.messages.length > 0).map(chat => (
                       <div key={chat.id} className="relative group">
                         <button
-                          onClick={() => switchChat(chat.id)}
+                          onClick={() => {
+                            setCurrentSubject(subject);
+                            switchChat(chat.id);
+                          }}
                           className={`w-full px-4 py-2.5 text-left text-xs hover:bg-neutral-50 transition ${
                             currentChatId === chat.id ? 'bg-neutral-50' : ''
                           }`}
@@ -379,13 +519,14 @@ export default function Newton() {
                           <div className="text-neutral-900 truncate pr-6">
                             {generateChatTitle(chat.messages)}
                           </div>
+                          <div className="text-neutral-500 text-xs mt-1">
+                            {new Date(chat.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                          </div>
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (window.confirm('Delete this chat?')) {
-                              deleteChat(subject, chat.id);
-                            }
+                            setOpenChatMenu(openChatMenu === chat.id ? null : chat.id);
                           }}
                           className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 hover:bg-neutral-200 rounded transition"
                         >
@@ -393,6 +534,20 @@ export default function Newton() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         </button>
+
+                        {openChatMenu === chat.id && (
+                          <div className="absolute right-2 top-10 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 min-w-[100px]">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteChat(chat.id);
+                              }}
+                              className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 text-sm rounded-lg"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -400,6 +555,15 @@ export default function Newton() {
               </div>
             );
           })}
+        </div>
+
+        <div className="p-2 border-t border-neutral-200">
+          <button
+            onClick={addSubject}
+            className="w-full p-3 bg-black text-white rounded-lg hover:bg-neutral-800 transition"
+          >
+            + Add Subject
+          </button>
         </div>
       </div>
 
@@ -428,14 +592,14 @@ export default function Newton() {
         {suggestedSubject && !dismissedSuggestion && (
           <div className="bg-neutral-50 border-b border-neutral-200 px-6 py-3 flex items-center justify-between">
             <span className="text-sm text-neutral-600">
-              Move this chat to <strong className="text-black">{suggestedSubject}</strong>?
+              This looks like a <strong className="text-black">{suggestedSubject}</strong> question. Move this chat?
             </span>
             <div className="flex items-center space-x-2">
               <button
                 onClick={acceptSuggestion}
                 className="px-4 py-1.5 bg-black text-white text-xs rounded-full hover:bg-neutral-800 transition"
               >
-                Move
+                Move to {suggestedSubject}
               </button>
               <button
                 onClick={() => {
@@ -444,14 +608,22 @@ export default function Newton() {
                 }}
                 className="px-4 py-1.5 bg-white border border-neutral-300 text-black text-xs rounded-full hover:border-black transition"
               >
-                Dismiss
+                Stay in {currentSubject}
               </button>
             </div>
           </div>
         )}
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-8">
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto px-6 py-8"
+          onScroll={(e) => {
+            const container = e.target;
+            const isAtBottom = Math.abs(container.scrollHeight - container.scrollTop - container.clientHeight) < 10;
+            isUserScrollingRef.current = !isAtBottom;
+          }}
+        >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-6">
@@ -499,11 +671,14 @@ export default function Newton() {
                   </div>
                   {message.role === 'user' && (
                     <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-medium text-neutral-600">You</span>
+                      <span className="text-xs font-medium text-neutral-600">You</span>
                     </div>
                   )}
                 </div>
               ))}
+              {isLoading && messages[messages.length - 1]?.content === '' && (
+                <div className="text-neutral-400">Thinking...</div>
+              )}
               <div ref={messagesEndRef} />
             </div>
           )}
@@ -511,7 +686,7 @@ export default function Newton() {
 
         {/* Input */}
         <div className="border-t border-neutral-200 p-6">
-          <form onSubmit={sendMessage} className="max-w-3xl mx-auto">
+          <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
             <div className="flex items-end gap-3">
               <textarea
                 ref={textareaRef}
@@ -520,7 +695,7 @@ export default function Newton() {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendMessage(e);
+                    handleSubmit(e);
                   }
                 }}
                 placeholder={`Ask about ${currentSubject.toLowerCase()}...`}
