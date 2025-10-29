@@ -96,20 +96,21 @@ export default function Newton() {
   const [menuOpen, setMenuOpen] = useState(null);
 
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const textareaRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
-    // Force white background only
-    document.body.style.backgroundColor = 'white';
-    document.documentElement.style.backgroundColor = 'white';
   }, []);
 
   const currentChat = mounted && chatsBySubject[currentSubject]?.find(c => c.id === currentChatId);
   const messages = currentChat?.messages || [];
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Scroll only the messages container, not the whole page
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -352,9 +353,9 @@ export default function Newton() {
   if (!mounted) return null;
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden fixed inset-0">
+    <div className="flex h-screen bg-white">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-neutral-50 border-r border-neutral-200 flex flex-col transition-all duration-200 overflow-hidden`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-neutral-50 border-r border-neutral-200 flex flex-col transition-all duration-200 overflow-hidden h-full`}>
         <div className="p-4 border-b border-neutral-200">
           <Link href="/" className="flex items-center space-x-2 mb-4 group">
             <svg className="w-5 h-5 text-neutral-600 group-hover:text-black transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -525,7 +526,7 @@ export default function Newton() {
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto px-6 py-8">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-8">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-6">
