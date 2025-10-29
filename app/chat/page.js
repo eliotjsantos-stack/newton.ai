@@ -669,11 +669,16 @@ export default function Newton() {
                         li: ({node, ...props}) => <li {...props} className="mb-1" />,
                       }}
                     >
-                      {fixMathNotation(
-                        typeof message.content === 'string' 
-                          ? message.content 
-                          : message.content.find(c => c.type === 'text')?.text || ''
-                      )}
+                      {(() => {
+                        let textContent = '';
+                        if (typeof message.content === 'string') {
+                          textContent = message.content;
+                        } else if (Array.isArray(message.content)) {
+                          const textPart = message.content.find(c => c && c.type === 'text');
+                          textContent = textPart?.text || '';
+                        }
+                        return fixMathNotation(textContent);
+                      })()}
                     </ReactMarkdown>
                   </div>
                   {message.role === 'user' && (
