@@ -398,7 +398,6 @@ export default function Newton() {
                         </svg>
                       )}
                       <span className="text-sm font-medium text-black">{subject}</span>
-                      <span className="text-xs text-neutral-500">({chats.length})</span>
                     </div>
                     
                     <button
