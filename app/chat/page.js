@@ -5,6 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
+import Link from 'next/link';
+import 'katex/dist/katex.min.css';
 
 function fixMathNotation(text) {
   const parts = text.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/);
@@ -17,9 +19,9 @@ function fixMathNotation(text) {
 }
 
 function generateChatTitle(messages) {
-  if (messages.length === 0) return 'New Chat';
+  if (messages.length === 0) return 'New chat';
   const firstUserMessage = messages.find(m => m.role === 'user');
-  if (!firstUserMessage) return 'New Chat';
+  if (!firstUserMessage) return 'New chat';
   const title = firstUserMessage.content.slice(0, 40);
   return title.length < firstUserMessage.content.length ? title + '...' : title;
 }
@@ -28,7 +30,7 @@ const subjectKeywords = {
   'Maths': ['equation', 'algebra', 'calculus', 'geometry', 'trigonometry', 'math', 'solve', 'calculate', 'formula', 'derivative', 'integral', 'graph', 'function', 'quadratic', 'polynomial', 'fraction', 'decimal', 'percentage', 'angle', 'triangle', 'circle', 'theorem', 'proof', 'statistics', 'probability'],
   'Science': ['biology', 'chemistry', 'physics', 'cell', 'atom', 'molecule', 'energy', 'force', 'gravity', 'photosynthesis', 'evolution', 'ecosystem', 'chemical', 'reaction', 'element', 'compound', 'electron', 'proton', 'neutron', 'DNA', 'organ', 'tissue', 'species', 'experiment', 'hypothesis'],
   'English': ['essay', 'paragraph', 'grammar', 'sentence', 'verb', 'noun', 'adjective', 'metaphor', 'literature', 'novel', 'poem', 'poetry', 'shakespeare', 'writing', 'reading', 'comprehension', 'analysis', 'theme', 'character', 'plot', 'author'],
-  'History': ['war', 'ancient', 'medieval', 'renaissance', 'revolution', 'empire', 'dynasty', 'civilization', 'century', 'BC', 'AD', 'historical', 'treaty', 'battle', 'monarch', 'president', 'independence', 'democracy', 'communism', 'fascism'],
+  'History': ['essay', 'war', 'ancient', 'medieval', 'renaissance', 'revolution', 'empire', 'dynasty', 'civilization', 'century', 'BC', 'AD', 'historical', 'treaty', 'battle', 'monarch', 'president', 'independence', 'democracy', 'communism', 'fascism'],
   'Languages': ['french', 'spanish', 'german', 'italian', 'mandarin', 'japanese', 'translate', 'vocabulary', 'conjugate', 'verb conjugation', 'pronunciation', 'grammar', 'accent', 'fluent', 'bilingual']
 };
 
@@ -93,8 +95,9 @@ export default function Newton() {
   const [suggestedSubject, setSuggestedSubject] = useState(null);
   const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
   const [mounted, setMounted] = useState(false);
-  
+
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const isUserScrollingRef = useRef(false);
 
@@ -102,30 +105,35 @@ export default function Newton() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('newton-current-chat-id');
-    }
-  }, []);
+  const currentChat = currentChatId ? chatsBySubject[currentSubject]?.find(chat => chat.id === currentChatId) : null;
+  const messages = currentChat?.messages || [];
+
+  // Auto-scroll functionality
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('newton-current-subject', currentSubject);
+    if (!isUserScrollingRef.current) {
+      scrollToBottom();
     }
-  }, [currentSubject]);
+  }, [messages]);
 
+  // Subject detection from messages
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('newton-subjects', JSON.stringify(subjects));
+    if (messages.length > 0 && !dismissedSuggestion) {
+      const userMessages = messages.filter(m => m.role === 'user');
+      if (userMessages.length > 0) {
+        const lastUserMessage = userMessages[userMessages.length - 1];
+        const detected = detectSubject(lastUserMessage.content);
+        if (detected && detected !== currentSubject) {
+          setSuggestedSubject(detected);
+        }
+      }
     }
-  }, [subjects]);
+  }, [messages, currentSubject, dismissedSuggestion]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('newton-chats', JSON.stringify(chatsBySubject));
-    }
-  }, [chatsBySubject]);
-
+  // Subject detection from input
   useEffect(() => {
     if (input.trim().length > 10) {
       const detected = detectSubject(input);
@@ -139,18 +147,29 @@ export default function Newton() {
     }
   }, [input, currentSubject, dismissedSuggestion]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const currentChat = currentChatId ? chatsBySubject[currentSubject]?.find(chat => chat.id === currentChatId) : null;
-  const messages = currentChat?.messages || [];
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem('newton-chats', JSON.stringify(chatsBySubject));
+    }
+  }, [chatsBySubject, mounted]);
 
   useEffect(() => {
-    if (!isUserScrollingRef.current) {
-      scrollToBottom();
+    if (mounted) {
+      localStorage.setItem('newton-subjects', JSON.stringify(subjects));
     }
-  }, [messages]);
+  }, [subjects, mounted]);
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem('newton-current-subject', currentSubject);
+    }
+  }, [currentSubject, mounted]);
+
+  useEffect(() => {
+    if (mounted && currentChatId) {
+      localStorage.setItem('newton-current-chat-id', currentChatId);
+    }
+  }, [currentChatId, mounted]);
 
   const setMessages = (newMessages) => {
     setChatsBySubject(prev => ({
@@ -177,6 +196,8 @@ export default function Newton() {
       ]
     }));
     setCurrentChatId(newChatId);
+    setDismissedSuggestion(false);
+    setSuggestedSubject(null);
   };
 
   const deleteChat = (chatId) => {
@@ -272,6 +293,52 @@ export default function Newton() {
     }
   };
 
+  const switchChat = (chatId) => {
+    setCurrentChatId(chatId);
+    setDismissedSuggestion(false);
+    setSuggestedSubject(null);
+  };
+
+  const switchSubject = (subject) => {
+    setCurrentSubject(subject);
+    const chats = chatsBySubject[subject];
+    if (chats && chats.length > 0) {
+      setCurrentChatId(chats[0].id);
+    } else {
+      const newId = Date.now().toString();
+      setChatsBySubject(prev => ({
+        ...prev,
+        [subject]: [{ id: newId, messages: [], date: new Date().toISOString() }]
+      }));
+      setCurrentChatId(newId);
+    }
+    setDismissedSuggestion(false);
+    setSuggestedSubject(null);
+  };
+
+  const acceptSuggestion = () => {
+    if (suggestedSubject && currentChatId) {
+      const currentChatData = chatsBySubject[currentSubject].find(c => c.id === currentChatId);
+      setChatsBySubject(prev => {
+        const updated = {
+          ...prev,
+          [currentSubject]: prev[currentSubject].filter(c => c.id !== currentChatId)
+        };
+        updated[suggestedSubject] = [
+          currentChatData,
+          ...(prev[suggestedSubject] || [])
+        ];
+        if (updated[currentSubject].length === 0) {
+          updated[currentSubject] = [{ id: Date.now().toString(), messages: [], date: new Date().toISOString() }];
+        }
+        return updated;
+      });
+      setCurrentSubject(suggestedSubject);
+      setSuggestedSubject(null);
+      setDismissedSuggestion(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -284,20 +351,22 @@ export default function Newton() {
     setDismissedSuggestion(false);
     setSuggestedSubject(null);
 
+    const userMessage = { role: 'user', content: trimmedInput };
+    
     if (!currentChatId) {
       const newChatId = Date.now().toString();
       setChatsBySubject(prev => ({
         ...prev,
         [currentSubject]: [
-          { id: newChatId, messages: [], date: new Date().toISOString() },
+          { id: newChatId, messages: [userMessage], date: new Date().toISOString() },
           ...prev[currentSubject]
         ]
       }));
       setCurrentChatId(newChatId);
+    } else {
+      setMessages(prev => [...prev, userMessage]);
     }
 
-    const userMessage = { role: 'user', content: trimmedInput };
-    setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
@@ -343,49 +412,57 @@ export default function Newton() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex">
-      {sidebarOpen && (
-        <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col fixed left-0 top-0 bottom-0 z-10">
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Subjects</h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-1 hover:bg-gray-200 rounded"
-              title="Close sidebar"
-            >
-              ✕
-            </button>
-          </div>
+    <div className="flex h-screen bg-white">
+      {/* Sidebar */}
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-neutral-50 border-r border-neutral-200 flex flex-col transition-all duration-200 overflow-hidden`}>
+        {/* Header */}
+        <div className="p-4 border-b border-neutral-200">
+          <Link href="/" className="flex items-center space-x-2 mb-4 group">
+            <svg className="w-5 h-5 text-neutral-600 group-hover:text-black transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span className="text-sm text-neutral-600 group-hover:text-black transition">Home</span>
+          </Link>
           
-          <div className="flex-1 overflow-y-auto p-2">
-            {subjects.map((subject) => (
-              <div key={subject} className="mb-1">
-                <div
-                  className={`group relative flex items-center justify-between p-3 rounded-lg transition ${
-                    currentSubject === subject
-                      ? 'bg-gray-900 text-white'
-                      : 'hover:bg-gray-200 text-gray-700'
+          <button
+            onClick={createNewChat}
+            className="w-full px-4 py-2.5 bg-black text-white rounded-full text-sm hover:bg-neutral-800 transition"
+          >
+            New chat
+          </button>
+        </div>
+
+        {/* Subjects List */}
+        <div className="flex-1 overflow-y-auto">
+          {subjects.map(subject => {
+            const chats = chatsBySubject[subject] || [];
+            const isExpanded = expandedSubject === subject;
+            const hasChats = chats.some(c => c.messages.length > 0);
+            
+            return (
+              <div key={subject} className="border-b border-neutral-200">
+                <button
+                  onClick={() => toggleSubject(subject)}
+                  className={`w-full px-4 py-3 text-left flex items-center justify-between hover:bg-neutral-100 transition ${
+                    currentSubject === subject ? 'bg-neutral-100' : ''
                   }`}
                 >
-                  <button
-                    onClick={() => toggleSubject(subject)}
-                    className="flex-1 text-left flex items-center gap-2"
-                  >
-                    <span className="text-sm">{expandedSubject === subject ? '▼' : '▶'}</span>
-                    {subject}
-                    <span className="ml-2 text-xs opacity-70">
-                      ({chatsBySubject[subject]?.length || 0})
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{isExpanded ? '▼' : '▶'}</span>
+                    <span className="text-sm font-medium text-black">{subject}</span>
+                    <span className="text-xs text-neutral-500">
+                      ({chats.length})
                     </span>
-                  </button>
+                  </div>
                   
-                  <div className="relative flex gap-1">
-                    {expandedSubject === subject && (
+                  <div className="flex gap-1">
+                    {isExpanded && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           createNewChat();
                         }}
-                        className="p-1 px-2 rounded hover:bg-gray-700 text-sm"
+                        className="p-1 px-2 rounded hover:bg-neutral-200 text-sm"
                         title="New chat"
                       >
                         +
@@ -396,22 +473,20 @@ export default function Newton() {
                         e.stopPropagation();
                         setOpenMenuSubject(openMenuSubject === subject ? null : subject);
                       }}
-                      className={`p-1 px-2 rounded hover:bg-gray-300 text-lg ${
-                        currentSubject === subject ? 'text-white hover:bg-gray-700' : 'text-gray-600'
-                      }`}
+                      className="p-1 px-2 rounded hover:bg-neutral-200 text-lg"
                     >
                       ⋯
                     </button>
                   </div>
                   
                   {openMenuSubject === subject && (
-                    <div className="absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                    <div className="absolute right-0 top-12 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 min-w-[120px]">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           renameSubject(subject);
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 text-sm rounded-t-lg"
+                        className="w-full text-left px-4 py-2 hover:bg-neutral-100 text-black text-sm rounded-t-lg"
                       >
                         Rename
                       </button>
@@ -426,46 +501,42 @@ export default function Newton() {
                       </button>
                     </div>
                   )}
-                </div>
+                </button>
 
-                {expandedSubject === subject && (
-                  <div className="ml-4 mt-1 space-y-1">
-                    {chatsBySubject[subject]?.map((chat) => (
-                      <div
-                        key={chat.id}
-                        className={`group relative p-2 rounded-lg transition cursor-pointer text-sm ${
-                          currentChatId === chat.id
-                            ? 'bg-gray-300 text-gray-900'
-                            : 'hover:bg-gray-200 text-gray-600'
-                        }`}
-                        onClick={() => {
-                          setCurrentSubject(subject);
-                          setCurrentChatId(chat.id);
-                        }}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium truncate" suppressHydrationWarning>
-                              {typeof window !== 'undefined' ? generateChatTitle(chat.messages) : 'Chat'}
-                            </p>
-                            <p className="text-xs opacity-70 mt-1" suppressHydrationWarning>
-                              {new Date(chat.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                            </p>
+                {isExpanded && hasChats && (
+                  <div className="bg-white">
+                    {chats.filter(c => c.messages.length > 0).map(chat => (
+                      <div key={chat.id} className="relative group">
+                        <button
+                          onClick={() => {
+                            setCurrentSubject(subject);
+                            switchChat(chat.id);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-xs hover:bg-neutral-50 transition ${
+                            currentChatId === chat.id ? 'bg-neutral-50' : ''
+                          }`}
+                        >
+                          <div className="text-neutral-900 truncate pr-6">
+                            {generateChatTitle(chat.messages)}
                           </div>
-                          
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenChatMenu(openChatMenu === chat.id ? null : chat.id);
-                            }}
-                            className="p-1 rounded hover:bg-gray-400 text-sm ml-2"
-                          >
-                            ⋯
-                          </button>
-                        </div>
+                          <div className="text-neutral-500 text-xs mt-1">
+                            {new Date(chat.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                          </div>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenChatMenu(openChatMenu === chat.id ? null : chat.id);
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 hover:bg-neutral-200 rounded transition"
+                        >
+                          <svg className="w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
 
                         {openChatMenu === chat.id && (
-                          <div className="absolute right-2 top-10 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[100px]">
+                          <div className="absolute right-2 top-10 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 min-w-[100px]">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -482,142 +553,170 @@ export default function Newton() {
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-
-          <div className="p-2 border-t border-gray-200">
-            <button
-              onClick={addSubject}
-              className="w-full p-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition"
-            >
-              + Add Subject
-            </button>
-          </div>
+            );
+          })}
         </div>
-      )}
 
-      <div className={`flex-1 flex flex-col ${sidebarOpen ? 'ml-80' : 'ml-0'} transition-all`} onClick={() => { setOpenMenuSubject(null); setOpenChatMenu(null); }}>
-        <div className="text-center py-8 px-4 border-b border-gray-200 relative">
-          {!sidebarOpen && (
+        <div className="p-2 border-t border-neutral-200">
+          <button
+            onClick={addSubject}
+            className="w-full p-3 bg-black text-white rounded-lg hover:bg-neutral-800 transition"
+          >
+            + Add Subject
+          </button>
+        </div>
+      </div>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
+        <div className="h-14 border-b border-neutral-200 flex items-center justify-between px-6">
+          <div className="flex items-center space-x-4">
             <button
-              onClick={() => setSidebarOpen(true)}
-              className="absolute left-4 top-8 p-2 hover:bg-gray-100 rounded"
-              title="Open sidebar"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-neutral-100 rounded-lg transition"
             >
-              ☰
+              <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             </button>
-          )}
-          <h1 className="text-4xl font-semibold text-gray-900 mb-1">
+            <span className="text-sm font-medium text-black">{currentSubject}</span>
+          </div>
+          
+          <Link href="/" className="text-sm text-neutral-600 hover:text-black transition">
             Newton
-          </h1>
-          <p className="text-sm text-gray-500">
-            {currentSubject} • AI Learning Assistant
-          </p>
+          </Link>
         </div>
 
+        {/* Subject Suggestion Banner */}
+        {suggestedSubject && !dismissedSuggestion && (
+          <div className="bg-neutral-50 border-b border-neutral-200 px-6 py-3 flex items-center justify-between">
+            <span className="text-sm text-neutral-600">
+              This looks like a <strong className="text-black">{suggestedSubject}</strong> question. Move this chat?
+            </span>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={acceptSuggestion}
+                className="px-4 py-1.5 bg-black text-white text-xs rounded-full hover:bg-neutral-800 transition"
+              >
+                Move to {suggestedSubject}
+              </button>
+              <button
+                onClick={() => {
+                  setDismissedSuggestion(true);
+                  setSuggestedSubject(null);
+                }}
+                className="px-4 py-1.5 bg-white border border-neutral-300 text-black text-xs rounded-full hover:border-black transition"
+              >
+                Stay in {currentSubject}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Messages */}
         <div 
           ref={scrollContainerRef}
-          className="flex-1 max-w-4xl w-full mx-auto px-4 pb-32 overflow-y-auto"
+          className="flex-1 overflow-y-auto px-6 py-8"
           onScroll={(e) => {
             const container = e.target;
             const isAtBottom = Math.abs(container.scrollHeight - container.scrollTop - container.clientHeight) < 10;
             isUserScrollingRef.current = !isAtBottom;
           }}
         >
-          <div suppressHydrationWarning>
-            {messages.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
-                Start a conversation about {currentSubject}...
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl font-semibold text-white">N</span>
               </div>
-            ) : (
-              <div className="space-y-6 py-6">
-                {messages.map((message, i) => (
+              <h2 className="text-2xl font-semibold text-black mb-3">Start learning</h2>
+              <p className="text-neutral-600 max-w-md">
+                Ask me anything about {currentSubject.toLowerCase()}. I&apos;ll guide you through understanding, not just give you answers.
+              </p>
+            </div>
+          ) : (
+            <div className="max-w-3xl mx-auto space-y-6">
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`flex gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  {message.role === 'assistant' && (
+                    <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-medium text-white">N</span>
+                    </div>
+                  )}
                   <div
-                    key={i}
-                    className={`p-5 rounded-2xl border ${
+                    className={`max-w-[80%] rounded-2xl px-5 py-4 ${
                       message.role === 'user'
-                        ? 'bg-gray-50 border-gray-200'
-                        : 'bg-white border-gray-200 shadow-sm'
+                        ? 'bg-neutral-100 text-black'
+                        : 'bg-white border border-neutral-200 text-black'
                     }`}
                   >
-                    <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none prose-headings:font-semibold prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1">
-                      <ReactMarkdown 
-                        remarkPlugins={[remarkMath, remarkGfm]} 
-                        rehypePlugins={[rehypeKatex]}
-                        components={{
-                          a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline" />
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
-                    </div>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkMath, remarkGfm]}
+                      rehypePlugins={[rehypeKatex]}
+                      components={{
+                        a: ({node, ...props}) => (
+                          <a {...props} target="_blank" rel="noopener noreferrer" className="text-black underline hover:text-neutral-600" />
+                        ),
+                        p: ({node, ...props}) => <p {...props} className="mb-3 last:mb-0" />,
+                        ul: ({node, ...props}) => <ul {...props} className="list-disc ml-4 mb-3 space-y-1" />,
+                        ol: ({node, ...props}) => <ol {...props} className="list-decimal ml-4 mb-3 space-y-1" />,
+                        li: ({node, ...props}) => <li {...props} className="mb-1" />,
+                      }}
+                    >
+                      {fixMathNotation(message.content)}
+                    </ReactMarkdown>
                   </div>
-                ))}
-                {isLoading && messages[messages.length - 1]?.content === '' && (
-                  <div className="text-gray-400">Thinking...</div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </div>
+                  {message.role === 'user' && (
+                    <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-medium text-neutral-600">You</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+              {isLoading && messages[messages.length - 1]?.content === '' && (
+                <div className="text-neutral-400">Thinking...</div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
         </div>
 
-        <div className={`fixed bottom-0 right-0 ${sidebarOpen ? 'left-80' : 'left-0'} bg-white border-t border-gray-200 p-4 transition-all`}>
-          <div className="max-w-4xl mx-auto">
-            {suggestedSubject && (
-              <div className="mb-2">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">💡</span>
-                    <span className="text-sm text-gray-700">
-                      This looks like a <strong>{suggestedSubject}</strong> question.
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setCurrentSubject(suggestedSubject);
-                        setExpandedSubject(suggestedSubject);
-                        const firstChat = chatsBySubject[suggestedSubject]?.[0];
-                        if (firstChat) setCurrentChatId(firstChat.id);
-                        setSuggestedSubject(null);
-                      }}
-                      className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                    >
-                      Switch to {suggestedSubject}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSuggestedSubject(null);
-                        setDismissedSuggestion(true);
-                      }}
-                      className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
-                    >
-                      Stay in {currentSubject}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <form onSubmit={handleSubmit} className="flex gap-3 items-center">
-              <input
-                type="text"
+        {/* Input */}
+        <div className="border-t border-neutral-200 p-6">
+          <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+            <div className="flex items-end gap-3">
+              <textarea
+                ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={`Ask Newton about ${currentSubject}...`}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                disabled={isLoading}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
+                placeholder={`Ask about ${currentSubject.toLowerCase()}...`}
+                className="flex-1 px-5 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl resize-none focus:outline-none focus:border-neutral-400 transition text-black placeholder-neutral-400"
+                rows={1}
+                style={{
+                  minHeight: '50px',
+                  maxHeight: '200px',
+                }}
               />
               <button
                 type="submit"
-                disabled={isLoading || !input.trim()}
-                className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 disabled:opacity-50 transition-colors font-medium"
+                disabled={!input.trim() || isLoading}
+                className="px-6 py-3 bg-black text-white rounded-full hover:bg-neutral-800 transition disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Send
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
