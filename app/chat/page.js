@@ -70,7 +70,24 @@ export default function Newton() {
   const [chatsBySubject, setChatsBySubject] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('newton-chats');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Migrate old messages: ensure content is always a string
+        Object.keys(parsed).forEach(subject => {
+          parsed[subject] = parsed[subject].map(chat => ({
+            ...chat,
+            messages: chat.messages.map(msg => ({
+              ...msg,
+              content: typeof msg.content === 'string' 
+                ? msg.content 
+                : Array.isArray(msg.content) 
+                  ? msg.content.find(c => c && c.type === 'text')?.text || ''
+                  : ''
+            }))
+          }));
+        });
+        return parsed;
+      }
     }
     return defaultSubjects.reduce((acc, subject) => {
       acc[subject] = [{ id: 'initial', messages: [], date: new Date().toISOString() }];
