@@ -88,46 +88,27 @@ export default function Newton() {
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [suggestedSubject, setSuggestedSubject] = useState(null);
   const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(null);
-  const [notesOpen, setNotesOpen] = useState(false);
-
-  const [savedConcepts, setSavedConcepts] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('newton-saved-concepts');
-      if (saved) return JSON.parse(saved);
-    }
-    return {};
-  });
 
   const messagesEndRef = useRef(null);
-  const messagesContainerRef = useRef(null);
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
-    // Set white background and lock body scroll
-    document.body.style.backgroundColor = 'white';
-    document.documentElement.style.backgroundColor = 'white';
-    document.body.style.overflow = 'hidden';
-    
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, []);
 
   const currentChat = mounted && chatsBySubject[currentSubject]?.find(c => c.id === currentChatId);
   const messages = currentChat?.messages || [];
 
   useEffect(() => {
-    // Scroll only the messages container, not the whole page
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   useEffect(() => {
@@ -166,12 +147,6 @@ export default function Newton() {
       localStorage.setItem('newton-current-chat-id', currentChatId);
     }
   }, [currentChatId, mounted]);
-
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('newton-saved-concepts', JSON.stringify(savedConcepts));
-    }
-  }, [savedConcepts, mounted]);
 
   const startNewChat = () => {
     const newChatId = Date.now().toString();
@@ -287,32 +262,85 @@ export default function Newton() {
     setMenuOpen(null);
   };
 
-  const saveConcept = (content) => {
-    const id = Date.now().toString();
-    setSavedConcepts(prev => ({
-      ...prev,
-      [id]: {
-        content,
-        subject: currentSubject,
-        date: new Date().toISOString()
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    
+    // Validate files
+    const validFiles = [];
+    for (const file of files) {
+      // Check file type
+      const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'application/pdf', 'text/plain'];
+      if (!validTypes.includes(file.type)) {
+        alert(`${file.name} is not a supported file type`);
+        continue;
       }
-    }));
+      
+      // Check file size (20MB limit)
+      if (file.size > 20 * 1024 * 1024) {
+        alert(`${file.name} is too large (max 20MB)`);
+        continue;
+      }
+      
+      // Convert to base64
+      const base64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+      
+      validFiles.push({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        base64
+      });
+    }
+    
+    // Limit to 4 files total
+    const newFiles = [...uploadedFiles, ...validFiles].slice(0, 4);
+    setUploadedFiles(newFiles);
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
-  const deleteConcept = (id) => {
-    if (!window.confirm('Delete this saved concept?')) return;
-    setSavedConcepts(prev => {
-      const updated = {...prev};
-      delete updated[id];
-      return updated;
-    });
+  const removeFile = (index) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && uploadedFiles.length === 0) || isLoading) return;
 
-    const userMessage = { role: 'user', content: input.trim() };
+    // Construct user message with files
+    let userMessageContent;
+    if (uploadedFiles.length > 0) {
+      // Format for vision API
+      userMessageContent = [
+        { type: 'text', text: input.trim() || 'What can you tell me about this?' }
+      ];
+      
+      // Add images
+      uploadedFiles.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          userMessageContent.push({
+            type: 'image_url',
+            image_url: { url: file.base64 }
+          });
+        }
+      });
+    } else {
+      userMessageContent = input.trim();
+    }
+
+    const userMessage = { 
+      role: 'user', 
+      content: userMessageContent,
+      files: uploadedFiles.map(f => ({ name: f.name, type: f.type })) // Store file metadata for display
+    };
+    
     let activeChatId = currentChatId;
 
     if (!activeChatId || !chatsBySubject[currentSubject]?.find(c => c.id === activeChatId)) {
@@ -337,6 +365,7 @@ export default function Newton() {
     }
 
     setInput('');
+    setUploadedFiles([]);
     setIsLoading(true);
     setDismissedSuggestion(false);
 
@@ -399,7 +428,7 @@ export default function Newton() {
   return (
     <div className="flex h-screen bg-white overflow-hidden">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-neutral-50 border-r border-neutral-200 flex flex-col transition-all duration-200 overflow-hidden h-full`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-neutral-50 border-r border-neutral-200 flex flex-col transition-all duration-200 overflow-hidden`}>
         <div className="p-4 border-b border-neutral-200">
           <Link href="/" className="flex items-center space-x-2 mb-4 group">
             <svg className="w-5 h-5 text-neutral-600 group-hover:text-black transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,55 +445,6 @@ export default function Newton() {
           </button>
         </div>
 
-        {/* My Notes Section */}
-        <div className="border-b border-neutral-200">
-          <button
-            onClick={() => setNotesOpen(!notesOpen)}
-            className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-neutral-100 transition"
-          >
-            <div className="flex items-center gap-2">
-              <svg
-                className={`w-4 h-4 text-neutral-600 transition-transform ${notesOpen ? 'rotate-90' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-              <span className="text-sm font-medium text-black">📓 My Notes</span>
-              <span className="text-xs text-neutral-500">({Object.keys(savedConcepts).length})</span>
-            </div>
-          </button>
-
-          {notesOpen && (
-            <div className="bg-white max-h-64 overflow-y-auto">
-              {Object.keys(savedConcepts).length === 0 ? (
-                <div className="px-4 py-6 text-center text-xs text-neutral-500">
-                  No saved concepts yet.<br />Click the save button on messages to add them here.
-                </div>
-              ) : (
-                Object.entries(savedConcepts).reverse().map(([id, concept]) => (
-                  <div key={id} className="px-4 py-3 border-b border-neutral-100 hover:bg-neutral-50 group relative">
-                    <div className="text-xs font-medium text-neutral-900 mb-1">{concept.subject}</div>
-                    <div className="text-xs text-neutral-600 line-clamp-2 pr-6">{concept.content}</div>
-                    <div className="text-xs text-neutral-400 mt-1">
-                      {new Date(concept.date).toLocaleDateString('en-GB')}
-                    </div>
-                    <button
-                      onClick={() => deleteConcept(id)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-neutral-200 rounded transition"
-                    >
-                      <svg className="w-3.5 h-3.5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-        </div>
-
         <div className="flex-1 overflow-y-auto">
           {subjects.map(subject => {
             const chats = chatsBySubject[subject] || [];
@@ -474,16 +454,16 @@ export default function Newton() {
             return (
               <div key={subject} className="border-b border-neutral-200">
                 <div className="relative">
-                  <button
-                    onClick={() => {
-                      switchSubject(subject);
-                      setExpandedSubject(isExpanded ? null : subject);
-                    }}
-                    className={`w-full px-4 py-3 text-left flex items-center justify-between hover:bg-neutral-100 transition ${
-                      currentSubject === subject ? 'bg-neutral-100' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
+                  <div className={`w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-100 transition ${
+                    currentSubject === subject ? 'bg-neutral-100' : ''
+                  }`}>
+                    <button
+                      onClick={() => {
+                        switchSubject(subject);
+                        setExpandedSubject(isExpanded ? null : subject);
+                      }}
+                      className="flex-1 flex items-center gap-2 text-left"
+                    >
                       {hasChats && (
                         <svg
                           className={`w-4 h-4 text-neutral-600 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -495,7 +475,7 @@ export default function Newton() {
                         </svg>
                       )}
                       <span className="text-sm font-medium text-black">{subject}</span>
-                    </div>
+                    </button>
                     
                     <button
                       onClick={(e) => {
@@ -506,7 +486,7 @@ export default function Newton() {
                     >
                       <span className="text-neutral-600">⋯</span>
                     </button>
-                  </button>
+                  </div>
 
                   {menuOpen === `subject-${subject}` && (
                     <div className="absolute right-2 top-12 bg-white border border-neutral-200 rounded-lg shadow-lg z-20 min-w-[120px]">
@@ -619,7 +599,7 @@ export default function Newton() {
           </div>
         )}
 
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-8">
+        <div className="flex-1 overflow-y-auto px-6 py-8">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-6">
@@ -643,12 +623,26 @@ export default function Newton() {
                     </div>
                   )}
                   <div
-                    className={`max-w-[80%] rounded-2xl px-5 py-4 relative group ${
+                    className={`max-w-[80%] rounded-2xl px-5 py-4 ${
                       message.role === 'user'
                         ? 'bg-neutral-100 text-black'
                         : 'bg-white border border-neutral-200 text-black'
                     }`}
                   >
+                    {/* Show attached files for user messages */}
+                    {message.role === 'user' && message.files && message.files.length > 0 && (
+                      <div className="flex gap-2 mb-3 flex-wrap">
+                        {message.files.map((file, fileIndex) => (
+                          <div key={fileIndex} className="bg-neutral-200 rounded px-2 py-1 text-xs flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                            {file.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
                     <ReactMarkdown
                       remarkPlugins={[remarkMath, remarkGfm]}
                       rehypePlugins={[rehypeKatex]}
@@ -662,20 +656,12 @@ export default function Newton() {
                         li: ({node, ...props}) => <li {...props} className="mb-1" />,
                       }}
                     >
-                      {fixMathNotation(message.content)}
+                      {fixMathNotation(
+                        typeof message.content === 'string' 
+                          ? message.content 
+                          : message.content.find(c => c.type === 'text')?.text || ''
+                      )}
                     </ReactMarkdown>
-                    
-                    {message.role === 'assistant' && message.content && (
-                      <button
-                        onClick={() => saveConcept(message.content)}
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-2 hover:bg-neutral-100 rounded-lg transition"
-                        title="Save to My Notes"
-                      >
-                        <svg className="w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                      </button>
-                    )}
                   </div>
                   {message.role === 'user' && (
                     <div className="w-8 h-8 bg-neutral-200 rounded-full flex items-center justify-center flex-shrink-0">
@@ -691,7 +677,59 @@ export default function Newton() {
 
         <div className="border-t border-neutral-200 p-6">
           <form onSubmit={sendMessage} className="max-w-3xl mx-auto">
+            {/* File Preview Area */}
+            {uploadedFiles.length > 0 && (
+              <div className="mb-3 flex gap-2 flex-wrap">
+                {uploadedFiles.map((file, index) => (
+                  <div key={index} className="relative group bg-neutral-100 rounded-lg p-2 pr-8">
+                    {file.type.startsWith('image/') ? (
+                      <img src={file.base64} alt={file.name} className="h-16 w-16 object-cover rounded" />
+                    ) : (
+                      <div className="h-16 w-16 flex items-center justify-center bg-neutral-200 rounded">
+                        <svg className="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="text-xs text-neutral-600 mt-1 max-w-[64px] truncate">{file.name}</div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="absolute -top-1 -right-1 bg-black text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             <div className="flex gap-3">
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf,.txt"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              
+              {/* Attach button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading || uploadedFiles.length >= 4}
+                className="px-4 py-3 bg-neutral-100 border border-neutral-200 rounded-full hover:bg-neutral-200 transition disabled:opacity-30"
+                title="Attach files (images, PDFs, text)"
+              >
+                <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+              </button>
+              
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -709,7 +747,7 @@ export default function Newton() {
               />
               <button
                 type="submit"
-                disabled={!input.trim() || isLoading}
+                disabled={(!input.trim() && uploadedFiles.length === 0) || isLoading}
                 className="px-6 py-3 bg-black text-white rounded-full hover:bg-neutral-800 transition disabled:opacity-30"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
