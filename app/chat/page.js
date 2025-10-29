@@ -108,7 +108,6 @@ export default function Newton() {
 
   useEffect(() => {
     if (messages.length > 0 && !dismissedSuggestion) {
-      // Check the most recent user message
       const userMessages = messages.filter(m => m.role === 'user');
       if (userMessages.length > 0) {
         const lastUserMessage = userMessages[userMessages.length - 1];
@@ -197,7 +196,6 @@ export default function Newton() {
       const decoder = new TextDecoder();
       let assistantMessage = '';
 
-      // Add empty assistant message
       setChatsBySubject(prev => ({
         ...prev,
         [currentSubject]: prev[currentSubject].map(chat =>
