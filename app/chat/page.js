@@ -101,6 +101,14 @@ export default function Newton() {
 
   useEffect(() => {
     setMounted(true);
+    // Set white background and lock body scroll
+    document.body.style.backgroundColor = 'white';
+    document.documentElement.style.backgroundColor = 'white';
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, []);
 
   const currentChat = mounted && chatsBySubject[currentSubject]?.find(c => c.id === currentChatId);
@@ -353,7 +361,7 @@ export default function Newton() {
   if (!mounted) return null;
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-white overflow-hidden">
       {/* Sidebar */}
       <div className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-neutral-50 border-r border-neutral-200 flex flex-col transition-all duration-200 overflow-hidden h-full`}>
         <div className="p-4 border-b border-neutral-200">
