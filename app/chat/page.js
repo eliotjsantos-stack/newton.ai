@@ -268,8 +268,21 @@ export default function Newton() {
     // Validate files
     const validFiles = [];
     for (const file of files) {
-      // Check file type
-      const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'application/pdf', 'text/plain'];
+      // Check file type - expanded list
+      const validTypes = [
+        'image/png', 
+        'image/jpeg', 
+        'image/jpg', 
+        'image/webp', 
+        'image/gif',
+        'application/pdf', 
+        'text/plain',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/msword', // .doc
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/vnd.ms-excel' // .xls
+      ];
+      
       if (!validTypes.includes(file.type)) {
         alert(`${file.name} is not a supported file type`);
         continue;
@@ -711,7 +724,7 @@ export default function Newton() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*,.pdf,.txt"
+                accept="image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx"
                 multiple
                 onChange={handleFileSelect}
                 className="hidden"
