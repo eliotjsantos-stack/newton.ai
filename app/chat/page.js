@@ -301,7 +301,11 @@ export default function Newton() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to get response');
+if (!response.ok) {
+  const errorText = await response.text();
+  console.error('API Error:', response.status, errorText);
+  throw new Error(`Failed to get response: ${response.status}`);
+}
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
