@@ -613,4 +613,4 @@ export default function Newton() {
       </div>
     </div>
   );
-}
+} 
