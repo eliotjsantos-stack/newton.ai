@@ -9,6 +9,10 @@ import Link from 'next/link';
 import 'katex/dist/katex.min.css';
 
 function fixMathNotation(text) {
+  // Ensure text is a string
+  if (typeof text !== 'string') {
+    return '';
+  }
   const parts = text.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/);
   return parts.map((part, index) => {
     if (index % 2 === 1) return part;
