@@ -377,39 +377,39 @@ export default function Newton() {
             return (
               <div key={subject} className="border-b border-neutral-200">
                 <div className="relative">
-                  <button
-                    onClick={() => {
-                      switchSubject(subject);
-                      setExpandedSubject(isExpanded ? null : subject);
-                    }}
-                    className={`w-full px-4 py-3 text-left flex items-center justify-between hover:bg-neutral-100 transition ${
-                      currentSubject === subject ? 'bg-neutral-100' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {hasChats && (
-                        <svg
-                          className={`w-4 h-4 text-neutral-600 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      )}
-                      <span className="text-sm font-medium text-black">{subject}</span>
-                    </div>
-                    
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMenuOpen(menuOpen === `subject-${subject}` ? null : `subject-${subject}`);
-                      }}
-                      className="p-1 hover:bg-neutral-200 rounded transition"
-                    >
-                      <span className="text-neutral-600">⋯</span>
-                    </button>
-                  </button>
+                  <div
+  onClick={() => {
+    switchSubject(subject);
+    setExpandedSubject(isExpanded ? null : subject);
+  }}
+  className={`w-full px-4 py-3 text-left flex items-center justify-between hover:bg-neutral-100 transition cursor-pointer ${
+    currentSubject === subject ? 'bg-neutral-100' : ''
+  }`}
+>
+  <div className="flex items-center gap-2">
+    {hasChats && (
+      <svg
+        className={`w-4 h-4 text-neutral-600 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    )}
+    <span className="text-sm font-medium text-black">{subject}</span>
+  </div>
+  
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      setMenuOpen(menuOpen === `subject-${subject}` ? null : `subject-${subject}`);
+    }}
+    className="p-1 hover:bg-neutral-200 rounded transition"
+  >
+    <span className="text-neutral-600">⋯</span>
+  </button>
+</div>
 
                   {menuOpen === `subject-${subject}` && (
                     <div className="absolute right-2 top-12 bg-white border border-neutral-200 rounded-lg shadow-lg z-20 min-w-[120px]">
