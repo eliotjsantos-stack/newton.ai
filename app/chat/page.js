@@ -104,6 +104,25 @@ export default function Newton() {
     // Lock body scroll to prevent scrolling past page
     document.body.style.overflow = 'hidden';
     
+    // Check if coming from landing page (via URL parameter or referrer)
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromLanding = urlParams.get('new') === 'true' || document.referrer.includes(window.location.origin + '/');
+    
+    // Start a new chat if coming from landing page
+    if (fromLanding && !urlParams.get('chat')) {
+      const newChatId = Date.now().toString();
+      setChatsBySubject(prev => ({
+        ...prev,
+        [currentSubject]: [
+          { id: newChatId, messages: [], date: new Date().toISOString() },
+          ...(prev[currentSubject] || [])
+        ]
+      }));
+      setCurrentChatId(newChatId);
+      // Clean up URL
+      window.history.replaceState({}, '', '/chat');
+    }
+    
     return () => {
       document.body.style.overflow = '';
     };
@@ -311,11 +330,7 @@ export default function Newton() {
         }),
       });
 
-if (!response.ok) {
-  const errorText = await response.text();
-  console.error('API Error:', response.status, errorText);
-  throw new Error(`Failed to get response: ${response.status}`);
-}
+      if (!response.ok) throw new Error('Failed to get response');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
