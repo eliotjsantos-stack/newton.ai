@@ -88,6 +88,7 @@ export default function Newton() {
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [suggestedSubject, setSuggestedSubject] = useState(null);
@@ -102,6 +103,12 @@ export default function Newton() {
   });
   const [showYearModal, setShowYearModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [hasSeenWelcome, setHasSeenWelcome] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('newton-seen-welcome') === 'true';
+    }
+    return false;
+  });
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -318,6 +325,14 @@ export default function Newton() {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
+    // Mark welcome as seen
+    if (!hasSeenWelcome) {
+      setHasSeenWelcome(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('newton-seen-welcome', 'true');
+      }
+    }
+
     const userMessage = { role: 'user', content: input.trim() };
     let activeChatId = currentChatId;
 
@@ -344,6 +359,7 @@ export default function Newton() {
 
     setInput('');
     setIsLoading(true);
+    setIsTyping(true); // Show typing indicator
     setDismissedSuggestion(false);
 
     try {
@@ -361,6 +377,8 @@ export default function Newton() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let assistantMessage = '';
+
+      setIsTyping(false); // Hide typing indicator when response starts
 
       setChatsBySubject(prev => ({
         ...prev,
@@ -398,6 +416,7 @@ export default function Newton() {
       console.error('Error:', error);
     } finally {
       setIsLoading(false);
+      setIsTyping(false); // Reset typing indicator
     }
   };
 
@@ -604,15 +623,69 @@ export default function Newton() {
 
         <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-8">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-6">
-                <span className="text-2xl font-semibold text-white">N</span>
+            !hasSeenWelcome ? (
+              // First time welcome
+              <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl flex items-center justify-center mb-6 shadow-lg">
+                  <span className="text-3xl font-bold text-white">N</span>
+                </div>
+                <h2 className="text-4xl font-bold text-black mb-4">Welcome to Newton</h2>
+                <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
+                  I'm here to help you truly learn. I won't do your homework—instead, I'll guide you to understand it yourself through questions and step-by-step thinking.
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-4 w-full mb-8">
+                  <div className="bg-blue-50 rounded-2xl p-6 text-left border border-blue-100">
+                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center mb-3">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-black mb-2">Learn by thinking</h3>
+                    <p className="text-sm text-neutral-700">I ask questions that help you discover answers yourself</p>
+                  </div>
+                  
+                  <div className="bg-green-50 rounded-2xl p-6 text-left border border-green-100">
+                    <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center mb-3">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-black mb-2">Academic integrity</h3>
+                    <p className="text-sm text-neutral-700">I refuse to do homework, so your work stays yours</p>
+                  </div>
+                </div>
+
+                <div className="bg-neutral-50 rounded-2xl p-6 border border-neutral-200 w-full">
+                  <p className="text-sm font-medium text-black mb-3">Try asking:</p>
+                  <div className="space-y-2 text-left">
+                    <div className="flex items-center gap-3 text-sm text-neutral-700">
+                      <div className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0"></div>
+                      <span>"I don't understand how photosynthesis works"</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-neutral-700">
+                      <div className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0"></div>
+                      <span>"Can you help me approach this algebra problem?"</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-neutral-700">
+                      <div className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0"></div>
+                      <span>"Explain themes in Macbeth step by step"</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h2 className="text-2xl font-semibold text-black mb-3">Start learning</h2>
-              <p className="text-neutral-600 max-w-md">
-                Ask me anything about {currentSubject.toLowerCase()}. I&apos;ll guide you through understanding, not just give you answers.
-              </p>
-            </div>
+            ) : (
+              // Simple empty state for returning users
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <div className="w-16 h-16 bg-neutral-100 rounded-2xl flex items-center justify-center mb-4">
+                  <span className="text-2xl font-semibold text-neutral-600">N</span>
+                </div>
+                <h2 className="text-xl font-semibold text-black mb-2">New conversation</h2>
+                <p className="text-neutral-600 max-w-md">
+                  Ask me anything about {currentSubject.toLowerCase()}
+                </p>
+              </div>
+            )
           ) : (
             <div className="max-w-3xl mx-auto space-y-6">
               {messages.map((message, index) => (
@@ -655,6 +728,23 @@ export default function Newton() {
                   )}
                 </div>
               ))}
+              
+              {/* Typing Indicator */}
+              {isTyping && (
+                <div className="flex gap-4 justify-start">
+                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-medium text-white">N</span>
+                  </div>
+                  <div className="bg-white border border-neutral-200 rounded-2xl px-5 py-4">
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                      <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                      <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div ref={messagesEndRef} />
             </div>
           )}
@@ -681,11 +771,18 @@ export default function Newton() {
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="px-6 py-3 bg-black text-white rounded-full hover:bg-neutral-800 transition disabled:opacity-30"
+                className="px-6 py-3 bg-black text-white rounded-full hover:bg-neutral-800 transition disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                </svg>
+                {isLoading ? (
+                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                )}
               </button>
             </div>
           </form>
