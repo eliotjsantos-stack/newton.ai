@@ -14,6 +14,14 @@ export default function Dashboard() {
     return defaultSubjects;
   });
 
+  const [subjectColors, setSubjectColors] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('newton-subject-colors');
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(null);
 
@@ -26,6 +34,12 @@ export default function Dashboard() {
       localStorage.setItem('newton-subjects', JSON.stringify(subjects));
     }
   }, [subjects, mounted]);
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem('newton-subject-colors', JSON.stringify(subjectColors));
+    }
+  }, [subjectColors, mounted]);
 
   const addSubject = () => {
     const newSubjectName = prompt('Enter new subject name:');
@@ -54,6 +68,36 @@ export default function Dashboard() {
     const newName = prompt('Rename subject:', oldName);
     if (newName && newName !== oldName && !subjects.includes(newName)) {
       setSubjects(subjects.map(s => s === oldName ? newName : s));
+    }
+  };
+
+  const changeColor = (subject, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMenuOpen(null);
+    
+    const colors = [
+      { name: 'Blue', bg: 'bg-blue-50', icon: 'bg-blue-600' },
+      { name: 'Green', bg: 'bg-green-50', icon: 'bg-green-600' },
+      { name: 'Purple', bg: 'bg-purple-50', icon: 'bg-purple-600' },
+      { name: 'Pink', bg: 'bg-pink-50', icon: 'bg-pink-600' },
+      { name: 'Amber', bg: 'bg-amber-50', icon: 'bg-amber-600' },
+      { name: 'Red', bg: 'bg-red-50', icon: 'bg-red-600' },
+      { name: 'Indigo', bg: 'bg-indigo-50', icon: 'bg-indigo-600' },
+      { name: 'Teal', bg: 'bg-teal-50', icon: 'bg-teal-600' }
+    ];
+    
+    const colorNames = colors.map(c => c.name).join(', ');
+    const choice = prompt(`Choose a color:\n${colorNames}`, 'Blue');
+    
+    if (choice) {
+      const selectedColor = colors.find(c => c.name.toLowerCase() === choice.toLowerCase());
+      if (selectedColor) {
+        setSubjectColors({
+          ...subjectColors,
+          [subject]: selectedColor
+        });
+      }
     }
   };
 
@@ -108,12 +152,12 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {subjects.map(subject => {
-            const style = subjectStyles[subject] || subjectStyles['General'];
+            const style = subjectColors[subject] || subjectStyles[subject] || subjectStyles['General'];
             return (
               <div key={subject} className="relative">
                 <Link
                   href={`/subject/${subject.toLowerCase()}`}
-                  className={`block group ${style.bg} rounded-2xl p-8 hover:shadow-md transition border border-neutral-200`}
+                  className={`block ${style.bg} rounded-2xl p-8 hover:shadow-md transition border border-neutral-200`}
                 >
                   <div className={`w-12 h-12 ${style.icon} rounded-xl flex items-center justify-center mb-4`}>
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,13 +172,14 @@ export default function Dashboard() {
                   </p>
                 </Link>
 
-                {/* Three-dot menu */}
+                {/* Three-dot menu - outside Link */}
                 <button
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     setMenuOpen(menuOpen === subject ? null : subject);
                   }}
-                  className="absolute top-4 right-4 p-2 opacity-0 hover:opacity-100 group-hover:opacity-100 hover:bg-white/80 rounded-lg transition z-10"
+                  className="absolute top-4 right-4 p-2 hover:bg-white/80 rounded-lg transition z-10"
                 >
                   <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
@@ -143,7 +188,10 @@ export default function Dashboard() {
 
                 {/* Dropdown menu */}
                 {menuOpen === subject && (
-                  <div className="absolute top-14 right-4 bg-white border border-neutral-200 rounded-xl shadow-lg z-20 min-w-[140px] overflow-hidden">
+                  <div 
+                    className="absolute top-14 right-4 bg-white border border-neutral-200 rounded-xl shadow-lg z-20 min-w-[160px] overflow-hidden"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
                       onClick={(e) => renameSubject(subject, e)}
                       className="w-full text-left px-4 py-3 hover:bg-neutral-50 text-black text-sm flex items-center gap-2 transition"
@@ -153,10 +201,19 @@ export default function Dashboard() {
                       </svg>
                       Rename
                     </button>
+                    <button
+                      onClick={(e) => changeColor(subject, e)}
+                      className="w-full text-left px-4 py-3 hover:bg-neutral-50 text-black text-sm flex items-center gap-2 transition border-t border-neutral-100"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                      </svg>
+                      Change Color
+                    </button>
                     {subjects.length > 1 && (
                       <button
                         onClick={(e) => deleteSubject(subject, e)}
-                        className="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600 text-sm flex items-center gap-2 transition border-t border-neutral-200"
+                        className="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600 text-sm flex items-center gap-2 transition border-t border-neutral-100"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
