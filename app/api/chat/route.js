@@ -905,13 +905,33 @@ The goal: A student who uses you regularly should become a BETTER student who ev
 
 export async function POST(req) {
   try {
-    const { messages } = await req.json();
+    const { messages, yearGroup } = await req.json();
 
-const response = await openai.chat.completions.create({
+    // Year group specific adjustments to system prompt
+    const yearGroupPrompts = {
+      year7: '\n\n📚 YEAR 7 STUDENT - Adjust your communication:\n- Use clear, accessible language\n- Break concepts into simple steps\n- Be extra encouraging and patient\n- Use relatable examples from daily life\n- Check understanding frequently\n- Celebrate small wins enthusiastically',
+      
+      year8: '\n\n📚 YEAR 8 STUDENT - Adjust your communication:\n- Clear language but slightly more sophisticated\n- Introduce abstract concepts progressively\n- Balance guidance with growing independence\n- Use age-appropriate examples\n- Build confidence in their abilities',
+      
+      year9: '\n\n📚 YEAR 9 STUDENT - Adjust your communication:\n- Moderate complexity in explanations\n- Develop analytical thinking skills\n- Prepare for GCSE-level work gradually\n- Connect to their interests and future goals\n- Support growing academic independence',
+      
+      year10: '\n\n📚 YEAR 10 GCSE STUDENT - Adjust your communication:\n- Use exam terminology and command words\n- Focus on GCSE assessment objectives\n- Teach exam technique and time management\n- Reference mark schemes when relevant\n- Build confidence for upcoming GCSEs\n- More subject-specific academic language',
+      
+      year11: '\n\n📚 YEAR 11 GCSE STUDENT - Adjust your communication:\n- High focus on exam success and revision\n- Teach active recall and practice strategies\n- Use GCSE command words precisely\n- Help prioritize revision topics\n- Support exam stress management\n- This is high-stakes - be strategic and efficient',
+      
+      year12: '\n\n📚 YEAR 12 A-LEVEL STUDENT - Adjust your communication:\n- University-preparation level language\n- Engage with competing theories and perspectives\n- Develop extended writing and research skills\n- Challenge intellectually - expect independence\n- Introduce academic debates and historiography\n- More collaborative, peer-like tone\n- Support transition to A-Level rigor',
+      
+      year13: '\n\n📚 YEAR 13 A-LEVEL STUDENT - Adjust your communication:\n- Sophisticated academic discourse\n- Deep engagement with subject expertise\n- Support university applications and preparation\n- Expect high-level independent research\n- Challenge rigorously - minimal scaffolding\n- Thesis-level thinking and synthesis\n- Treat as intellectual peer while still guiding'
+    };
+
+    const yearPrompt = yearGroupPrompts[yearGroup] || yearGroupPrompts.year9; // Default to Year 9
+    const fullSystemPrompt = SYSTEM_PROMPT + yearPrompt;
+
+    const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       stream: true,
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: fullSystemPrompt },
         ...messages,
       ],
     });
