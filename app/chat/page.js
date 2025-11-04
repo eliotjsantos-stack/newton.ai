@@ -94,6 +94,14 @@ export default function Newton() {
   const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(null);
+  const [yearGroup, setYearGroup] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('newton-year-group') || null;
+    }
+    return null;
+  });
+  const [showYearModal, setShowYearModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -104,8 +112,19 @@ export default function Newton() {
     // Lock body scroll to prevent scrolling past page
     document.body.style.overflow = 'hidden';
     
-    // Check if coming from landing page (via URL parameter or referrer)
+    // Show year group modal if not set
+    if (!yearGroup) {
+      setShowYearModal(true);
+    }
+    
+    // Check URL for subject parameter
     const urlParams = new URLSearchParams(window.location.search);
+    const urlSubject = urlParams.get('subject');
+    if (urlSubject && subjects.includes(urlSubject)) {
+      switchSubject(urlSubject);
+    }
+    
+    // Check if coming from landing page (via URL parameter or referrer)
     const fromLanding = urlParams.get('new') === 'true' || document.referrer.includes(window.location.origin + '/');
     
     // Start a new chat if coming from landing page
@@ -174,6 +193,12 @@ export default function Newton() {
       localStorage.setItem('newton-current-chat-id', currentChatId);
     }
   }, [currentChatId, mounted]);
+
+  useEffect(() => {
+    if (mounted && yearGroup) {
+      localStorage.setItem('newton-year-group', yearGroup);
+    }
+  }, [yearGroup, mounted]);
 
   const startNewChat = () => {
     const newChatId = Date.now().toString();
@@ -326,7 +351,8 @@ export default function Newton() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMessage]
+          messages: [...messages, userMessage],
+          yearGroup: yearGroup || 'year9' // Default to Year 9 if not set
         }),
       });
 
@@ -375,7 +401,22 @@ export default function Newton() {
     }
   };
 
+  const saveYearGroup = (year) => {
+    setYearGroup(year);
+    setShowYearModal(false);
+  };
+
   if (!mounted) return null;
+
+  const yearOptions = [
+    { value: 'year7', label: 'Year 7' },
+    { value: 'year8', label: 'Year 8' },
+    { value: 'year9', label: 'Year 9' },
+    { value: 'year10', label: 'Year 10 (GCSE)' },
+    { value: 'year11', label: 'Year 11 (GCSE)' },
+    { value: 'year12', label: 'Year 12 (A-Level)' },
+    { value: 'year13', label: 'Year 13 (A-Level)' }
+  ];
 
   return (
     <div className="flex h-screen bg-white overflow-hidden">
@@ -493,12 +534,22 @@ export default function Newton() {
           })}
         </div>
 
-        <div className="p-3 border-t border-neutral-200">
+        <div className="p-3 border-t border-neutral-200 space-y-2">
           <button
             onClick={addSubject}
             className="w-full px-4 py-2.5 bg-black text-white rounded-full text-sm hover:bg-neutral-800 transition"
           >
             + Add Subject
+          </button>
+          <button
+            onClick={() => setShowSettings(true)}
+            className="w-full px-4 py-2.5 border border-neutral-300 text-black rounded-full text-sm hover:border-black transition flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Settings
           </button>
         </div>
       </div>
@@ -640,6 +691,68 @@ export default function Newton() {
           </form>
         </div>
       </div>
+
+      {/* Year Group Selection Modal */}
+      {showYearModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full">
+            <h2 className="text-2xl font-semibold text-black mb-2">Welcome to Newton!</h2>
+            <p className="text-neutral-600 mb-6">What year group are you in? This helps me adjust my teaching style for you.</p>
+            
+            <div className="space-y-2">
+              {yearOptions.map(option => (
+                <button
+                  key={option.value}
+                  onClick={() => saveYearGroup(option.value)}
+                  className="w-full px-6 py-3 bg-neutral-100 hover:bg-neutral-200 rounded-xl text-left text-black transition"
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowSettings(false)}>
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-black">Settings</h2>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="p-2 hover:bg-neutral-100 rounded-lg transition"
+              >
+                <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-black block mb-2">Year Group</label>
+                <select
+                  value={yearGroup || ''}
+                  onChange={(e) => saveYearGroup(e.target.value)}
+                  className="w-full px-4 py-3 bg-neutral-100 rounded-xl text-black focus:outline-none focus:ring-2 focus:ring-black"
+                >
+                  <option value="" disabled>Select your year</option>
+                  {yearOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-neutral-500 mt-2">
+                  Current: {yearOptions.find(y => y.value === yearGroup)?.label || 'Not set'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

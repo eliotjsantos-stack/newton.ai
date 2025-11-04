@@ -22,7 +22,7 @@ export default function LandingPage() {
               <a href="#features" className="text-sm text-neutral-600 hover:text-black transition">Features</a>
               <Link href="/about" className="text-sm text-neutral-600 hover:text-black transition">About</Link>
               <Link href="/faq" className="text-sm text-neutral-600 hover:text-black transition">FAQ</Link>
-              <Link href="/chat" className="px-5 py-2 bg-black text-white text-sm rounded-full hover:bg-neutral-800 transition">
+              <Link href="/dashboard" className="px-5 py-2 bg-black text-white text-sm rounded-full hover:bg-neutral-800 transition">
                 Try Newton
               </Link>
             </div>
@@ -45,7 +45,7 @@ export default function LandingPage() {
               <a href="#features" className="block px-4 py-2 text-sm text-neutral-600">Features</a>
               <Link href="/about" className="block px-4 py-2 text-sm text-neutral-600">About</Link>
               <Link href="/faq" className="block px-4 py-2 text-sm text-neutral-600">FAQ</Link>
-              <Link href="/chat" className="block px-4 py-2 bg-black text-white text-sm rounded-full text-center mt-4">
+              <Link href="/dashboard" className="block px-4 py-2 bg-black text-white text-sm rounded-full text-center mt-4">
                 Try Newton
               </Link>
             </div>
@@ -69,7 +69,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
-            <Link href="/chat" className="px-8 py-3.5 bg-black text-white rounded-full hover:bg-neutral-800 transition text-base">
+            <Link href="/dashboard" className="px-8 py-3.5 bg-black text-white rounded-full hover:bg-neutral-800 transition text-base">
               Try Newton
             </Link>
             <a href="#how-it-works" className="px-8 py-3.5 border border-neutral-300 text-black rounded-full hover:border-black transition text-base">
