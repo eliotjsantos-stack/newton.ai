@@ -250,7 +250,7 @@ function NotesTab({ subject }) {
               </div>
               <div>
                 <p className="font-medium text-black mb-1">Save from chat</p>
-                <p className="text-sm text-neutral-600">Click the bookmark icon on any of Newton's responses to save it</p>
+                <p className="text-sm text-neutral-600">Click the bookmark icon on any of Newton&apos;s responses to save it</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
