@@ -628,65 +628,68 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl sm:text-6xl font-extrabold text-neutral-900 mb-6 tracking-tight">
-              What People Say
+              What Students & Teachers Say
             </h2>
+            <p className="text-xl text-neutral-600 max-w-2xl mx-auto font-medium">
+              Real feedback from people using Newton every day
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {[
               {
-                quote: "Newton actually helped me understand, not just get the answer. I used it for my A-Level Maths and felt way more confident in my exams.",
-                author: "Sarah, Year 13",
+                quote: "I love the fact that it gives methodology suggestions and guidance rather than quick fix solutions.",
+                author: "Kate Williams",
+                role: "Maths Teacher",
                 rating: 5
               },
               {
-                quote: "As a teacher, I love that this AI maintains academic integrity. It teaches students to think, which is exactly what we need.",
-                author: "Mr. Thompson, Maths Teacher",
+                quote: "I was struggling to understand the constant of e in A-Level maths. Newton explained it really well and I now understand. When I asked it to write an essay, it refused because that would be cheating—but it did help me construct my own essay, which was very helpful!",
+                author: "Grace Adam",
+                role: "Year 12 Student",
                 rating: 5
+              },
+              {
+                quote: "This helps students plan essays and create ideas for certain points. It stops students from using inaccurate quotations which is a problem for English lit. Really good for humanities students to further their understanding.",
+                author: "Flora Meyrick",
+                role: "Year 12 Student",
+                rating: 5
+              },
+              {
+                quote: "If I want to get work done quickly, I use ChatGPT. But if I am actually trying to learn how to do my work—which I have been doing because I know I will not be able to use AI in exams—Newton is really useful.",
+                author: "Pippin Wilce",
+                role: "Year 12 Student",
+                rating: 4
               }
             ].map((testimonial, i) => (
               <div
                 key={i}
-                className="p-8 bg-white/70 backdrop-blur-2xl border border-neutral-200/50 rounded-3xl shadow-xl"
+                className="p-8 bg-white/70 backdrop-blur-2xl border border-neutral-200/50 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300"
                 style={{
                   boxShadow: '0 12px 40px rgba(0, 0, 0, 0.08)'
                 }}
               >
                 <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  {[...Array(5)].map((_, starIndex) => (
+                    <svg 
+                      key={starIndex} 
+                      className={`w-5 h-5 ${starIndex < testimonial.rating ? 'text-yellow-400' : 'text-neutral-300'}`}
+                      fill="currentColor" 
+                      viewBox="0 0 20 20"
+                    >
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
                 </div>
-                <p className="text-lg text-neutral-700 font-medium leading-relaxed mb-4">
+                <p className="text-base text-neutral-700 font-medium leading-relaxed mb-6">
                   &ldquo;{testimonial.quote}&rdquo;
                 </p>
-                <p className="text-neutral-600 font-semibold">— {testimonial.author}</p>
+                <div className="border-t border-neutral-200 pt-4">
+                  <p className="font-bold text-neutral-900">{testimonial.author}</p>
+                  <p className="text-sm text-neutral-600 font-medium">{testimonial.role}</p>
+                </div>
               </div>
             ))}
-          </div>
-
-          {/* Featured Press */}
-          <div 
-            className="p-10 bg-white/70 backdrop-blur-2xl border border-neutral-200/50 rounded-3xl shadow-2xl max-w-4xl mx-auto"
-            style={{
-              boxShadow: '0 16px 48px rgba(0, 0, 0, 0.1)'
-            }}
-          >
-            <div className="flex items-center justify-center gap-2 mb-6">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <blockquote className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-6 leading-relaxed text-center">
-              &ldquo;This is exactly what AI in education should be—a tool that enhances learning rather than replacing it.&rdquo;
-            </blockquote>
-            <cite className="text-lg font-semibold text-neutral-600 text-center block">
-              — The Guardian
-            </cite>
           </div>
         </div>
       </section>
