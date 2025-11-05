@@ -249,7 +249,7 @@ export default function SubjectPage({ params }) {
                   Track Your Learning Journey
                 </h2>
                 <p className="text-lg text-neutral-600 mb-10 leading-relaxed font-medium">
-                  Your progress dashboard is being built. Soon you'll see detailed analytics of your learning.
+                  Your progress dashboard is being built. Soon you&apos;ll see detailed analytics of your learning.
                 </p>
 
                 {/* Preview Stats Grid */}
@@ -321,7 +321,7 @@ export default function SubjectPage({ params }) {
                   Save Important Concepts
                 </h2>
                 <p className="text-lg text-neutral-600 mb-10 leading-relaxed font-medium">
-                  Soon you'll be able to bookmark key insights from your conversations with Newton.
+                  Soon you&apos;ll be able to bookmark key insights from your conversations with Newton.
                 </p>
 
                 <div 
