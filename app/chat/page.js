@@ -200,6 +200,18 @@ export default function Newton() {
       localStorage.setItem('newton-year-group', yearGroup);
     }
   }, [yearGroup, mounted]);
+  
+  useEffect(() => {
+  if (input.trim().length > 10 && !dismissedSuggestion) {
+    const detected = detectSubject(input);
+    if (detected && detected !== currentSubject) {
+      setSuggestedSubject(detected);
+    } else if (!detected) {
+      setSuggestedSubject(null);
+    }
+  }
+}, [input, currentSubject, dismissedSuggestion]);
+
 
   const startNewChat = () => {
     const newChatId = Date.now().toString();
