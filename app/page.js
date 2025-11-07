@@ -183,12 +183,6 @@ export default function LandingPage() {
                 <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span className="font-semibold">100% Free</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
                 <span className="font-semibold">No Sign-Up Required</span>
               </div>
               <div className="flex items-center gap-2">
@@ -196,6 +190,12 @@ export default function LandingPage() {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span className="font-semibold">UK Curriculum Aligned</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="font-semibold">Academic Integrity First</span>
               </div>
             </div>
           </div>
@@ -513,102 +513,69 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Subjects Covered Section */}
+      {/* Universal Learning Section */}
       <section id="subjects" className="py-24 px-6 sm:px-8 lg:px-12 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-5xl sm:text-6xl font-extrabold text-neutral-900 mb-6 tracking-tight">
-              Subjects We Cover
+              Works for Any Subject
             </h2>
             <p className="text-xl text-neutral-600 max-w-3xl mx-auto leading-relaxed font-medium">
-              Expert guidance across all major GCSE and A-Level subjects
+              From GCSE Maths to A-Level History—Newton adapts to whatever you are learning
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
             {[
               { 
-                name: 'Mathematics', 
-                topics: 'Algebra, Geometry, Calculus, Statistics, Trigonometry',
+                name: 'STEM Subjects', 
+                examples: 'Maths, Physics, Chemistry, Biology, Computer Science',
                 icon: (
                   <svg className="w-8 h-8 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 ),
-                color: 'from-blue-100 to-blue-50'
               },
               { 
-                name: 'Sciences', 
-                topics: 'Biology, Chemistry, Physics—all three sciences covered',
-                icon: (
-                  <svg className="w-8 h-8 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                  </svg>
-                ),
-                color: 'from-green-100 to-green-50'
-              },
-              { 
-                name: 'English', 
-                topics: 'Literature analysis, Essay writing, Language techniques',
-                icon: (
-                  <svg className="w-8 h-8 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                ),
-                color: 'from-purple-100 to-purple-50'
-              },
-              { 
-                name: 'History', 
-                topics: 'Medieval, Modern, World Wars, Essay structure',
-                icon: (
-                  <svg className="w-8 h-8 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                ),
-                color: 'from-yellow-100 to-yellow-50'
-              },
-              { 
-                name: 'Languages', 
-                topics: 'French, Spanish, German grammar and vocabulary',
-                icon: (
-                  <svg className="w-8 h-8 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                  </svg>
-                ),
-                color: 'from-red-100 to-red-50'
-              },
-              { 
-                name: 'Geography', 
-                topics: 'Physical, Human, Environmental systems',
+                name: 'Humanities', 
+                examples: 'History, Geography, Religious Studies, Philosophy',
                 icon: (
                   <svg className="w-8 h-8 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 ),
-                color: 'from-teal-100 to-teal-50'
+              },
+              { 
+                name: 'Languages & Arts', 
+                examples: 'English, French, Spanish, Art, Music',
+                icon: (
+                  <svg className="w-8 h-8 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                ),
               }
-            ].map((subject, i) => (
+            ].map((category, i) => (
               <div
                 key={i}
-                className={`group p-8 bg-gradient-to-br ${subject.color} backdrop-blur-xl border border-neutral-200/50 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105`}
+                className="group p-8 bg-white/70 backdrop-blur-xl border border-neutral-200/50 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105"
                 style={{
                   boxShadow: '0 12px 40px rgba(0, 0, 0, 0.08)'
                 }}
               >
-                <div className="mb-4">{subject.icon}</div>
+                <div className="mb-6">{category.icon}</div>
                 <h3 className="text-2xl font-bold text-neutral-900 mb-3 group-hover:text-black transition-colors duration-300">
-                  {subject.name}
+                  {category.name}
                 </h3>
                 <p className="text-neutral-600 font-medium leading-relaxed">
-                  {subject.topics}
+                  {category.examples}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-16 text-center">
-            <p className="text-lg text-neutral-600 font-medium mb-6">
-              Cannot find your subject? Newton adapts to any topic you need help with.
+          <div className="text-center">
+            <p className="text-lg text-neutral-600 font-semibold mb-8">
+              Year 7 to Year 13 • GCSE to A-Level • Any topic you need help with
             </p>
             <Link
               href="/dashboard"
@@ -706,10 +673,6 @@ export default function LandingPage() {
           <div className="space-y-4">
             {[
               {
-                q: 'Is Newton really free?',
-                a: 'Yes, completely free. No hidden costs, no premium tiers, no credit card required. We believe quality education should be accessible to everyone.'
-              },
-              {
                 q: 'Do I need to create an account?',
                 a: 'No! You can start using Newton immediately without signing up. We respect your privacy and do not collect personal data.'
               },
@@ -736,6 +699,10 @@ export default function LandingPage() {
               {
                 q: 'What if Newton cannot answer my question?',
                 a: 'Newton is powered by advanced AI and can handle most academic questions. If it encounters something unusual, it will be honest about its limitations and guide you to other resources.'
+              },
+              {
+                q: 'How is Newton different from ChatGPT?',
+                a: 'Unlike ChatGPT, Newton refuses to do your homework. It uses the Socratic method to teach you to think critically, rather than giving you answers you can copy. This means you actually learn the material.'
               }
             ].map((faq, i) => (
               <div
@@ -787,7 +754,7 @@ export default function LandingPage() {
             Start Learning the Right Way
           </h2>
           <p className="text-xl text-neutral-300 mb-12 leading-relaxed font-medium max-w-2xl mx-auto">
-            Join thousands of students who are learning to think, not just copying answers. Newton is completely free, no sign-up required.
+            Join thousands of students who are learning to think, not just copying answers.
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
             <Link
@@ -797,7 +764,7 @@ export default function LandingPage() {
                 boxShadow: '0 16px 48px rgba(255, 255, 255, 0.3)'
               }}
             >
-              Try Newton Free →
+              Try Newton Now →
             </Link>
             <a
               href="#features"
@@ -812,19 +779,19 @@ export default function LandingPage() {
               <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="font-semibold">Free Forever</span>
+              <span className="font-semibold">No Sign-Up Required</span>
             </div>
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="font-semibold">No Account Needed</span>
+              <span className="font-semibold">Start in Seconds</span>
             </div>
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="font-semibold">Start in 10 Seconds</span>
+              <span className="font-semibold">Real Learning</span>
             </div>
           </div>
         </div>
