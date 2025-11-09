@@ -536,9 +536,8 @@ export default function Newton() {
 
                   {/* Three-dot Menu Dropdown */}
                   {menuOpen === `subject-${subject}` && (
-                    <div 
-                      className="absolute right-2 top-14 bg-white/95 backdrop-blur-xl border border-neutral-200/50 rounded-xl shadow-2xl z-20 min-w-[140px] overflow-hidden animate-scaleIn"
-                      style={{
+                     <div 
+                       className="absolute right-2 top-14 bg-white border border-neutral-200/50 rounded-xl shadow-2xl z-20 min-w-[140px] overflow-hidden animate-scaleIn"                      style={{
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)'
                       }}
                     >
