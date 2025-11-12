@@ -486,7 +486,7 @@ export default function Newton() {
             return (
               <div 
                 key={subject} 
-                className="mb-2 animate-slideIn"
+                className={`mb-2 animate-slideIn ${menuOpen === `subject-${subject}` ? 'relative z-50' : ''}`}
                 style={{ animationDelay: `${subjectIndex * 50}ms` }}
               >
                 <div className="relative">
@@ -537,7 +537,7 @@ export default function Newton() {
                   {/* Three-dot Menu Dropdown */}
                   {menuOpen === `subject-${subject}` && (
                      <div 
-                       className="absolute right-2 top-14 bg-white border border-neutral-200/50 rounded-xl shadow-2xl z-20 min-w-[140px] overflow-hidden animate-scaleIn"                      style={{
+                       className="absolute right-2 top-14 bg-white border border-neutral-200/50 rounded-xl shadow-2xl z-50 min-w-[140px] overflow-hidden animate-scaleIn"                      style={{
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)'
                       }}
                     >

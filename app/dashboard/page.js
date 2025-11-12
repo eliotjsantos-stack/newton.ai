@@ -153,13 +153,13 @@ const addSubject = () => {
         </div>
 
         {/* Subject Grid with Premium Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {subjects.map((subject, index) => {
             const color = getSubjectColor(subject);
             return (
               <div
                 key={subject}
-                className="animate-scaleIn"
+                className={`animate-scaleIn overflow-visible ${menuOpen === subject ? 'relative z-50' : ''}`}
                 style={{ 
                   animationDelay: `${index * 60}ms`,
                   animationFillMode: 'both'
@@ -170,7 +170,7 @@ const addSubject = () => {
                   className="block group"
                 >
                   <div 
-                    className={`relative p-8 bg-gradient-to-br ${color.from} ${color.to} backdrop-blur-xl border ${color.border}/50 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105`}
+                    className={`relative p-8 bg-gradient-to-br ${color.from} ${color.to} backdrop-blur-xl border ${color.border}/50 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-visible`}
                     style={{
                       boxShadow: '0 12px 40px rgba(0, 0, 0, 0.08)'
                     }}
@@ -211,7 +211,7 @@ const addSubject = () => {
                     {/* Premium Three-dot Dropdown Menu */}
                     {menuOpen === subject && (
                       <div 
-                        className="absolute top-16 right-6 bg-white/95 backdrop-blur-2xl border border-neutral-200/50 rounded-2xl shadow-2xl z-20 min-w-[160px] overflow-hidden animate-scaleIn"
+                        className="absolute top-16 right-6 bg-white/95 backdrop-blur-2xl border border-neutral-200/50 rounded-2xl shadow-2xl z-50 min-w-[160px] animate-scaleIn"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
