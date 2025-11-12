@@ -50,7 +50,7 @@ function detectSubject(question) {
 }
 
 export default function Newton() {
-  const defaultSubjects = ['General', 'Maths', 'Science', 'English', 'History', 'Languages'];
+   const defaultSubjects = ['English', 'General', 'History', 'Languages', 'Maths', 'Science'];
 
   const [currentSubject, setCurrentSubject] = useState(() => {
     if (typeof window !== 'undefined') {
