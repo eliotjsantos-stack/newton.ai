@@ -273,9 +273,9 @@ export default function Newton() {
   };
 
   const addSubject = () => {
-    const newSubjectName = prompt('Enter new subject name:');
-    if (newSubjectName && !subjects.includes(newSubjectName)) {
-    setSubjects([...subjects, name].sort());
+  const newSubjectName = prompt('Enter new subject name:');
+  if (newSubjectName && newSubjectName.trim() && !subjects.includes(newSubjectName)) {
+    setSubjects([...subjects, newSubjectName].sort());
         const newChatId = Date.now().toString();
       setChatsBySubject(prev => ({
         ...prev,
