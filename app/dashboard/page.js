@@ -57,12 +57,12 @@ export default function Dashboard() {
     return subjectColors[subject] || colorOptions[0];
   };
 
-  const addSubject = () => {
-    const name = prompt('Enter new subject name:');
-    if (name && !subjects.includes(name)) {
-      setSubjects([...subjects, name]);
-    }
-  };
+const addSubject = () => {
+  const name = prompt('Enter new subject name:');
+  if (name && !subjects.includes(name)) {
+    setSubjects([...subjects, name].sort());
+  }
+};
 
   const renameSubject = (oldName) => {
     const newName = prompt('Rename subject:', oldName);
