@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const defaultSubjects = ['General', 'Maths', 'Science', 'English', 'History', 'Languages'];
+  const defaultSubjects = ['English', 'General', 'History', 'Languages', 'Maths', 'Science'];
   
   const [subjects, setSubjects] = useState(() => {
     if (typeof window !== 'undefined') {
