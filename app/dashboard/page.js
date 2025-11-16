@@ -41,6 +41,22 @@ export default function Dashboard() {
       localStorage.setItem('subject-colors', JSON.stringify(subjectColors));
     }
   }, [subjectColors, mounted]);
+// Close menu when clicking outside
+useEffect(() => {
+  const handleClickOutside = () => {
+    if (menuOpen) {
+      setMenuOpen(null);
+    }
+  };
+  
+  if (menuOpen) {
+    document.addEventListener('click', handleClickOutside);
+  }
+  
+  return () => {
+    document.removeEventListener('click', handleClickOutside);
+  };
+}, [menuOpen]);
 
   const colorOptions = [
     { name: 'Neutral', from: 'from-neutral-100', to: 'to-neutral-50', border: 'border-neutral-200' },

@@ -211,7 +211,22 @@ export default function Newton() {
     }
   }
 }, [input, currentSubject, dismissedSuggestion]);
-
+// Close menu when clicking outside
+useEffect(() => {
+  const handleClickOutside = () => {
+    if (menuOpen) {
+      setMenuOpen(null);
+    }
+  };
+  
+  if (menuOpen) {
+    document.addEventListener('click', handleClickOutside);
+  }
+  
+  return () => {
+    document.removeEventListener('click', handleClickOutside);
+  };
+}, [menuOpen]);
 
   const startNewChat = () => {
     const newChatId = Date.now().toString();
