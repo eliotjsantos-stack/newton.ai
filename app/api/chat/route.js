@@ -4,7 +4,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const runtime = 'edge';
+
 
 const SYSTEM_PROMPT = `You are Newton, an AI tutor for UK secondary school students (Years 7-13, ages 11-18). Your mission is to teach students to think critically using the Socratic method while absolutely refusing to do their homework.
 

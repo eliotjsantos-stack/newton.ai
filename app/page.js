@@ -70,15 +70,21 @@ export default function LandingPage() {
               >
                 FAQ
               </a>
-              <Link
-                href="/dashboard"
-                className="px-8 py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
-                style={{
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15)'
-                }}
-              >
-                Try Newton
-              </Link>
+<Link
+  href="/login"
+  className="px-6 py-2.5 text-neutral-700 hover:text-black font-semibold rounded-2xl hover:bg-neutral-100/80 backdrop-blur-sm transition-all duration-300 hover:scale-105 active:scale-95"
+>
+  Log In
+</Link>
+<Link
+  href="/signup"
+  className="px-8 py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+  style={{
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15)'
+  }}
+>
+  Sign Up
+</Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -118,9 +124,12 @@ export default function LandingPage() {
               <a href="#faq" className="block px-6 py-4 text-neutral-700 hover:text-black font-semibold rounded-2xl hover:bg-neutral-100/80 transition-all duration-300">
                 FAQ
               </a>
-              <Link href="/dashboard" className="block px-8 py-4 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-bold rounded-2xl text-center shadow-xl transition-all duration-300">
-                Try Newton
-              </Link>
+<Link href="/login" className="block px-6 py-4 text-neutral-700 hover:text-black font-semibold rounded-2xl hover:bg-neutral-100/80 transition-all duration-300">
+  Log In
+</Link>
+<Link href="/signup" className="block px-8 py-4 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-bold rounded-2xl text-center shadow-xl transition-all duration-300">
+  Sign Up
+</Link>
             </div>
           </div>
         )}
@@ -157,15 +166,15 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-5 justify-center items-center animate-slideUp" style={{ animationDelay: '200ms' }}>
-              <Link
-                href="/dashboard"
-                className="px-10 py-5 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 active:scale-95"
-                style={{
-                  boxShadow: '0 12px 40px rgba(0, 0, 0, 0.25), 0 6px 16px rgba(0, 0, 0, 0.2)'
-                }}
-              >
-                Start Learning Free →
-              </Link>
+<Link
+  href="/signup"
+  className="px-10 py-5 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 active:scale-95"
+  style={{
+    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.25), 0 6px 16px rgba(0, 0, 0, 0.2)'
+  }}
+>
+  Start Learning Free →
+</Link>
               <a
                 href="#how-it-works"
                 className="px-10 py-5 bg-white/70 backdrop-blur-xl border-2 border-neutral-200/50 text-neutral-900 text-lg font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
@@ -577,15 +586,15 @@ export default function LandingPage() {
             <p className="text-lg text-neutral-600 font-semibold mb-8">
               Year 7 to Year 13 • GCSE to A-Level • Any topic you need help with
             </p>
-            <Link
-              href="/dashboard"
-              className="inline-block px-10 py-4 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
-              style={{
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
-              }}
-            >
-              Try Newton Now →
-            </Link>
+<Link
+  href="/signup"
+  className="inline-block px-10 py-4 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+  style={{
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
+  }}
+>
+  Try Newton Now →
+</Link>
           </div>
         </div>
       </section>
@@ -757,15 +766,15 @@ export default function LandingPage() {
             Join thousands of students who are learning to think, not just copying answers.
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
-            <Link
-              href="/dashboard"
-              className="px-12 py-5 bg-white text-neutral-900 text-lg font-bold rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 active:scale-95"
-              style={{
-                boxShadow: '0 16px 48px rgba(255, 255, 255, 0.3)'
-              }}
-            >
-              Try Newton Now →
-            </Link>
+<Link
+  href="/signup"
+  className="px-12 py-5 bg-white text-neutral-900 text-lg font-bold rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 active:scale-95"
+  style={{
+    boxShadow: '0 16px 48px rgba(255, 255, 255, 0.3)'
+  }}
+>
+  Try Newton Now →
+</Link>
             <a
               href="#features"
               className="px-12 py-5 bg-white/10 backdrop-blur-xl border-2 border-white/30 text-white text-lg font-bold rounded-2xl hover:bg-white/20 transition-all duration-300 hover:scale-105 active:scale-95"

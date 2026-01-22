@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import Link from 'next/link';
 import 'katex/dist/katex.min.css';
+import { useChatStorage, loadFromDB } from '@/hooks/useChatStorage'
 
 function fixMathNotation(text) {
   const parts = text.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/);
@@ -109,6 +110,11 @@ export default function Newton() {
     }
     return false;
   });
+  
+  const [currentUserEmail, setCurrentUserEmail] = useState(null);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  
+  useChatStorage(chatsBySubject, subjects, currentSubject, currentChatId);
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -131,7 +137,7 @@ export default function Newton() {
     const fromLanding = urlParams.get('new') === 'true' || document.referrer.includes(window.location.origin + '/');
     
     if (fromLanding && !urlParams.get('chat')) {
-      const newChatId = Date.now().toString();
+      const newChatId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       setChatsBySubject(prev => ({
         ...prev,
         [currentSubject]: [
@@ -228,8 +234,49 @@ useEffect(() => {
   };
 }, [menuOpen]);
 
+useEffect(() => {
+  const loadUserData = async () => {
+    const token = localStorage.getItem('newton-auth-token');
+    
+    if (token) {
+      try {
+        const userResponse = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setCurrentUserEmail(userData.email);
+          
+          const chatData = await loadFromDB();
+          
+          if (chatData) {
+            localStorage.removeItem('newton-chats');
+            localStorage.removeItem('newton-subjects');
+            localStorage.removeItem('newton-current-subject');
+            localStorage.removeItem('newton-current-chat-id');
+            
+            if (chatData.chatsBySubject) setChatsBySubject(chatData.chatsBySubject);
+            if (chatData.subjects) setSubjects(chatData.subjects);
+            if (chatData.currentSubject) setCurrentSubject(chatData.currentSubject);
+            if (chatData.currentChatId) setCurrentChatId(chatData.currentChatId);
+          }
+        } else {
+          localStorage.removeItem('newton-auth-token');
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+      }
+    }
+    
+    setIsLoadingData(false);
+  };
+  
+  loadUserData();
+}, []);
+
   const startNewChat = () => {
-    const newChatId = Date.now().toString();
+  const newChatId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     setChatsBySubject(prev => ({
       ...prev,
       [currentSubject]: [
@@ -258,7 +305,7 @@ useEffect(() => {
         [subj]: prev[subj].filter(chat => chat.id !== chatId)
       };
       if (updated[subj].length === 0) {
-        updated[subj] = [{ id: Date.now().toString(), messages: [], date: new Date().toISOString() }];
+        updated[subj] = [{ id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, messages: [], date: new Date().toISOString() }];
       }
       return updated;
     });
@@ -276,7 +323,7 @@ useEffect(() => {
     if (chats && chats.length > 0) {
       setCurrentChatId(chats[0].id);
     } else {
-      const newId = Date.now().toString();
+      const newId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       setChatsBySubject(prev => ({
         ...prev,
         [subject]: [{ id: newId, messages: [], date: new Date().toISOString() }]
@@ -291,7 +338,7 @@ useEffect(() => {
   const newSubjectName = prompt('Enter new subject name:');
   if (newSubjectName && newSubjectName.trim() && !subjects.includes(newSubjectName)) {
     setSubjects([...subjects, newSubjectName].sort());
-        const newChatId = Date.now().toString();
+        const newChatId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       setChatsBySubject(prev => ({
         ...prev,
         [newSubjectName]: [{ id: newChatId, messages: [], date: new Date().toISOString() }]
@@ -357,7 +404,7 @@ useEffect(() => {
     let activeChatId = currentChatId;
 
     if (!activeChatId || !chatsBySubject[currentSubject]?.find(c => c.id === activeChatId)) {
-      activeChatId = Date.now().toString();
+      activeChatId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       setChatsBySubject(prev => ({
         ...prev,
         [currentSubject]: [
@@ -447,6 +494,19 @@ useEffect(() => {
 
   if (!mounted) return null;
 
+if (isLoadingData) {
+  return (
+    <div className="flex h-screen bg-neutral-100 items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl flex items-center justify-center shadow-2xl mb-4 mx-auto animate-pulse">
+          <span className="text-2xl font-bold text-white">N</span>
+        </div>
+        <p className="text-neutral-600 font-medium">Loading your chats...</p>
+      </div>
+    </div>
+  );
+}
+
   const yearOptions = [
     { value: 'year7', label: 'Year 7' },
     { value: 'year8', label: 'Year 8' },
@@ -479,6 +539,31 @@ useEffect(() => {
             </div>
             <span className="text-base font-semibold text-neutral-900 group-hover:text-black transition-colors duration-250">Newton</span>
           </Link>
+          
+          {currentUserEmail && (
+            <div className="mb-4 p-3 bg-white/50 backdrop-blur-sm rounded-xl border border-neutral-200/50">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-neutral-600 mb-1">Logged in as</p>
+                  <p className="text-sm font-bold text-neutral-900 truncate">{currentUserEmail}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    if (confirm('Log out? Your chats are saved to your account.')) {
+                      localStorage.removeItem('newton-auth-token');
+                      window.location.reload();
+                    }
+                  }}
+                  className="ml-2 p-2 hover:bg-neutral-100 rounded-lg transition-all"
+                  title="Logout"
+                >
+                  <svg className="w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
           
           <button
             onClick={startNewChat}
