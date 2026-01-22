@@ -16,43 +16,46 @@ export async function GET(req) {
     }
 
     const token = authHeader.substring(7);
-   let decoded;
+    let decoded;
     
     try {
       decoded = jwt.verify(token, JWT_SECRET);
-    } catch (jwtError) {
-      console.error('JWT verification failed:', jwtError);
+    } catch (error) {
       return NextResponse.json(
         { error: 'Invalid token' },
         { status: 401 }
       );
     }
 
-    const { data: user, error: dbError } = await supabase
+    const { data: requestingUser, error: userError } = await supabase
       .from('users')
-      .select('id, email, year_group, is_admin, created_at, last_login')
+      .select('is_admin')
       .eq('id', decoded.userId)
       .single();
 
-    if (dbError || !user) {
-      console.error('Database error:', dbError);
+    if (userError || !requestingUser?.is_admin) {
       return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
+        { error: 'Admin access required' },
+        { status: 403 }
       );
     }
 
-    return NextResponse.json({
-      id: user.id,
-      email: user.email,
-      yearGroup: user.year_group,
-      isAdmin: user.is_admin || false,
-      createdAt: user.created_at,
-      lastLogin: user.last_login
-    });
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, email, year_group, is_admin, chat_data, created_at, last_login')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return NextResponse.json(
+        { error: 'Failed to fetch users' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ users });
 
   } catch (error) {
-    console.error('Get user error:', error);
+    console.error('Admin users error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

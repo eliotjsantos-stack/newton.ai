@@ -946,32 +946,41 @@ if (isLoadingData) {
                     }}
                   >
                     <ReactMarkdown
-                      remarkPlugins={[remarkMath, remarkGfm]}
-                      rehypePlugins={[rehypeKatex]}
-                      components={{
-                        a: ({node, ...props}) => (
-                          <a 
-                            {...props} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="text-neutral-900 underline hover:text-black font-semibold transition-colors duration-200" 
-                          />
-                        ),
-                        p: ({node, ...props}) => <p {...props} className="mb-4 last:mb-0 leading-relaxed" />,
-                        ul: ({node, ...props}) => <ul {...props} className="list-disc ml-5 mb-4 space-y-2" />,
-                        ol: ({node, ...props}) => <ol {...props} className="list-decimal ml-5 mb-4 space-y-2" />,
-                        li: ({node, ...props}) => <li {...props} className="mb-1.5 leading-relaxed" />,
-                        strong: ({node, ...props}) => <strong {...props} className="font-bold text-black" />,
-                        code: ({node, inline, ...props}) => 
-                          inline ? (
-                            <code {...props} className="bg-neutral-100 px-2 py-1 rounded-lg text-sm font-mono" />
-                          ) : (
-                            <code {...props} className="block bg-neutral-100 p-4 rounded-xl text-sm font-mono overflow-x-auto" />
-                          ),
-                      }}
-                    >
-                      {fixMathNotation(message.content)}
-                    </ReactMarkdown>
+  remarkPlugins={[remarkMath, remarkGfm]}
+  rehypePlugins={[rehypeKatex]}
+  components={{
+    a: ({node, ...props}) => (
+      <a 
+        {...props} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="text-neutral-900 underline hover:text-black font-semibold transition-colors duration-200" 
+      />
+    ),
+    p: ({node, ...props}) => <p {...props} className="mb-4 last:mb-0 leading-relaxed" />,
+    ul: ({node, ...props}) => <ul {...props} className="list-disc ml-5 mb-4 space-y-2" />,
+    ol: ({node, ...props}) => <ol {...props} className="list-decimal ml-5 mb-4 space-y-2" />,
+    li: ({node, ...props}) => <li {...props} className="mb-1.5 leading-relaxed" />,
+    strong: ({node, ...props}) => <strong {...props} className="font-bold text-black" />,
+    h1: ({node, ...props}) => <h1 {...props} className="text-xl font-bold my-4 text-neutral-900" />,
+    h2: ({node, ...props}) => <h2 {...props} className="text-lg font-bold my-3 text-neutral-900" />,
+    h3: ({node, ...props}) => <h3 {...props} className="text-base font-semibold my-2 text-neutral-800" />,
+    code: ({node, inline, children, ...props}) => 
+      inline ? (
+        <code {...props} className="bg-neutral-100 text-pink-600 px-2 py-0.5 rounded font-mono text-sm">
+          {children}
+        </code>
+      ) : (
+        <pre className="bg-neutral-50 border border-neutral-200 p-4 rounded-xl my-3 overflow-x-auto">
+          <code {...props} className="text-sm font-mono text-neutral-800 block whitespace-pre-wrap leading-relaxed">
+            {children}
+          </code>
+        </pre>
+      ),
+  }}
+>
+  {fixMathNotation(message.content)}
+</ReactMarkdown>
                   </div>
                   {message.role === 'user' && (
                     <div className="w-10 h-10 bg-neutral-200/80 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
