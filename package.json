@@ -11,6 +11,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
     "ai": "^5.0.68",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
     "katex": "^0.16.25",
     "next": "15.5.4",
     "openai": "^6.3.0",
