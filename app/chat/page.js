@@ -107,6 +107,7 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   }
   return true;
 });
+  const [draggedSubject, setDraggedSubject] = useState(null);
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [suggestedSubject, setSuggestedSubject] = useState(null);
   const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
@@ -432,6 +433,33 @@ useEffect(() => {
   }
 };
 
+const handleDragStart = (e, subject) => {
+  setDraggedSubject(subject);
+  e.dataTransfer.effectAllowed = 'move';
+};
+
+const handleDragOver = (e, subject) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  
+  if (!draggedSubject || draggedSubject === subject) return;
+  
+  const draggedIdx = subjects.indexOf(draggedSubject);
+  const targetIdx = subjects.indexOf(subject);
+  
+  if (draggedIdx === -1 || targetIdx === -1) return;
+  
+  const newSubjects = [...subjects];
+  newSubjects.splice(draggedIdx, 1);
+  newSubjects.splice(targetIdx, 0, draggedSubject);
+  
+  setSubjects(newSubjects);
+};
+
+const handleDragEnd = () => {
+  setDraggedSubject(null);
+};
+
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -640,10 +668,14 @@ if (isLoadingData) {
             
             return (
               <div 
-                key={subject} 
-                className={`mb-2 animate-slideIn ${menuOpen === `subject-${subject}` ? 'relative z-50' : ''}`}
-                style={{ animationDelay: `${subjectIndex * 50}ms` }}
-              >
+  key={subject}
+  draggable
+  onDragStart={(e) => handleDragStart(e, subject)}
+  onDragOver={(e) => handleDragOver(e, subject)}
+  onDragEnd={handleDragEnd}
+  className={`mb-2 animate-slideIn cursor-move ${menuOpen === `subject-${subject}` ? 'relative z-50' : ''} ${draggedSubject === subject ? 'opacity-50' : ''}`}
+  style={{ animationDelay: `${subjectIndex * 50}ms` }}
+>
                 <div className="relative">
                   <div className={`
                     flex items-center justify-between rounded-xl transition-all duration-250
