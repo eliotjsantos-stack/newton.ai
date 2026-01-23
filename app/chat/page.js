@@ -101,7 +101,12 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth >= 768;
+  }
+  return true;
+});
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [suggestedSubject, setSuggestedSubject] = useState(null);
   const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
@@ -559,13 +564,13 @@ if (isLoadingData) {
     <div className="flex h-screen bg-neutral-100 overflow-hidden">
       {/* Premium Glassmorphism Sidebar */}
       <div 
-        className={`${
-          sidebarOpen ? 'w-72' : 'w-0'
-        } bg-white/60 backdrop-blur-2xl border-r border-neutral-200/50 flex flex-col transition-all duration-300 ease-out overflow-hidden shadow-2xl`}
-        style={{
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
-        }}
-      >
+  className={`${
+    sidebarOpen ? 'w-72' : 'w-0'
+  } bg-white/60 backdrop-blur-2xl border-r border-neutral-200/50 flex flex-col transition-all duration-300 ease-out overflow-hidden shadow-2xl md:relative fixed inset-y-0 left-0 z-50`}
+  style={{
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
+  }}
+>
         {/* Sidebar Header with Glassmorphism */}
         <div className="p-6 border-b border-neutral-200/50 bg-white/30 backdrop-blur-xl">
           <Link 
@@ -775,6 +780,13 @@ if (isLoadingData) {
           </button>
         </div>
       </div>
+
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-white">

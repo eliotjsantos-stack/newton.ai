@@ -136,9 +136,9 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 px-6 sm:px-8 lg:px-12">
+      <section className="pt-24 pb-16 md:pt-32 md:pb-24 px-6 sm:px-8 lg:px-12">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-5xl mx-auto mb-20 animate-fadeIn">
+          <div className="text-center max-w-5xl mx-auto mb-10 md:mb-20 animate-fadeIn">
             <div 
               className="inline-block mb-8 px-6 py-3 bg-white/70 backdrop-blur-xl border border-neutral-200/50 rounded-full shadow-lg animate-float"
               style={{
@@ -153,7 +153,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold text-neutral-900 mb-8 tracking-tighter leading-none animate-slideUp">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-extrabold text-neutral-900 mb-6 md:mb-8 tracking-tighter leading-none animate-slideUp">
               Learn to think,
               <br />
               <span className="bg-gradient-to-r from-neutral-800 to-neutral-600 bg-clip-text text-transparent">
@@ -161,14 +161,14 @@ export default function LandingPage() {
               </span>
             </h1>
 
-            <p className="text-xl sm:text-2xl text-neutral-600 mb-12 leading-relaxed max-w-3xl mx-auto font-medium animate-slideUp" style={{ animationDelay: '100ms' }}>
+            <p className="text-lg sm:text-2xl text-neutral-600 mb-8 md:mb-12 leading-relaxed max-w-3xl mx-auto font-medium animate-slideUp" style={{ animationDelay: '100ms' }}>
               Newton refuses to do your homework. Instead, it guides you through the Socratic method—asking questions that help you discover answers yourself.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-5 justify-center items-center animate-slideUp" style={{ animationDelay: '200ms' }}>
+            <div className="flex flex-row gap-3 sm:gap-5 justify-center items-center animate-slideUp flex-wrap" style={{ animationDelay: '200ms' }}>
 <Link
   href="/signup"
-  className="px-10 py-5 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white text-lg font-bold rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 active:scale-95"
+  className="px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white text-base sm:text-lg font-bold rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 active:scale-95"
   style={{
     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.25), 0 6px 16px rgba(0, 0, 0, 0.2)'
   }}
@@ -187,7 +187,7 @@ export default function LandingPage() {
             </div>
 
             {/* Trust Indicators */}
-            <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-neutral-600">
+            <div className="mt-12 md:mt-16 grid grid-cols-2 md:flex md:flex-wrap items-center justify-center gap-4 md:gap-8 text-neutral-600">
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -212,9 +212,9 @@ export default function LandingPage() {
       </section>
 
       {/* Problem/Solution Section */}
-      <section id="features" className="py-24 px-6 sm:px-8 lg:px-12 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white">
+      <section id="features" className="py-12 md:py-24 px-6 sm:px-8 lg:px-12 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-10 md:mb-20">
             <h2 className="text-5xl sm:text-6xl font-extrabold text-neutral-900 mb-6 tracking-tight">
               The AI Homework Crisis
             </h2>
@@ -223,7 +223,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-start mb-20">
+          <div className="grid lg:grid-cols-2 gap-12 items-start mb-10 md:mb-20">
             {/* Problem Card */}
             <div 
               className="p-10 bg-white/70 backdrop-blur-2xl border border-red-200/50 rounded-3xl shadow-2xl"
@@ -296,7 +296,7 @@ export default function LandingPage() {
           </div>
 
           {/* Key Features Grid */}
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
             {[
               {
                 icon: (
@@ -382,9 +382,9 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-24 px-6 sm:px-8 lg:px-12">
+      <section id="how-it-works" className="py-12 md:py-24 px-6 sm:px-8 lg:px-12">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-10 md:mb-20">
             <h2 className="text-5xl sm:text-6xl font-extrabold text-neutral-900 mb-6 tracking-tight">
               How Newton Works
             </h2>
@@ -393,7 +393,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {[
               {
                 step: '1',
@@ -480,11 +480,13 @@ export default function LandingPage() {
             <div className="space-y-6 max-w-3xl mx-auto">
               {[
                 { role: 'student', text: 'Can you solve this quadratic equation for me: x² + 5x + 6 = 0?' },
-                { role: 'newton', text: 'I cannot solve it for you—that would be doing your homework! But I can help you learn. What do you know about factoring quadratics?' },
-                { role: 'student', text: 'I think you need two numbers that multiply to make 6 and add to make 5?' },
-                { role: 'newton', text: 'Exactly! Now you are thinking. What two numbers fit that description?' },
-                { role: 'student', text: '2 and 3?' },
-                { role: 'newton', text: 'Perfect! So how would you write the factored form using those numbers?' }
+{ role: 'newton', text: 'I\'d love to help you learn how to solve it! Let\'s work through this together. First, do you know what it means to factor a quadratic equation?' },
+{ role: 'student', text: 'Not really... can you just show me?' },
+{ role: 'newton', text: 'I could, but you won\'t learn that way! Think of factoring like finding two numbers that are "hiding" inside the equation. For x² + 5x + 6, we need two numbers that multiply to give 6 and add to give 5. Can you think of any pairs?' },
+{ role: 'student', text: 'Um... maybe 2 and 3?' },
+{ role: 'newton', text: 'Brilliant! You got it! So we can write this as (x + 2)(x + 3) = 0. Now, what does that tell us about the solutions?' },
+{ role: 'student', text: 'So x = -2 or x = -3?' },
+{ role: 'newton', text: 'Perfect! You just solved a quadratic equation on your own. See how much more powerful it is when you understand the why, not just the how?' }
               ].map((msg, i) => (
                 <div
                   key={i}
@@ -525,7 +527,7 @@ export default function LandingPage() {
       {/* Universal Learning Section */}
       <section id="subjects" className="py-24 px-6 sm:px-8 lg:px-12 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="text-center mb-10 md:mb-20">
             <h2 className="text-5xl sm:text-6xl font-extrabold text-neutral-900 mb-6 tracking-tight">
               Works for Any Subject
             </h2>
@@ -534,7 +536,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mb-8 md:mb-16">
             {[
               { 
                 name: 'STEM Subjects', 
@@ -611,7 +613,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
             {[
               {
                 quote: "I love the fact that it gives methodology suggestions and guidance rather than quick fix solutions.",
@@ -671,7 +673,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-24 px-6 sm:px-8 lg:px-12 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white">
+      <section id="faq" className="py-12 md:py-24 px-6 sm:px-8 lg:px-12 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl sm:text-6xl font-extrabold text-neutral-900 mb-6 tracking-tight">
