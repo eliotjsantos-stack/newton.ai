@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@supabase/supabase-js": "^2.91.0",
     "ai": "^5.0.68",
     "bcryptjs": "^3.0.3",

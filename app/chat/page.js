@@ -19,7 +19,8 @@ function fixMathNotation(text) {
   }).join('');
 }
 
-function generateChatTitle(messages) {
+function generateChatTitle(messages, chatTitle) {
+  if (chatTitle) return chatTitle;
   if (messages.length === 0) return 'New chat';
   const firstUserMessage = messages.find(m => m.role === 'user');
   if (!firstUserMessage) return 'New chat';
@@ -622,6 +623,35 @@ const sendMessage = async (e) => {
           )
         }));
       }
+      
+      if (messages.length === 0) {
+        try {
+          const titleResponse = await fetch('/api/chat/title', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userMessage: userMessage.content,
+              assistantMessage: assistantMessage
+            })
+          });
+          
+          if (titleResponse.ok) {
+            const { title } = await titleResponse.json();
+            
+            setChatsBySubject(prev => ({
+              ...prev,
+              [currentSubject]: prev[currentSubject].map(chat =>
+                chat.id === activeChatId
+                  ? { ...chat, title: title }
+                  : chat
+              )
+            }));
+          }
+        } catch (error) {
+          console.error('Failed to generate title:', error);
+        }
+      }
+      
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -841,7 +871,7 @@ if (isLoadingData) {
                           `}
                         >
                           <div className="text-xs font-medium text-neutral-900 truncate pr-8">
-                            {generateChatTitle(chat.messages)}
+                            {generateChatTitle(chat.messages, chat.title)}
                           </div>
                           <div className="text-xs text-neutral-500 mt-1.5">
                             {new Date(chat.date).toLocaleDateString('en-GB', { 
