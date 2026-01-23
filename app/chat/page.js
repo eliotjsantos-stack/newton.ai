@@ -108,6 +108,7 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   return true;
 });
   const [draggedSubject, setDraggedSubject] = useState(null);
+  const [draggedChat, setDraggedChat] = useState(null);
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [suggestedSubject, setSuggestedSubject] = useState(null);
   const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
@@ -460,6 +461,37 @@ const handleDragEnd = () => {
   setDraggedSubject(null);
 };
 
+const handleChatDragStart = (e, chatId, subject) => {
+  setDraggedChat({ id: chatId, subject });
+  e.dataTransfer.effectAllowed = 'move';
+};
+
+const handleChatDragOver = (e, targetChatId, subject) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  
+  if (!draggedChat || draggedChat.id === targetChatId || draggedChat.subject !== subject) return;
+  
+  const chats = chatsBySubject[subject] || [];
+  const draggedIdx = chats.findIndex(c => c.id === draggedChat.id);
+  const targetIdx = chats.findIndex(c => c.id === targetChatId);
+  
+  if (draggedIdx === -1 || targetIdx === -1) return;
+  
+  const newChats = [...chats];
+  const [removed] = newChats.splice(draggedIdx, 1);
+  newChats.splice(targetIdx, 0, removed);
+  
+  setChatsBySubject(prev => ({
+    ...prev,
+    [subject]: newChats
+  }));
+};
+
+const handleChatDragEnd = () => {
+  setDraggedChat(null);
+};
+
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -750,10 +782,14 @@ if (isLoadingData) {
                   <div className="mt-2 ml-4 space-y-1 animate-slideDown overflow-hidden">
                     {chats.filter(c => c.messages.length > 0).map((chat, chatIndex) => (
                       <div 
-                        key={chat.id} 
-                        className="relative group animate-fadeIn"
-                        style={{ animationDelay: `${chatIndex * 40}ms` }}
-                      >
+  key={chat.id}
+  draggable
+  onDragStart={(e) => handleChatDragStart(e, chat.id, subject)}
+  onDragOver={(e) => handleChatDragOver(e, chat.id, subject)}
+  onDragEnd={handleChatDragEnd}
+  className={`relative group animate-fadeIn cursor-move ${draggedChat?.id === chat.id ? 'opacity-50' : ''}`}
+  style={{ animationDelay: `${chatIndex * 40}ms` }}
+>
                         <button
                           onClick={() => switchChat(chat.id)}
                           className={`
