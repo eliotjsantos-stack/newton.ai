@@ -51,7 +51,7 @@ function detectSubject(question) {
 }
 
 export default function Newton() {
-   const defaultSubjects = ['English', 'General', 'History', 'Languages', 'Maths', 'Science'];
+   const defaultSubjects = ['General'];
 
   const [currentSubject, setCurrentSubject] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -61,23 +61,34 @@ export default function Newton() {
   });
 
   const [subjects, setSubjects] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('newton-subjects');
-      return saved ? JSON.parse(saved) : defaultSubjects;
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('newton-subjects');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse subjects:', e);
+      }
     }
-    return defaultSubjects;
-  });
+  }
+  return ['General'];
+});
 
-  const [chatsBySubject, setChatsBySubject] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('newton-chats');
-      if (saved) return JSON.parse(saved);
+const [chatsBySubject, setChatsBySubject] = useState(() => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('newton-chats');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse chats:', e);
+      }
     }
-    return defaultSubjects.reduce((acc, subject) => {
-      acc[subject] = [{ id: 'initial', messages: [], date: new Date().toISOString() }];
-      return acc;
-    }, {});
-  });
+  }
+  return {
+    'General': [{ id: 'initial', messages: [], date: new Date().toISOString() }]
+  };
+});
 
   const [currentChatId, setCurrentChatId] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -249,17 +260,22 @@ useEffect(() => {
           setCurrentUserEmail(userData.email);
           
           const chatData = await loadFromDB();
-          
-          if (chatData) {
-            localStorage.removeItem('newton-chats');
-            localStorage.removeItem('newton-subjects');
-            localStorage.removeItem('newton-current-subject');
-            localStorage.removeItem('newton-current-chat-id');
-            
-            if (chatData.chatsBySubject) setChatsBySubject(chatData.chatsBySubject);
-            if (chatData.subjects) setSubjects(chatData.subjects);
-            if (chatData.currentSubject) setCurrentSubject(chatData.currentSubject);
-            if (chatData.currentChatId) setCurrentChatId(chatData.currentChatId);
+
+          localStorage.removeItem('newton-chats');
+          localStorage.removeItem('newton-subjects');
+          localStorage.removeItem('newton-current-subject');
+          localStorage.removeItem('newton-current-chat-id');
+
+          if (chatData && chatData.chatsBySubject) {
+            setChatsBySubject(chatData.chatsBySubject);
+            setSubjects(chatData.subjects || ['General']);
+            setCurrentSubject(chatData.currentSubject || 'General');
+            setCurrentChatId(chatData.currentChatId || null);
+          } else {
+            setChatsBySubject({ 'General': [{ id: 'initial', messages: [], date: new Date().toISOString() }] });
+            setSubjects(['General']);
+            setCurrentSubject('General');
+            setCurrentChatId(null);
           }
         } else {
           localStorage.removeItem('newton-auth-token');
@@ -366,28 +382,50 @@ useEffect(() => {
     setMenuOpen(null);
   };
 
-  const deleteSubject = (subjectName, e) => {
-    e.stopPropagation();
-    if (subjects.length === 1) {
-      alert('Cannot delete the last subject!');
-      return;
+  const deleteSubject = async (subjectName, e) => {
+  e.stopPropagation();
+  if (subjects.length === 1) {
+    alert('Cannot delete the last subject!');
+    return;
+  }
+  if (!window.confirm(`Delete "${subjectName}" and all its chats?`)) return;
+  
+  const newSubjects = subjects.filter(s => s !== subjectName);
+  const newChats = {...chatsBySubject};
+  delete newChats[subjectName];
+  
+  setSubjects(newSubjects);
+  setChatsBySubject(newChats);
+  
+  if (currentSubject === subjectName) {
+    const newSubject = newSubjects[0];
+    setCurrentSubject(newSubject);
+    setCurrentChatId(newChats[newSubject]?.[0]?.id || null);
+    setExpandedSubject(newSubject);
+  }
+  setMenuOpen(null);
+
+  const token = localStorage.getItem('newton-auth-token');
+  if (token) {
+    try {
+      await fetch('/api/chat/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          chatsBySubject: newChats,
+          subjects: newSubjects,
+          currentSubject: currentSubject === subjectName ? newSubjects[0] : currentSubject,
+          currentChatId
+        })
+      });
+    } catch (error) {
+      console.error('Failed to save after delete:', error);
     }
-    if (!window.confirm(`Delete "${subjectName}" and all its chats?`)) return;
-    
-    setSubjects(subjects.filter(s => s !== subjectName));
-    setChatsBySubject(prev => {
-      const newChats = {...prev};
-      delete newChats[subjectName];
-      return newChats;
-    });
-    if (currentSubject === subjectName) {
-      const newSubject = subjects.find(s => s !== subjectName);
-      setCurrentSubject(newSubject);
-      setCurrentChatId(chatsBySubject[newSubject][0].id);
-      setExpandedSubject(newSubject);
-    }
-    setMenuOpen(null);
-  };
+  }
+};
 
   const sendMessage = async (e) => {
     e.preventDefault();
