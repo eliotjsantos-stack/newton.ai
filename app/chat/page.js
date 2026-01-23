@@ -130,9 +130,12 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   });
   
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
-  const [isLoadingData, setIsLoadingData] = useState(true);
-  
-  useChatStorage(chatsBySubject, subjects, currentSubject, currentChatId);
+const [isLoadingData, setIsLoadingData] = useState(true);
+const [showReportIssue, setShowReportIssue] = useState(false);
+const [reportIssueText, setReportIssueText] = useState('');
+const [reportIssueSubmitting, setReportIssueSubmitting] = useState(false);
+
+useChatStorage(chatsBySubject, subjects, currentSubject, currentChatId);
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -492,7 +495,44 @@ const handleChatDragEnd = () => {
   setDraggedChat(null);
 };
 
-  const sendMessage = async (e) => {
+const handleReportIssue = async () => {
+  if (!reportIssueText.trim()) {
+    alert('Please describe the issue');
+    return;
+  }
+  
+  setReportIssueSubmitting(true);
+  
+  try {
+    const response = await fetch('/api/report-issue', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        issue: reportIssueText,
+        userEmail: currentUserEmail,
+        yearGroup: yearGroup,
+        timestamp: new Date().toISOString()
+      })
+    });
+    
+    if (response.ok) {
+      alert('Thank you! Your report has been submitted.');
+      setReportIssueText('');
+      setShowReportIssue(false);
+    } else {
+      alert('Failed to submit report. Please try again.');
+    }
+  } catch (error) {
+    console.error('Report issue error:', error);
+    alert('Failed to submit report. Please try again.');
+  } finally {
+    setReportIssueSubmitting(false);
+  }
+};
+
+const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -621,7 +661,7 @@ if (isLoadingData) {
   ];
 
   return (
-    <div className="flex h-screen bg-neutral-100 overflow-hidden">
+   <div className="flex h-screen bg-neutral-100 overflow-hidden">
       {/* Premium Glassmorphism Sidebar */}
       <div 
   className={`${
@@ -881,20 +921,29 @@ if (isLoadingData) {
           </div>
           
           <div className="flex items-center gap-3">
-            {yearGroup && (
-              <div 
-                className="px-4 py-2 bg-neutral-100/80 backdrop-blur-sm rounded-full text-xs font-semibold text-neutral-700 shadow-sm"
-              >
-                {yearOptions.find(y => y.value === yearGroup)?.label || 'Year 9'}
-              </div>
-            )}
-            <Link 
-              href="/" 
-              className="text-sm font-bold text-neutral-900 hover:text-black transition-colors duration-250"
-            >
-              Newton
-            </Link>
-          </div>
+  {yearGroup && (
+    <div 
+      className="px-4 py-2 bg-neutral-100/80 backdrop-blur-sm rounded-full text-xs font-semibold text-neutral-700 shadow-sm"
+    >
+      {yearOptions.find(y => y.value === yearGroup)?.label || 'Year 9'}
+    </div>
+  )}
+  <button
+    onClick={() => setShowReportIssue(true)}
+    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold transition-all duration-250 flex items-center gap-2 hover:scale-105 active:scale-95"
+  >
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+    Report Issue
+  </button>
+  <Link 
+    href="/" 
+    className="text-sm font-bold text-neutral-900 hover:text-black transition-colors duration-250"
+  >
+    Newton
+  </Link>
+</div>
         </div>
 
         {/* Suggestion Banner with Smooth Animation */}
@@ -1258,8 +1307,8 @@ if (isLoadingData) {
           </div>
         </div>
       )}
-
-      {/* Premium Settings Modal */}
+      
+{/* Settings Modal */}
       {showSettings && (
         <div 
           className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-6 animate-fadeIn"
@@ -1314,6 +1363,65 @@ if (isLoadingData) {
                   Current: {yearOptions.find(y => y.value === yearGroup)?.label || 'Not set'}
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Report Issue Modal */}
+      {showReportIssue && (
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-6 animate-fadeIn"
+          onClick={() => setShowReportIssue(false)}
+        >
+          <div 
+            className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2)'
+            }}
+          >
+            <div className="p-10">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-extrabold text-neutral-900 tracking-tight">Report Issue</h2>
+                <button
+                  onClick={() => setShowReportIssue(false)}
+                  className="p-3 hover:bg-neutral-100/80 rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
+                >
+                  <svg className="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div>
+                <label className="text-sm font-bold text-neutral-900 block mb-4">
+                  Describe the issue you encountered
+                </label>
+                <textarea
+                  value={reportIssueText}
+                  onChange={(e) => setReportIssueText(e.target.value)}
+                  placeholder="Please describe what happened, what you expected, and any steps to reproduce the issue..."
+                  rows={6}
+                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-neutral-900 placeholder:text-neutral-400"
+                />
+                
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => setShowReportIssue(false)}
+                    className="flex-1 px-6 py-3 bg-neutral-100 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-200 transition-all duration-250"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleReportIssue}
+                    disabled={reportIssueSubmitting || !reportIssueText.trim()}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-250 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {reportIssueSubmitting ? 'Submitting...' : 'Submit Report'}
+                  </button>
+                </div>
+             </div>
             </div>
           </div>
         </div>
