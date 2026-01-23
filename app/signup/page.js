@@ -144,7 +144,7 @@ export default function SignupPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your.email@school.ac.uk"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
                 />
                 <p className="text-xs text-neutral-500 mt-2">
                   We&apos;ll send you a 6-digit verification code
@@ -184,7 +184,7 @@ export default function SignupPage() {
                   placeholder="000000"
                   maxLength="6"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-center text-2xl tracking-widest font-mono"
+                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-center text-2xl tracking-widest font-mono text-black placeholder:text-neutral-400"
                 />
                 <p className="text-xs text-neutral-500 mt-2">
                   Sent to: {email}
@@ -201,7 +201,7 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min 8 characters, 1 number"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
                 />
               </div>
 
@@ -215,7 +215,7 @@ export default function SignupPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
                 />
               </div>
 
@@ -226,7 +226,7 @@ export default function SignupPage() {
                 <select
                   value={yearGroup}
                   onChange={(e) => setYearGroup(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
                 >
                   {yearGroups.map(({ value, label }) => (
                     <option key={value} value={value}>
