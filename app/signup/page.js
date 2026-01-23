@@ -129,14 +129,7 @@ export default function SignupPage() {
           )}
 
           {/* Dev Code Display (Development Only) */}
-          {devCode && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl animate-slideIn">
-              <p className="text-blue-700 text-sm">
-                <strong>Verification Code:</strong> <span className="font-mono text-lg">{devCode}</span>
-              </p>
-              <p className="text-blue-600 text-xs mt-1">Copy this code to verify your email</p>
-            </div>
-          )}
+          
 
           {/* Step 1: Email */}
           {step === 1 && (
