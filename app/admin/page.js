@@ -114,24 +114,24 @@ export default function AdminDashboard() {
               key={user.id}
               onClick={() => selectUser(user)}
               className={`p-4 rounded-xl mb-2 cursor-pointer transition-all ${
-                selectedUser?.id === user.id
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-50 hover:bg-neutral-100'
-              }`}
+  selectedUser?.id === user.id
+    ? 'bg-neutral-800 text-white'
+    : 'bg-white hover:bg-neutral-50 border border-neutral-200'
+}`}
             >
               <div className="flex items-center justify-between mb-1">
-                <p className="font-semibold truncate">{user.email}</p>
+                <p className={`font-semibold truncate ${selectedUser?.id === user.id ? 'text-white' : 'text-neutral-900'}`}>{user.email}</p>
                 {user.is_admin && (
                   <span className="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-bold">
                     ADMIN
                   </span>
                 )}
               </div>
-              <p className={`text-sm ${selectedUser?.id === user.id ? 'text-neutral-300' : 'text-neutral-500'}`}>
+              <p className={`text-sm ${selectedUser?.id === user.id ? 'text-neutral-300' : 'text-neutral-700 font-medium'}`}>
                 {user.year_group} • {new Date(user.created_at).toLocaleDateString()}
               </p>
               {user.chat_data?.chatsBySubject && (
-                <p className={`text-xs mt-1 ${selectedUser?.id === user.id ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                <p className={`text-xs mt-1 ${selectedUser?.id === user.id ? 'text-neutral-400' : 'text-neutral-600'}`}>
                   {Object.keys(user.chat_data.chatsBySubject).length} subjects
                 </p>
               )}
@@ -155,13 +155,13 @@ export default function AdminDashboard() {
                   key={subject}
                   onClick={() => selectSubject(subject)}
                   className={`p-4 rounded-xl mb-2 cursor-pointer transition-all ${
-                    selectedSubject === subject
-                      ? 'bg-neutral-900 text-white'
-                      : 'bg-neutral-50 hover:bg-neutral-100'
-                  }`}
+  selectedSubject === subject
+    ? 'bg-neutral-800 text-white'
+    : 'bg-white hover:bg-neutral-50 border border-neutral-200'
+}`}
                 >
-                  <p className="font-semibold mb-1">{subject}</p>
-                  <p className={`text-sm ${selectedSubject === subject ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                  <p className={`font-semibold mb-1 ${selectedSubject === subject ? 'text-white' : 'text-neutral-900'}`}>{subject}</p>
+                  <p className={`text-sm ${selectedSubject === subject ? 'text-neutral-300' : 'text-neutral-700 font-medium'}`}>
                     {chats.filter(c => c.messages?.length > 0).length} conversations
                   </p>
                 </div>
@@ -189,17 +189,17 @@ export default function AdminDashboard() {
                   key={chat.id}
                   onClick={() => selectChat(chat)}
                   className={`p-4 rounded-xl mb-2 cursor-pointer transition-all ${
-                    selectedChat?.id === chat.id
-                      ? 'bg-neutral-900 text-white'
-                      : 'bg-neutral-50 hover:bg-neutral-100'
-                  }`}
+  selectedChat?.id === chat.id
+    ? 'bg-neutral-800 text-white'
+    : 'bg-white hover:bg-neutral-50 border border-neutral-200'
+}`}
                 >
                   <p className={`text-sm mb-1 line-clamp-2 ${
                     selectedChat?.id === chat.id ? 'text-neutral-100' : 'text-neutral-700'
                   }`}>
                     {chat.messages[0]?.content?.substring(0, 60)}...
                   </p>
-                  <p className={`text-xs ${selectedChat?.id === chat.id ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  <p className={`text-xs ${selectedChat?.id === chat.id ? 'text-neutral-400' : 'text-neutral-600'}`}>
                     {chat.messages.length} messages • {new Date(chat.date).toLocaleDateString()}
                   </p>
                 </div>
