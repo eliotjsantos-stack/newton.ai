@@ -135,6 +135,41 @@ const [isLoadingData, setIsLoadingData] = useState(true);
 const [showReportIssue, setShowReportIssue] = useState(false);
 const [reportIssueText, setReportIssueText] = useState('');
 const [reportIssueSubmitting, setReportIssueSubmitting] = useState(false);
+const [showTutorial, setShowTutorial] = useState(() => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('newton-seen-tutorial') !== 'true';
+  }
+  return false;
+});
+const [buttonPositions, setButtonPositions] = useState({});
+const [tutorialStep, setTutorialStep] = useState(0);
+
+useEffect(() => {
+  if (!showTutorial || tutorialStep === 0 || tutorialStep === 3 || tutorialStep === 6) return;
+  
+  const updatePositions = () => {
+    const positions = {};
+    
+    const newConv = document.querySelector('button[class*="bg-gradient-to-r"]');
+    if (newConv) positions.newConv = newConv.getBoundingClientRect();
+    
+    const general = Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === 'General');
+    if (general) positions.general = general.getBoundingClientRect();
+    
+    const report = Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Report Issue'));
+    if (report) positions.report = report.getBoundingClientRect();
+    
+    const dash = document.querySelector('a[href="/dashboard"]');
+    if (dash) positions.dashboard = dash.getBoundingClientRect();
+    
+    setButtonPositions(positions);
+  };
+  
+  updatePositions();
+  window.addEventListener('resize', updatePositions);
+  
+  return () => window.removeEventListener('resize', updatePositions);
+}, [showTutorial, tutorialStep]);
 
 useChatStorage(chatsBySubject, subjects, currentSubject, currentChatId);
 
@@ -303,7 +338,7 @@ useEffect(() => {
 }, []);
 
   const startNewChat = () => {
-  const newChatId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const newChatId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     setChatsBySubject(prev => ({
       ...prev,
       [currentSubject]: [
@@ -314,6 +349,10 @@ useEffect(() => {
     setCurrentChatId(newChatId);
     setDismissedSuggestion(false);
     setSuggestedSubject(null);
+    
+    if (showTutorial && tutorialStep === 1) {
+      nextTutorialStep();
+    }
   };
 
   const switchChat = (chatId) => {
@@ -359,6 +398,10 @@ useEffect(() => {
     }
     setDismissedSuggestion(false);
     setSuggestedSubject(null);
+    
+    if (showTutorial && tutorialStep === 2) {
+      nextTutorialStep();
+    }
   };
 
   const addSubject = () => {
@@ -531,6 +574,31 @@ const handleReportIssue = async () => {
   } finally {
     setReportIssueSubmitting(false);
   }
+};
+
+const startTutorial = () => {
+  setShowTutorial(true);
+  setTutorialStep(0);
+};
+
+const nextTutorialStep = () => {
+  if (tutorialStep < 6) {
+    setTutorialStep(tutorialStep + 1);
+  } else {
+    closeTutorial();
+  }
+};
+
+const closeTutorial = () => {
+  setShowTutorial(false);
+  setTutorialStep(0);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('newton-seen-tutorial', 'true');
+  }
+};
+
+const skipTutorial = () => {
+  closeTutorial();
 };
 
 const sendMessage = async (e) => {
@@ -741,7 +809,13 @@ if (isLoadingData) {
           {currentUserEmail && (
             <Link 
               href="/dashboard"
-              className="mb-4 w-full px-4 py-3 bg-white/50 backdrop-blur-sm rounded-xl border border-neutral-200/50 hover:bg-white/70 transition-all flex items-center gap-2 text-sm font-semibold text-neutral-700 hover:text-neutral-900"
+              onClick={(e) => {
+                if (showTutorial && tutorialStep === 5) {
+                  e.preventDefault();
+                  nextTutorialStep();
+                }
+              }}
+              className={`mb-4 w-full px-4 py-3 bg-white/50 backdrop-blur-sm rounded-xl border border-neutral-200/50 hover:bg-white/70 transition-all flex items-center gap-2 text-sm font-semibold text-neutral-700 hover:text-neutral-900 ${showTutorial && tutorialStep === 5 ? 'relative z-[102]' : ''}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -959,8 +1033,16 @@ if (isLoadingData) {
     </div>
   )}
   <button
-    onClick={() => setShowReportIssue(true)}
-    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold transition-all duration-250 flex items-center gap-2 hover:scale-105 active:scale-95"
+    onClick={() => {
+      setShowReportIssue(true);
+      if (showTutorial && tutorialStep === 4) {
+        setTimeout(() => {
+          setShowReportIssue(false);
+          nextTutorialStep();
+        }, 2000);
+      }
+    }}
+    className={`px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold transition-all duration-250 flex items-center gap-2 hover:scale-105 active:scale-95 ${showTutorial && tutorialStep === 4 ? 'relative z-[102]' : ''}`}
   >
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -1030,7 +1112,7 @@ if (isLoadingData) {
                   Welcome to Newton
                 </h2>
                 <p className="text-xl text-neutral-600 mb-12 leading-relaxed max-w-2xl px-4">
-                  I&apos;m here to help you truly learn. I won&apos;t do your homework—instead, I&apos;ll guide you to understand it yourself through questions and step-by-step thinking.
+                  I&apos;m here to help you truly learn. I won&apos;t do your work—instead, I&apos;ll guide you to understand it yourself through questions and step-by-step thinking.
                 </p>
                 
                 <div className="grid md:grid-cols-2 gap-6 w-full mb-10">
@@ -1064,7 +1146,7 @@ if (isLoadingData) {
                     </div>
                     <h3 className="font-bold text-neutral-900 mb-3 text-lg">Academic integrity</h3>
                     <p className="text-sm text-neutral-600 leading-relaxed">
-                      I refuse to do homework, so your work stays yours
+                      I refuse to do your work, so it stays yours
                     </p>
                   </div>
                 </div>
@@ -1393,8 +1475,353 @@ if (isLoadingData) {
                   Current: {yearOptions.find(y => y.value === yearGroup)?.label || 'Not set'}
                 </p>
               </div>
+
+              <div className="mt-8 pt-8 border-t border-neutral-200">
+                <button
+                  onClick={() => {
+                    setShowSettings(false);
+                    startTutorial();
+                  }}
+                  className="w-full px-5 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl font-semibold transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-3"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  Retake Tutorial
+                </button>
+              </div>
+
             </div>
           </div>
+        </div>
+      )}
+
+      {showTutorial && (
+        <div className="fixed inset-0 z-[100] pointer-events-none">
+          {/* Backdrop with SVG cutouts for spotlights */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-auto" style={{ zIndex: 100 }}>
+            <defs>
+              <mask id="spotlight-mask">
+                <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                
+                {/* Cut out holes for spotlights based on step */}
+                {tutorialStep === 1 && sidebarOpen && buttonPositions.newConv && (
+  <rect x={buttonPositions.newConv.left} y={buttonPositions.newConv.top} width={buttonPositions.newConv.width} height={buttonPositions.newConv.height} rx="16" fill="black" />
+)}
+{tutorialStep === 2 && sidebarOpen && buttonPositions.general && (
+  <rect x={buttonPositions.general.left} y={buttonPositions.general.top} width={buttonPositions.general.width} height={buttonPositions.general.height} rx="12" fill="black" />
+)}
+{tutorialStep === 4 && buttonPositions.report && (
+  <rect x={buttonPositions.report.left} y={buttonPositions.report.top} width={buttonPositions.report.width} height={buttonPositions.report.height} rx="12" fill="black" />
+)}
+{tutorialStep === 5 && sidebarOpen && currentUserEmail && buttonPositions.dashboard && (
+  <rect x={buttonPositions.dashboard.left} y={buttonPositions.dashboard.top} width={buttonPositions.dashboard.width} height={buttonPositions.dashboard.height} rx="12" fill="black" />
+)}
+              </mask>
+            </defs>
+            <rect x="0" y="0" width="100%" height="100%" fill="rgba(0, 0, 0, 0.7)" mask="url(#spotlight-mask)" />
+          </svg>
+
+          {/* Animated spotlight borders */}
+          {tutorialStep === 1 && sidebarOpen && buttonPositions.newConv && (
+  <div 
+    className="absolute border-4 border-blue-500 rounded-2xl animate-pulse-slow pointer-events-none"
+    style={{
+      top: `${buttonPositions.newConv.top}px`,
+      left: `${buttonPositions.newConv.left}px`,
+      width: `${buttonPositions.newConv.width}px`,
+      height: `${buttonPositions.newConv.height}px`,
+      zIndex: 101
+    }}
+  />
+)}
+
+{tutorialStep === 2 && sidebarOpen && buttonPositions.general && (
+  <div 
+    className="absolute border-4 border-blue-500 rounded-xl animate-pulse-slow pointer-events-none"
+    style={{
+      top: `${buttonPositions.general.top}px`,
+      left: `${buttonPositions.general.left}px`,
+      width: `${buttonPositions.general.width}px`,
+      height: `${buttonPositions.general.height}px`,
+      zIndex: 101
+    }}
+  />
+)}
+
+{tutorialStep === 4 && buttonPositions.report && (
+  <div 
+    className="absolute border-4 border-red-500 rounded-xl animate-pulse-slow pointer-events-none"
+    style={{
+      top: `${buttonPositions.report.top}px`,
+      left: `${buttonPositions.report.left}px`,
+      width: `${buttonPositions.report.width}px`,
+      height: `${buttonPositions.report.height}px`,
+      zIndex: 101
+    }}
+  />
+)}
+
+{tutorialStep === 5 && sidebarOpen && currentUserEmail && buttonPositions.dashboard && (
+  <div 
+    className="absolute border-4 border-blue-500 rounded-xl animate-pulse-slow pointer-events-none"
+    style={{
+      top: `${buttonPositions.dashboard.top}px`,
+      left: `${buttonPositions.dashboard.left}px`,
+      width: `${buttonPositions.dashboard.width}px`,
+      height: `${buttonPositions.dashboard.height}px`,
+      zIndex: 101
+    }}
+  />
+)}
+
+
+          {/* Tutorial content cards */}
+          {tutorialStep === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
+              <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-12 text-center animate-scaleIn">
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
+                  <span className="text-4xl font-bold text-white">N</span>
+                </div>
+                <h2 className="text-4xl font-extrabold text-neutral-900 mb-4">Welcome to Newton!</h2>
+                <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
+                  Let's take a quick tour. This will only take a minute!
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <button
+                    onClick={skipTutorial}
+                    className="px-6 py-3 bg-neutral-100 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-200 transition-all"
+                  >
+                    Skip Tour
+                  </button>
+                  <button
+                    onClick={nextTutorialStep}
+                    className="px-8 py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-xl font-semibold hover:scale-105 transition-all shadow-lg"
+                  >
+                    Start Tour →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tutorialStep === 1 && (
+  <div 
+    className="absolute bg-white rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+    style={{
+      top: '285px',
+      left: sidebarOpen ? '300px' : '50px',
+      zIndex: 102
+    }}
+            >
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                1
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 mb-2">New Conversations</h3>
+              <p className="text-neutral-600 mb-4">
+                Click "New conversation" to start a fresh chat. Each is automatically saved by subject!
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-700">
+                  Skip
+                </button>
+                <button
+                  onClick={nextTutorialStep}
+                  className="px-4 py-2 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-lg font-semibold hover:scale-105 transition-all"
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {tutorialStep === 2 && (
+  <div 
+    className="absolute bg-white rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+    style={{
+      top: '315px',
+      left: sidebarOpen ? '265px' : '50px',
+      zIndex: 102
+    }}
+            >
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                2
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 mb-2">Organize by Subject</h3>
+              <p className="text-neutral-600 mb-4">
+                Your chats are organized by subject. Switch between subjects to see all conversations about each topic!
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-700">
+                  Skip
+                </button>
+                <button
+                  onClick={nextTutorialStep}
+                  className="px-4 py-2 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-lg font-semibold hover:scale-105 transition-all"
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {tutorialStep === 3 && (
+            <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
+              <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full p-10 animate-scaleIn">
+                <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                  3
+                </div>
+                <h3 className="text-2xl font-bold text-neutral-900 mb-6">How Newton Helps You Learn</h3>
+                
+                <div className="bg-neutral-50 rounded-2xl p-6 mb-6">
+                  <div className="flex gap-4 mb-4">
+                    <div className="w-10 h-10 bg-neutral-400 rounded-xl flex items-center justify-center flex-shrink-0">
+      <span className="text-xs font-bold text-white">You</span>
+    </div>
+                    <div className="flex-1 bg-white rounded-xl p-4 shadow-sm">
+                      <p className="text-neutral-900">What's the answer to 2x + 5 = 15?</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-bold text-white">N</span>
+                    </div>
+                    <div className="flex-1 bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                      <p className="text-neutral-900 mb-3">Great question! Let's work through this together. First, what do you think we should do to get x by itself?</p>
+                      <p className="text-sm text-blue-700 font-semibold">💡 Newton guides you to discover answers yourself!</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4 mb-6">
+  <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
+    <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center mb-3">
+      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <p className="font-semibold text-neutral-900 mb-1">Newton Will:</p>
+    <ul className="text-sm text-neutral-700 space-y-1">
+      <li>• Ask guiding questions</li>
+      <li>• Explain step-by-step</li>
+      <li>• Help you understand deeply</li>
+    </ul>
+  </div>
+  
+  <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+    <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center mb-3">
+      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </div>
+    <p className="font-semibold text-neutral-900 mb-1">Newton Won't:</p>
+    <ul className="text-sm text-neutral-700 space-y-1">
+      <li>• Do your homework</li>
+      <li>• Give direct answers</li>
+      <li>• Write your essays</li>
+    </ul>
+  </div>
+</div>
+
+                <div className="flex gap-3 justify-end">
+                  <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-700">
+                    Skip
+                  </button>
+                  <button
+                    onClick={nextTutorialStep}
+                    className="px-6 py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-xl font-semibold hover:scale-105 transition-all shadow-lg"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tutorialStep === 4 && (
+            <div 
+              className="absolute bg-white rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+              style={{
+                top: '80px',
+                right: '50px',
+                zIndex: 102
+              }}
+            >
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                4
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 mb-2">Report Issues</h3>
+              <p className="text-neutral-600 mb-4">
+                Encounter a bug? Click "Report Issue" to let us know and we'll fix it right away!
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-700">
+                  Skip
+                </button>
+                <button
+                  onClick={nextTutorialStep}
+                  className="px-4 py-2 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-lg font-semibold hover:scale-105 transition-all"
+                >
+                  {currentUserEmail ? 'Next →' : 'Finish! 🚀'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {tutorialStep === 5 && currentUserEmail && (
+  <div 
+    className="absolute bg-white rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+    style={{
+      top: '230px',
+      left: sidebarOpen ? '300px' : '50px',
+      zIndex: 102
+    }}
+            >
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                5
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 mb-2">Your Dashboard</h3>
+              <p className="text-neutral-600 mb-4">
+                Visit your Dashboard to see learning progress and analytics. Let's check it out!
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-700">
+                  Skip
+                </button>
+                <button
+                  onClick={() => {
+                    window.location.href = '/dashboard?tutorial=true';
+                  }}
+                  className="px-4 py-2 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-lg font-semibold hover:scale-105 transition-all"
+                >
+                  Visit Dashboard →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {tutorialStep === 6 && (
+            <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
+              <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-10 text-center animate-scaleIn">
+                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-green-600 rounded-3xl flex items-center justify-center mb-6 shadow-xl">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-3xl font-bold text-neutral-900 mb-4">You're All Set!</h3>
+                <p className="text-xl text-neutral-600 mb-8">
+                  Ready to start learning? Ask Newton your first question!
+                </p>
+                <button
+                  onClick={closeTutorial}
+                  className="px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-xl text-lg"
+                >
+                  Start Learning! 🚀
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1485,6 +1912,15 @@ if (isLoadingData) {
             transform: translateY(0);
           }
         }
+
+        @keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
         
         @keyframes slideDown {
           from {

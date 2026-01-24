@@ -25,9 +25,19 @@ export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(null);
   const [colorPickerOpen, setColorPickerOpen] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tutorial') === 'true') {
+      setShowTutorial(true);
+      setTutorialStep(0);
+    }
   }, []);
 
   useEffect(() => {
@@ -398,6 +408,59 @@ const addSubject = () => {
           </div>
         </div>
       </main>
+
+      {/* Dashboard Tutorial */}
+      {showTutorial && (
+        <div className="fixed inset-0 z-[100]">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          
+          {tutorialStep === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto">
+              <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-12 text-center animate-scaleIn">
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
+                  <span className="text-4xl font-bold text-white">N</span>
+                </div>
+                <h2 className="text-4xl font-extrabold text-neutral-900 mb-4">Your Dashboard</h2>
+                <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
+                  This is where you manage all your subjects. You can add new subjects, change colors, and organize your learning!
+                </p>
+                <div className="bg-neutral-50 rounded-2xl p-6 mb-8 text-left">
+                  <h3 className="font-bold text-neutral-900 mb-3">What you can do here:</h3>
+                  <ul className="space-y-2 text-neutral-700">
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Click any subject to start learning</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Add new subjects with the + button</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Customize colors and rename subjects</span>
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowTutorial(false);
+                    window.location.href = '/chat';
+                  }}
+                  className="px-8 py-4 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-xl text-lg"
+                >
+                  Back to Chat →
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Premium CSS Animations */}
       <style jsx>{`
