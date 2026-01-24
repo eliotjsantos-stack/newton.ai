@@ -29,9 +29,26 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to log in');
       }
 
-      // Store token and redirect to chat
-      localStorage.setItem('newton-auth-token', data.token);
-      router.push('/chat');
+     localStorage.setItem('newton-auth-token', data.token);
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirect = urlParams.get('redirect');
+      
+      if (redirect === '/admin') {
+        const meResponse = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${data.token}` }
+        });
+        const meData = await meResponse.json();
+        
+        if (meData.isAdmin) {
+          router.push('/admin');
+        } else {
+          setError('Access denied. Admin only.');
+          localStorage.removeItem('newton-auth-token');
+        }
+      } else {
+        router.push('/chat');
+      }
     } catch (err) {
       setError(err.message);
     } finally {

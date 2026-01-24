@@ -704,7 +704,7 @@ if (isLoadingData) {
         {/* Sidebar Header with Glassmorphism */}
         <div className="p-6 border-b border-neutral-200/50 bg-white/30 backdrop-blur-xl">
           <Link 
-            href="/" 
+            href="/chat" 
             className="flex items-center space-x-3 mb-6 group transition-all duration-250"
           >
             <div className="w-9 h-9 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
@@ -968,7 +968,7 @@ if (isLoadingData) {
     Report Issue
   </button>
   <Link 
-    href="/" 
+    href="/chat" 
     className="text-sm font-bold text-neutral-900 hover:text-black transition-colors duration-250"
   >
     Newton
