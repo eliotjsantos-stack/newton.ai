@@ -181,9 +181,7 @@ useChatStorage(chatsBySubject, subjects, currentSubject, currentChatId);
     setMounted(true);
     document.body.style.overflow = 'hidden';
     
-    if (!yearGroup) {
-      setShowYearModal(true);
-    }
+    
     
     const urlParams = new URLSearchParams(window.location.search);
     const urlSubject = urlParams.get('subject');
