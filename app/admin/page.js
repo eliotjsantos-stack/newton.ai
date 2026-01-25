@@ -20,7 +20,22 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterYearGroup, setFilterYearGroup] = useState('all');
+  const [unviewedReportsCount, setUnviewedReportsCount] = useState(0);
 
+  useEffect(() => {
+  if (currentTab === 'reports' && unviewedReportsCount > 0) {
+    const markViewed = async () => {
+      const token = localStorage.getItem('newton-auth-token');
+      await fetch('/api/admin/reports/mark-viewed', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setUnviewedReportsCount(0);
+    };
+    markViewed();
+  }
+}, [currentTab, unviewedReportsCount]);
+  
   useEffect(() => {
     checkAdminAndLoadData();
   }, []);
@@ -76,13 +91,14 @@ export default function AdminDashboard() {
   };
 
   const loadReports = async () => {
-    const token = localStorage.getItem('newton-auth-token');
-    const response = await fetch('/api/admin/reports', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const data = await response.json();
-    setReports(data.reports || []);
-  };
+  const token = localStorage.getItem('newton-auth-token');
+  const response = await fetch('/api/admin/reports', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const data = await response.json();
+  setReports(data.reports || []);
+  setUnviewedReportsCount(data.unviewedCount || 0);
+};
 
   const loadAnalytics = async () => {
     const token = localStorage.getItem('newton-auth-token');
@@ -240,11 +256,11 @@ export default function AdminDashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span className="font-semibold">Reports</span>
-            {reports.length > 0 && (
-              <span className="ml-auto bg-red-600 text-white text-xs px-2 py-1 rounded-full font-bold">
-                {reports.length}
-              </span>
-            )}
+            {unviewedReportsCount > 0 && (
+  <span className="ml-auto bg-red-600 text-white text-xs px-2 py-1 rounded-full font-bold">
+    {unviewedReportsCount}
+  </span>
+)}
           </button>
 
           <button
