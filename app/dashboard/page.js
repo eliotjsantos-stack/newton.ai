@@ -449,9 +449,12 @@ const addSubject = () => {
                 </div>
                 <button
                   onClick={() => {
-                    setShowTutorial(false);
-                    window.location.href = '/chat';
-                  }}
+  setShowTutorial(false);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('newton-seen-tutorial', 'true');
+  }
+  window.location.href = '/chat';
+}}
                   className="px-8 py-4 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-xl text-lg"
                 >
                   Back to Chat →
