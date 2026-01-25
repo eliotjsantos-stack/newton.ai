@@ -300,8 +300,14 @@ useEffect(() => {
         });
         
         if (userResponse.ok) {
-          const userData = await userResponse.json();
-          setCurrentUserEmail(userData.email);
+  const userData = await userResponse.json();
+  setCurrentUserEmail(userData.email);
+  
+  // Redirect admins to admin panel
+  if (userData.isAdmin) {
+    window.location.href = '/admin';
+    return;
+  }
           
           const chatData = await loadFromDB();
 
@@ -716,6 +722,15 @@ const sendMessage = async (e) => {
         } catch (error) {
           console.error('Failed to generate title:', error);
         }
+      }
+      
+    // Update last activity
+      const token = localStorage.getItem('newton-auth-token');
+      if (token) {
+        fetch('/api/auth/update-activity', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).catch(() => {}); // Silent fail
       }
       
     } catch (error) {

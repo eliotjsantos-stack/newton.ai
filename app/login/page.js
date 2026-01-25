@@ -30,7 +30,6 @@ export default function LoginPage() {
       }
 
      localStorage.setItem('newton-auth-token', data.token);
-     localStorage.removeItem('newton-seen-tutorial');
       
       const urlParams = new URLSearchParams(window.location.search);
       const redirect = urlParams.get('redirect');
