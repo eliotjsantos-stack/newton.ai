@@ -280,7 +280,7 @@ export default function AdminDashboard() {
 
         <div className="p-4 border-t border-neutral-700">
           <Link
-            href="/chat"
+            href="/"
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 rounded-xl transition-all font-semibold"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

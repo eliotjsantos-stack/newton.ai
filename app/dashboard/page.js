@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const defaultSubjects = ['English', 'General', 'History', 'Languages', 'Maths', 'Science'];
+  const defaultSubjects = ['General'];
   
   const [subjects, setSubjects] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -192,7 +192,7 @@ const addSubject = () => {
                 }}
               >
                 <Link
-                  href={`/subject/${encodeURIComponent(subject)}`}
+                  href={subject === 'General' ? '/chat' : `/subject/${encodeURIComponent(subject)}`}
                   className="block group"
                 >
                   <div 
