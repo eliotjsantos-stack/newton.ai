@@ -775,10 +775,48 @@ export default function AdminDashboard() {
                         {new Date(report.created_at).toLocaleString()}
                       </span>
                     </div>
-                    <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-4">
-                      <p className="text-sm text-neutral-300 leading-relaxed whitespace-pre-wrap">
-                        {report.issue}
-                      </p>
+                    
+                    <div className="space-y-3">
+                      <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-4">
+                        <p className="text-xs font-semibold text-neutral-500 mb-2">Issue Description:</p>
+                        <p className="text-sm text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                          {report.issue}
+                        </p>
+                      </div>
+
+                      {report.chat_context && (
+                        <div className="bg-neutral-900 border border-blue-700/50 rounded-xl p-4">
+                          <p className="text-xs font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Chat Context ({JSON.parse(report.chat_context).subject}):
+                          </p>
+                          <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {JSON.parse(report.chat_context).messages.map((msg, i) => (
+                              <div key={i} className={`p-2 rounded text-xs ${msg.role === 'user' ? 'bg-blue-900/30 text-blue-200' : 'bg-neutral-800 text-neutral-400'}`}>
+                                <span className="font-semibold">{msg.role === 'user' ? 'Student' : 'Newton'}:</span> {msg.content.substring(0, 200)}{msg.content.length > 200 ? '...' : ''}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {report.screenshot && (
+                        <div className="bg-neutral-900 border border-purple-700/50 rounded-xl p-4">
+                          <p className="text-xs font-semibold text-purple-400 mb-3 flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Screenshot:
+                          </p>
+                          <img 
+                            src={report.screenshot} 
+                            alt="Issue screenshot" 
+                            className="w-full rounded-lg border border-neutral-700"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))

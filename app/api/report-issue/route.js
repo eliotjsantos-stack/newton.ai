@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   try {
-    const { issue, userEmail, yearGroup, timestamp } = await req.json();
+    const { issue, userEmail, yearGroup, timestamp, chatContext, screenshot } = await req.json();
     
     if (!issue || !issue.trim()) {
       return NextResponse.json(
@@ -18,7 +18,9 @@ export async function POST(req) {
         issue: issue.trim(),
         user_email: userEmail || 'anonymous',
         year_group: yearGroup || 'not specified',
-        created_at: timestamp
+        created_at: timestamp,
+        chat_context: chatContext ? JSON.stringify(chatContext) : null,
+        screenshot: screenshot || null
       });
 
     if (error) {

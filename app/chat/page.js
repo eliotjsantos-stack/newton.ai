@@ -127,6 +127,8 @@ const [isLoadingData, setIsLoadingData] = useState(true);
 const [showReportIssue, setShowReportIssue] = useState(false);
 const [reportIssueText, setReportIssueText] = useState('');
 const [reportIssueSubmitting, setReportIssueSubmitting] = useState(false);
+const [includeChat, setIncludeChat] = useState(true);
+const [screenshot, setScreenshot] = useState(null);
 const [showTutorial, setShowTutorial] = useState(() => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('newton-seen-tutorial') !== 'true';
@@ -544,22 +546,44 @@ const handleReportIssue = async () => {
   setReportIssueSubmitting(true);
   
   try {
+    const reportData = {
+      issue: reportIssueText,
+      userEmail: currentUserEmail,
+      yearGroup: yearGroup,
+      timestamp: new Date().toISOString(),
+      chatContext: null,
+      screenshot: null
+    };
+
+    if (includeChat && currentChat?.messages) {
+      reportData.chatContext = {
+        subject: currentSubject,
+        messages: currentChat.messages.slice(-10),
+        chatId: currentChatId
+      };
+    }
+
+    if (screenshot) {
+      const reader = new FileReader();
+      const screenshotBase64 = await new Promise((resolve) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(screenshot);
+      });
+      reportData.screenshot = screenshotBase64;
+    }
+
     const response = await fetch('/api/report-issue', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        issue: reportIssueText,
-        userEmail: currentUserEmail,
-        yearGroup: yearGroup,
-        timestamp: new Date().toISOString()
-      })
+      body: JSON.stringify(reportData)
     });
     
     if (response.ok) {
-      alert('Thank you! Your report has been submitted.');
+      alert('Thank you! Your report has been submitted with context.');
       setReportIssueText('');
+      setScreenshot(null);
       setShowReportIssue(false);
     } else {
       alert('Failed to submit report. Please try again.');
@@ -1848,7 +1872,7 @@ if (isLoadingData) {
           onClick={() => setShowReportIssue(false)}
         >
           <div 
-            className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
+            className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
             style={{
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2)'
@@ -1858,7 +1882,10 @@ if (isLoadingData) {
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-extrabold text-neutral-900 tracking-tight">Report Issue</h2>
                 <button
-                  onClick={() => setShowReportIssue(false)}
+                  onClick={() => {
+                    setShowReportIssue(false);
+                    setScreenshot(null);
+                  }}
                   className="p-3 hover:bg-neutral-100/80 rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
                 >
                   <svg className="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1867,21 +1894,101 @@ if (isLoadingData) {
                 </button>
               </div>
               
-              <div>
-                <label className="text-sm font-bold text-neutral-900 block mb-4">
-                  Describe the issue you encountered
-                </label>
-                <textarea
-                  value={reportIssueText}
-                  onChange={(e) => setReportIssueText(e.target.value)}
-                  placeholder="Please describe what happened, what you expected, and any steps to reproduce the issue..."
-                  rows={6}
-                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-neutral-900 placeholder:text-neutral-400"
-                />
-                
-                <div className="flex gap-3 mt-6">
+              <div className="space-y-6">
+                <div>
+                  <label className="text-sm font-bold text-neutral-900 block mb-4">
+                    Describe the issue you encountered
+                  </label>
+                  <textarea
+                    value={reportIssueText}
+                    onChange={(e) => setReportIssueText(e.target.value)}
+                    placeholder="Please describe what happened, what you expected, and any steps to reproduce the issue..."
+                    rows={6}
+                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-neutral-900 placeholder:text-neutral-400"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <input
+                    type="checkbox"
+                    id="includeChat"
+                    checked={includeChat}
+                    onChange={(e) => setIncludeChat(e.target.checked)}
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label htmlFor="includeChat" className="text-sm font-semibold text-neutral-900 cursor-pointer flex-1">
+                    Include current chat conversation (helps us debug faster)
+                  </label>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-sm font-bold text-neutral-900 block">
+                    Screenshot (optional)
+                  </label>
+                  
+                  {!screenshot ? (
+                    <button
+                      onClick={async () => {
+                        try {
+                          const stream = await navigator.mediaDevices.getDisplayMedia({
+                            video: { mediaSource: 'screen' }
+                          });
+                          
+                          const video = document.createElement('video');
+                          video.srcObject = stream;
+                          video.play();
+                          
+                          await new Promise(resolve => {
+                            video.onloadedmetadata = resolve;
+                          });
+                          
+                          const canvas = document.createElement('canvas');
+                          canvas.width = video.videoWidth;
+                          canvas.height = video.videoHeight;
+                          canvas.getContext('2d').drawImage(video, 0, 0);
+                          
+                          stream.getTracks().forEach(track => track.stop());
+                          
+                          canvas.toBlob(blob => {
+                            setScreenshot(blob);
+                          }, 'image/png');
+                        } catch (err) {
+                          console.error('Screenshot error:', err);
+                          alert('Screenshot capture cancelled or failed');
+                        }
+                      }}
+                      className="w-full px-4 py-3 bg-neutral-100 hover:bg-neutral-200 border-2 border-dashed border-neutral-300 rounded-xl font-semibold text-neutral-700 transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Capture Screenshot
+                    </button>
+                  ) : (
+                    <div className="relative p-4 bg-green-50 border-2 border-green-200 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-sm font-semibold text-green-900">Screenshot captured</span>
+                        <button
+                          onClick={() => setScreenshot(null)}
+                          className="ml-auto text-sm text-red-600 hover:text-red-700 font-semibold"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-3">
                   <button
-                    onClick={() => setShowReportIssue(false)}
+                    onClick={() => {
+                      setShowReportIssue(false);
+                      setScreenshot(null);
+                    }}
                     className="flex-1 px-6 py-3 bg-neutral-100 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-200 transition-all duration-250"
                   >
                     Cancel
@@ -1894,7 +2001,7 @@ if (isLoadingData) {
                     {reportIssueSubmitting ? 'Submitting...' : 'Submit Report'}
                   </button>
                 </div>
-             </div>
+              </div>
             </div>
           </div>
         </div>
