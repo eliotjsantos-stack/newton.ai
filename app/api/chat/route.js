@@ -344,12 +344,51 @@ export async function POST(req) {
 
     const fullPrompt = SYSTEM_PROMPT + (yearGroupNote[yearGroup] || yearGroupNote.year9);
 
+    // Process messages to handle files
+    const processedMessages = messages.map(msg => {
+      if (msg.files && msg.files.length > 0) {
+        // Create content array with text and files
+        const content = [
+          { type: 'text', text: msg.content }
+        ];
+        
+        msg.files.forEach(file => {
+          if (file.type === 'image') {
+            content.push({
+              type: 'image_url',
+              image_url: {
+                url: file.data
+              }
+            });
+          } else if (file.type === 'document') {
+            // For PDFs, extract base64 data
+            const base64Data = file.data.split(',')[1];
+            content.push({
+              type: 'input_pdf',
+              source: {
+                type: 'base64',
+                media_type: file.mimeType,
+                data: base64Data
+              }
+            });
+          }
+        });
+        
+        return {
+          role: msg.role,
+          content: content
+        };
+      }
+      
+      return msg;
+    });
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4o',
       stream: true,
       messages: [
         { role: 'system', content: fullPrompt },
-        ...messages,
+        ...processedMessages,
       ],
     });
 

@@ -129,6 +129,8 @@ const [reportIssueText, setReportIssueText] = useState('');
 const [reportIssueSubmitting, setReportIssueSubmitting] = useState(false);
 const [includeChat, setIncludeChat] = useState(true);
 const [screenshot, setScreenshot] = useState(null);
+const [uploadedFiles, setUploadedFiles] = useState([]);
+const [isDragging, setIsDragging] = useState(false);
 const [showTutorial, setShowTutorial] = useState(() => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('newton-seen-tutorial') !== 'true';
@@ -596,6 +598,45 @@ const handleReportIssue = async () => {
   }
 };
 
+const handleFileUpload = (files) => {
+  const validFiles = Array.from(files).filter(file => {
+    const isValidType = file.type === 'application/pdf' || file.type.startsWith('image/');
+    const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
+    
+    if (!isValidType) {
+      alert(`${file.name} is not a supported file type. Please upload PDFs or images.`);
+      return false;
+    }
+    if (!isValidSize) {
+      alert(`${file.name} is too large. Maximum file size is 10MB.`);
+      return false;
+    }
+    return true;
+  });
+  
+  setUploadedFiles(prev => [...prev, ...validFiles]);
+};
+
+const handleFileDragOver = (e) => {
+  e.preventDefault();
+  setIsDragging(true);
+};
+
+const handleDragLeave = (e) => {
+  e.preventDefault();
+  setIsDragging(false);
+};
+
+const handleDrop = (e) => {
+  e.preventDefault();
+  setIsDragging(false);
+  handleFileUpload(e.dataTransfer.files);
+};
+
+const removeFile = (index) => {
+  setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+};
+
 const startTutorial = () => {
   setShowTutorial(true);
   setTutorialStep(0);
@@ -633,6 +674,28 @@ const sendMessage = async (e) => {
     }
 
     const userMessage = { role: 'user', content: input.trim() };
+    
+    // Handle file uploads
+    if (uploadedFiles.length > 0) {
+      const filePromises = uploadedFiles.map(file => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve({
+              type: file.type.startsWith('image/') ? 'image' : 'document',
+              data: reader.result,
+              name: file.name,
+              mimeType: file.type
+            });
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+      
+      const filesData = await Promise.all(filePromises);
+      userMessage.files = filesData;
+    }
+    
     let activeChatId = currentChatId;
 
     if (!activeChatId || !chatsBySubject[currentSubject]?.find(c => c.id === activeChatId)) {
@@ -657,6 +720,7 @@ const sendMessage = async (e) => {
     }
 
     setInput('');
+    setUploadedFiles([]);
     setIsLoading(true);
     setIsTyping(true);
     setDismissedSuggestion(false);
@@ -1300,6 +1364,33 @@ if (isLoadingData) {
 >
   {message.content}
 </ReactMarkdown>
+
+                    {/* Display attached files */}
+                    {message.files && message.files.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {message.files.map((file, fileIndex) => (
+                          <div key={fileIndex} className="bg-neutral-100/80 border border-neutral-200 rounded-xl p-3">
+                            {file.type === 'image' ? (
+                              <div>
+                                <img 
+                                  src={file.data} 
+                                  alt={file.name}
+                                  className="rounded-lg max-w-full h-auto max-h-64 object-contain"
+                                />
+                                <p className="text-xs text-neutral-600 mt-2">{file.name}</p>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                <span className="text-sm font-semibold text-neutral-700">{file.name}</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   {message.role === 'user' && (
                     <div className="w-10 h-10 bg-neutral-200/80 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
@@ -1357,8 +1448,51 @@ if (isLoadingData) {
           }}
         >
           <form onSubmit={sendMessage} className="max-w-4xl mx-auto">
+            {/* File Upload Preview */}
+            {uploadedFiles.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {uploadedFiles.map((file, index) => (
+                  <div key={index} className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {file.type.startsWith('image/') ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      )}
+                    </svg>
+                    <span className="text-sm font-semibold text-blue-900">{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="ml-2 text-red-600 hover:text-red-700"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="flex gap-4">
-              <div className="flex-1 relative">
+              <div 
+                className="flex-1 relative"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                {isDragging && (
+                  <div className="absolute inset-0 bg-blue-100/90 border-4 border-dashed border-blue-400 rounded-3xl flex items-center justify-center z-10 backdrop-blur-sm">
+                    <div className="text-center">
+                      <svg className="w-12 h-12 mx-auto mb-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p className="text-blue-900 font-bold">Drop files here</p>
+                      <p className="text-blue-700 text-sm">PDF or Images (max 10MB)</p>
+                    </div>
+                  </div>
+                )}
                 <textarea
                   ref={textareaRef}
                   value={input}
@@ -1378,12 +1512,23 @@ if (isLoadingData) {
                     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)'
                   }}
                 />
-                {/* Character Counter */}
-                {input.length > 0 && (
-                  <div className="absolute bottom-4 right-4 text-xs text-neutral-500 font-semibold bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm animate-fadeIn">
-                    {input.length} characters
+                
+                {/* File Upload Button */}
+                <label className="absolute bottom-4 right-4 cursor-pointer">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*,application/pdf"
+                    onChange={(e) => handleFileUpload(e.target.files)}
+                    className="hidden"
+                  />
+                  <div className="p-2 bg-white/90 hover:bg-neutral-100 rounded-full transition-all hover:scale-110">
+                    <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
                   </div>
-                )}
+                </label>
+
               </div>
               <button
                 type="submit"
