@@ -600,11 +600,11 @@ const handleReportIssue = async () => {
 
 const handleFileUpload = (files) => {
   const validFiles = Array.from(files).filter(file => {
-    const isValidType = file.type === 'application/pdf' || file.type.startsWith('image/');
+    const isValidType = file.type.startsWith('image/'); // Only images for now
     const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
     
     if (!isValidType) {
-      alert(`${file.name} is not a supported file type. Please upload PDFs or images.`);
+      alert(`${file.name} is not a supported file type. Please upload images only.`);
       return false;
     }
     if (!isValidSize) {
@@ -1518,7 +1518,7 @@ if (isLoadingData) {
                   <input
                     type="file"
                     multiple
-                    accept="image/*,application/pdf"
+                    accept="image/*"
                     onChange={(e) => handleFileUpload(e.target.files)}
                     className="hidden"
                   />
