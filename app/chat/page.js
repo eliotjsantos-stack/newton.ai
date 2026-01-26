@@ -9,15 +9,7 @@ import Link from 'next/link';
 import 'katex/dist/katex.min.css';
 import { useChatStorage, loadFromDB } from '@/hooks/useChatStorage'
 
-function fixMathNotation(text) {
-  const parts = text.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/);
-  return parts.map((part, index) => {
-    if (index % 2 === 1) return part;
-    part = part.replace(/\(([a-zA-Z])\)/g, '$$$1$$');
-    part = part.replace(/\[\s*([^\]]+)\s*\]/g, '$$$$$$1$$$$');
-    return part;
-  }).join('');
-}
+
 
 function generateChatTitle(messages, chatTitle) {
   if (chatTitle) return chatTitle;
@@ -1282,7 +1274,7 @@ if (isLoadingData) {
       ),
   }}
 >
-  {fixMathNotation(message.content)}
+  {message.content}
 </ReactMarkdown>
                   </div>
                   {message.role === 'user' && (
