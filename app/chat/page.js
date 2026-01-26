@@ -1264,9 +1264,9 @@ if (isLoadingData) {
                   <p className="text-sm font-bold text-neutral-900 mb-5">Try asking:</p>
                   <div className="space-y-3 text-left">
                     {[
-                      'I don&apos;t understand how photosynthesis works',
-                      'Can you help me approach this algebra problem?',
-                      'Explain themes in Macbeth step by step'
+                      'Can you explain to me how photosynthesis works.',
+                      'Can you help me understand quadratic equations in maths.',
+                      'Help me plan an essay on Macbeth step by step.'
                     ].map((example, i) => (
                       <div 
                         key={i}
