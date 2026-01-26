@@ -803,9 +803,20 @@ if (isLoadingData) {
                 </div>
                 <button
                   onClick={() => {
-                    if (confirm('Log out? Your chats are saved to your account.')) {
+                    if (confirm('Log out?')) {
+                      // Clear all localStorage
                       localStorage.removeItem('newton-auth-token');
-                      window.location.reload();
+                      localStorage.removeItem('newton-year-group');
+                      localStorage.removeItem('newton-seen-welcome');
+                      localStorage.removeItem('newton-seen-tutorial');
+                      localStorage.removeItem('subjects');
+                      localStorage.removeItem('subject-colors');
+                      localStorage.removeItem('chats-by-subject');
+                      localStorage.removeItem('current-subject');
+                      localStorage.removeItem('current-chat-id');
+                      
+                      // Redirect to login
+                      window.location.href = '/';
                     }
                   }}
                   className="ml-2 p-2 hover:bg-neutral-100 rounded-lg transition-all"
