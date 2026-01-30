@@ -1,15 +1,43 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import Link from 'next/link';
 import 'katex/dist/katex.min.css';
-import { useChatStorage, loadFromDB } from '@/hooks/useChatStorage'
+import { useChatStorage, loadFromDB } from '@/hooks/useChatStorage';
+import { supabase } from '@/lib/supabase';
+import MermaidDiagram from '@/components/MermaidDiagram';
+import ChartDiagram from '@/components/ChartDiagram';
+import { useTheme } from '@/components/ThemeProvider';
 
+// Convert AI's wrong math delimiters to proper ones for KaTeX rendering
+function fixMathDelimiters(content) {
+  if (!content) return content;
 
+  let fixed = content;
+
+  // First, handle LaTeX-style delimiters: \( \) and \[ \]
+  // These are the most common wrong formats from AI models
+  // Convert \[ ... \] to $$ ... $$ (display math)
+  fixed = fixed.replace(/\\\[\s*([\s\S]*?)\s*\\\]/g, '$$$$$1$$$$');
+  // Convert \( ... \) to $ ... $ (inline math)
+  fixed = fixed.replace(/\\\(\s*([\s\S]*?)\s*\\\)/g, '$$$1$$');
+
+  // Handle standalone brackets containing math-like content
+  // Convert [ ... ] to $$ ... $$ when it contains LaTeX commands or equations
+  fixed = fixed.replace(/\[\s*([^\[\]]*(?:\\frac|\\sqrt|\\pm|\\times|\\div|\\cdot|\\int|\\sum|\\prod|\\lim|\\infty|\\alpha|\\beta|\\gamma|\\theta|\\pi)[^\[\]]*)\s*\]/g, '$$$$$1$$$$');
+
+  // Handle parentheses containing math-like content
+  // Convert ( ... ) to $ ... $ when it contains LaTeX commands
+  fixed = fixed.replace(/\(\s*([^()]*(?:\\frac|\\sqrt|\\pm|\\times|\\div|\\cdot)[^()]*)\s*\)/g, '$$$1$$');
+  // Convert ( x = ... ) style equations to inline math
+  fixed = fixed.replace(/\(\s*([a-zA-Z]_?\d?\s*=\s*[^()]+)\s*\)/g, '$$$1$$');
+
+  return fixed;
+}
 
 function generateChatTitle(messages, chatTitle) {
   if (chatTitle) return chatTitle;
@@ -43,8 +71,194 @@ function detectSubject(question) {
   return detectedSubject;
 }
 
+// Static plugin arrays to prevent re-renders
+const remarkPlugins = [remarkMath, remarkGfm];
+const rehypePlugins = [rehypeKatex];
+
+// Helper to extract links section from message content
+function extractLinksSection(content) {
+  if (!content) return { mainContent: content, linksContent: null };
+
+  // Match various patterns for the recommended links section
+  const linksPatterns = [
+    /\n---\n\*\*📚 Recommended Links:\*\*([\s\S]*?)$/,
+    /\n---\n\*\*Recommended Links:\*\*([\s\S]*?)$/,
+    /\n\*\*📚 Recommended Links:\*\*([\s\S]*?)$/,
+    /\n\*\*Recommended Links:\*\*([\s\S]*?)$/,
+    /\n📚 \*\*Recommended Links:\*\*([\s\S]*?)$/,
+  ];
+
+  for (const pattern of linksPatterns) {
+    const match = content.match(pattern);
+    if (match) {
+      const mainContent = content.replace(pattern, '').trim();
+      const linksContent = match[1].trim();
+      return { mainContent, linksContent };
+    }
+  }
+
+  return { mainContent: content, linksContent: null };
+}
+
+// Collapsible links card component
+const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Count the links
+  const linkCount = (linksContent.match(/\[.*?\]\(.*?\)/g) || []).length;
+
+  return (
+    <div className="mt-4 border border-blue-200/60 bg-gradient-to-br from-blue-50/80 to-indigo-50/50 rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-100/30 transition-colors"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-blue-900">Helpful Resources</p>
+            <p className="text-xs text-blue-600">{linkCount} link{linkCount !== 1 ? 's' : ''} to learn more</p>
+          </div>
+        </div>
+        <svg
+          className={`w-5 h-5 text-blue-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isExpanded && (
+        <div className="px-4 pb-4 pt-1 border-t border-blue-100">
+          <div className="prose prose-sm prose-blue max-w-none">
+            <ReactMarkdown
+              remarkPlugins={remarkPlugins}
+              rehypePlugins={rehypePlugins}
+              components={{
+                ...markdownComponents,
+                a: ({node, ...props}) => (
+                  <a
+                    {...props}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-700 hover:text-blue-900 underline decoration-blue-300 hover:decoration-blue-500 font-medium transition-colors"
+                  />
+                ),
+                p: ({node, ...props}) => <p {...props} className="mb-2 last:mb-0 text-neutral-700" />,
+                ul: ({node, ...props}) => <ul {...props} className="list-none ml-0 space-y-2 mt-2" />,
+                li: ({node, ...props}) => (
+                  <li {...props} className="flex items-start gap-2 text-sm text-neutral-700">
+                    <span className="text-blue-400 mt-0.5">→</span>
+                    <span className="flex-1">{props.children}</span>
+                  </li>
+                ),
+              }}
+            >
+              {linksContent}
+            </ReactMarkdown>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+});
+
+// Memoized message component to prevent re-renders when typing
+const MessageItem = memo(function MessageItem({ message, index, markdownComponents }) {
+  // Extract links section for assistant messages
+  const { mainContent, linksContent } = message.role === 'assistant'
+    ? extractLinksSection(message.content)
+    : { mainContent: message.content, linksContent: null };
+
+  return (
+    <div
+      className={`flex gap-5 ${
+        message.role === 'user' ? 'justify-end' : 'justify-start'
+      } animate-slideUp`}
+      style={{
+        animationDelay: `${Math.min(index * 40, 400)}ms`,
+        animationFillMode: 'both'
+      }}
+    >
+      {message.role === 'assistant' && (
+        <div
+          className="w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:from-neutral-100 dark:to-neutral-200 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
+          style={{
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+          }}
+        >
+          <span className="text-sm font-bold text-white dark:text-neutral-900">N</span>
+        </div>
+      )}
+      <div
+        className={`max-w-[75%] rounded-3xl px-6 py-5 shadow-lg transition-all duration-300 hover:shadow-xl ${
+          message.role === 'user'
+            ? 'bg-gradient-to-br from-neutral-100 to-neutral-50 dark:from-neutral-700 dark:to-neutral-800 text-neutral-900 dark:text-neutral-100 border border-neutral-200/50 dark:border-neutral-600/50'
+            : 'bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-700/50 text-neutral-900 dark:text-neutral-100'
+        }`}
+        style={{
+          boxShadow: message.role === 'user'
+            ? '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
+            : '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
+        }}
+      >
+        <ReactMarkdown
+          remarkPlugins={remarkPlugins}
+          rehypePlugins={rehypePlugins}
+          components={markdownComponents}
+        >
+          {fixMathDelimiters(mainContent)}
+        </ReactMarkdown>
+
+        {/* Collapsible Links Card */}
+        {linksContent && (
+          <LinksCard linksContent={linksContent} markdownComponents={markdownComponents} />
+        )}
+
+        {message.files && message.files.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {message.files.map((file, fileIndex) => (
+              <div key={fileIndex} className="bg-neutral-100/80 dark:bg-neutral-700/80 border border-neutral-200 dark:border-neutral-600 rounded-xl p-3">
+                {file.type === 'image' ? (
+                  <div>
+                    <img
+                      src={file.data}
+                      alt={file.name}
+                      className="rounded-lg max-w-full h-auto max-h-64 object-contain"
+                    />
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-2">{file.name}</p>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-neutral-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">{file.name}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {message.role === 'user' && (
+        <div className="w-10 h-10 bg-neutral-200/80 dark:bg-neutral-700/80 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+          <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">You</span>
+        </div>
+      )}
+    </div>
+  );
+});
+
 export default function Newton() {
-   const defaultSubjects = ['General'];
+  const { theme, toggleTheme } = useTheme();
+  const defaultSubjects = ['General'];
 
   const [currentSubject, setCurrentSubject] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -103,8 +317,6 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   const [draggedSubject, setDraggedSubject] = useState(null);
   const [draggedChat, setDraggedChat] = useState(null);
   const [expandedSubject, setExpandedSubject] = useState(null);
-  const [suggestedSubject, setSuggestedSubject] = useState(null);
-  const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(null);
   const [yearGroup, setYearGroup] = useState(() => {
@@ -137,6 +349,26 @@ const [showTutorial, setShowTutorial] = useState(() => {
   }
   return false;
 });
+const [showLinkRecommendations, setShowLinkRecommendations] = useState(() => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('newton-show-links') !== 'false';
+  }
+  return true;
+});
+const [archivedChats, setArchivedChats] = useState(() => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('newton-archived-chats');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse archived chats:', e);
+      }
+    }
+  }
+  return {};
+});
+const [chatSearch, setChatSearch] = useState('');
 const [buttonPositions, setButtonPositions] = useState({});
 const [tutorialStep, setTutorialStep] = useState(0);
 
@@ -209,24 +441,77 @@ useChatStorage(chatsBySubject, subjects, currentSubject, currentChatId);
   const currentChat = mounted && chatsBySubject[currentSubject]?.find(c => c.id === currentChatId);
   const messages = useMemo(() => currentChat?.messages || [], [currentChat]);
 
+  // Memoize markdown components to prevent chart re-renders when typing
+  const markdownComponents = useMemo(() => ({
+    a: ({node, ...props}) => (
+      <a
+        {...props}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-neutral-900 dark:text-neutral-100 underline hover:text-black dark:hover:text-white font-semibold transition-colors duration-200"
+      />
+    ),
+    p: ({node, ...props}) => <p {...props} className="mb-4 last:mb-0 leading-relaxed" />,
+    ul: ({node, ...props}) => <ul {...props} className="list-disc ml-5 mb-4 space-y-2" />,
+    ol: ({node, ...props}) => <ol {...props} className="list-decimal ml-5 mb-4 space-y-2" />,
+    li: ({node, ...props}) => <li {...props} className="mb-1.5 leading-relaxed" />,
+    strong: ({node, ...props}) => <strong {...props} className="font-bold text-black dark:text-white" />,
+    h1: ({node, ...props}) => <h1 {...props} className="text-xl font-bold my-4 text-neutral-900 dark:text-neutral-100" />,
+    h2: ({node, ...props}) => <h2 {...props} className="text-lg font-bold my-3 text-neutral-900 dark:text-neutral-100" />,
+    h3: ({node, ...props}) => <h3 {...props} className="text-base font-semibold my-2 text-neutral-800 dark:text-neutral-200" />,
+    code: ({node, inline, children, className, ...props}) => {
+      const match = /language-(\w+)/.exec(className || '');
+      const language = match ? match[1] : '';
+
+      if (!inline && language === 'mermaid') {
+        const code = String(children).replace(/\n$/, '');
+
+        // Detect xychart syntax which mermaid can't parse properly
+        if (code.includes('xychart') || code.includes('x-axis') || code.includes('y-axis')) {
+          return (
+            <div className="my-4 p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl">
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Graph format not supported</p>
+                  <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                    Newton tried to create a graph using an unsupported format. Please ask Newton to &quot;draw the graph using chart format&quot; instead.
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return <MermaidDiagram chart={code} />;
+      }
+
+      if (!inline && language === 'chart') {
+        const code = String(children).replace(/\n$/, '');
+        return <ChartDiagram config={code} />;
+      }
+
+      return inline ? (
+        <code {...props} className="bg-neutral-100 dark:bg-neutral-700 text-pink-600 dark:text-pink-400 px-2 py-0.5 rounded font-mono text-sm">
+          {children}
+        </code>
+      ) : (
+        <pre className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 p-4 rounded-xl my-3 overflow-x-auto">
+          <code {...props} className={`text-sm font-mono text-neutral-800 dark:text-neutral-200 block whitespace-pre-wrap leading-relaxed ${className || ''}`}>
+            {children}
+          </code>
+        </pre>
+      );
+    },
+  }), []);
+
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages]);
-
-  useEffect(() => {
-    if (messages.length > 0 && !dismissedSuggestion) {
-      const userMessages = messages.filter(m => m.role === 'user');
-      if (userMessages.length > 0) {
-        const lastUserMessage = userMessages[userMessages.length - 1];
-        const detected = detectSubject(lastUserMessage.content);
-        if (detected && detected !== currentSubject) {
-          setSuggestedSubject(detected);
-        }
-      }
-    }
-  }, [messages, currentSubject, dismissedSuggestion]);
 
   useEffect(() => {
     if (mounted) {
@@ -257,17 +542,19 @@ useChatStorage(chatsBySubject, subjects, currentSubject, currentChatId);
       localStorage.setItem('newton-year-group', yearGroup);
     }
   }, [yearGroup, mounted]);
-  
+
   useEffect(() => {
-  if (input.trim().length > 10 && !dismissedSuggestion) {
-    const detected = detectSubject(input);
-    if (detected && detected !== currentSubject) {
-      setSuggestedSubject(detected);
-    } else if (!detected) {
-      setSuggestedSubject(null);
+    if (mounted) {
+      localStorage.setItem('newton-show-links', showLinkRecommendations.toString());
     }
-  }
-}, [input, currentSubject, dismissedSuggestion]);
+  }, [showLinkRecommendations, mounted]);
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem('newton-archived-chats', JSON.stringify(archivedChats));
+    }
+  }, [archivedChats, mounted]);
+
 // Close menu when clicking outside
 useEffect(() => {
   const handleClickOutside = () => {
@@ -337,6 +624,31 @@ useEffect(() => {
   loadUserData();
 }, []);
 
+// Reload subjects when window regains focus (e.g., switching from dashboard)
+useEffect(() => {
+  const handleFocus = async () => {
+    const email = currentUserEmail || (typeof window !== 'undefined' ? localStorage.getItem('userEmail') : null);
+    if (!email) return;
+
+    try {
+      const { data } = await supabase
+        .from('user_chats')
+        .select('subjects')
+        .eq('user_email', email)
+        .single();
+
+      if (data && data.subjects) {
+        setSubjects(data.subjects);
+      }
+    } catch (error) {
+      console.error('Failed to reload subjects:', error);
+    }
+  };
+
+  window.addEventListener('focus', handleFocus);
+  return () => window.removeEventListener('focus', handleFocus);
+}, [currentUserEmail]);
+
   const startNewChat = () => {
     const newChatId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     setChatsBySubject(prev => ({
@@ -347,9 +659,7 @@ useEffect(() => {
       ]
     }));
     setCurrentChatId(newChatId);
-    setDismissedSuggestion(false);
-    setSuggestedSubject(null);
-    
+
     if (showTutorial && tutorialStep === 1) {
       nextTutorialStep();
     }
@@ -357,14 +667,12 @@ useEffect(() => {
 
   const switchChat = (chatId) => {
     setCurrentChatId(chatId);
-    setDismissedSuggestion(false);
-    setSuggestedSubject(null);
   };
 
   const deleteChat = (subj, chatId, e) => {
     e.stopPropagation();
     if (!window.confirm('Delete this chat?')) return;
-    
+
     setChatsBySubject(prev => {
       const updated = {
         ...prev,
@@ -375,7 +683,48 @@ useEffect(() => {
       }
       return updated;
     });
-    
+
+    if (currentChatId === chatId) {
+      const remaining = chatsBySubject[subj].filter(c => c.id !== chatId);
+      setCurrentChatId(remaining[0]?.id || null);
+    }
+    setMenuOpen(null);
+  };
+
+  const pinChat = (subj, chatId, e) => {
+    e.stopPropagation();
+    setChatsBySubject(prev => ({
+      ...prev,
+      [subj]: prev[subj].map(chat =>
+        chat.id === chatId ? { ...chat, pinned: !chat.pinned } : chat
+      )
+    }));
+    setMenuOpen(null);
+  };
+
+  const archiveChat = (subj, chatId, e) => {
+    e.stopPropagation();
+    const chatToArchive = chatsBySubject[subj]?.find(c => c.id === chatId);
+    if (!chatToArchive) return;
+
+    // Add to archived chats
+    setArchivedChats(prev => ({
+      ...prev,
+      [subj]: [...(prev[subj] || []), { ...chatToArchive, archivedAt: new Date().toISOString() }]
+    }));
+
+    // Remove from active chats
+    setChatsBySubject(prev => {
+      const updated = {
+        ...prev,
+        [subj]: prev[subj].filter(chat => chat.id !== chatId)
+      };
+      if (updated[subj].length === 0) {
+        updated[subj] = [{ id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, messages: [], date: new Date().toISOString() }];
+      }
+      return updated;
+    });
+
     if (currentChatId === chatId) {
       const remaining = chatsBySubject[subj].filter(c => c.id !== chatId);
       setCurrentChatId(remaining[0]?.id || null);
@@ -396,9 +745,7 @@ useEffect(() => {
       }));
       setCurrentChatId(newId);
     }
-    setDismissedSuggestion(false);
-    setSuggestedSubject(null);
-    
+
     if (showTutorial && tutorialStep === 2) {
       nextTutorialStep();
     }
@@ -723,7 +1070,6 @@ const sendMessage = async (e) => {
     setUploadedFiles([]);
     setIsLoading(true);
     setIsTyping(true);
-    setDismissedSuggestion(false);
 
     try {
       const response = await fetch('/api/chat', {
@@ -731,7 +1077,8 @@ const sendMessage = async (e) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...messages, userMessage],
-          yearGroup: yearGroup || 'year9'
+          yearGroup: yearGroup || 'year9',
+          showLinks: showLinkRecommendations
         }),
       });
 
@@ -830,12 +1177,12 @@ const sendMessage = async (e) => {
 
 if (isLoadingData) {
   return (
-    <div className="flex h-screen bg-neutral-100 items-center justify-center">
+    <div className="flex h-screen bg-neutral-100 dark:bg-neutral-900 items-center justify-center">
       <div className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl flex items-center justify-center shadow-2xl mb-4 mx-auto animate-pulse">
-          <span className="text-2xl font-bold text-white">N</span>
+        <div className="w-16 h-16 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:from-neutral-200 dark:to-neutral-100 rounded-2xl flex items-center justify-center shadow-2xl mb-4 mx-auto animate-pulse">
+          <span className="text-2xl font-bold text-white dark:text-neutral-900">N</span>
         </div>
-        <p className="text-neutral-600 font-medium">Loading your chats...</p>
+        <p className="text-neutral-600 dark:text-neutral-400 font-medium">Loading your chats...</p>
       </div>
     </div>
   );
@@ -852,66 +1199,37 @@ if (isLoadingData) {
   ];
 
   return (
-   <div className="flex h-screen bg-neutral-100 overflow-hidden">
+   <div className="flex h-screen bg-neutral-100 dark:bg-neutral-900 overflow-hidden">
       {/* Premium Glassmorphism Sidebar */}
-      <div 
+      <div
   className={`${
     sidebarOpen ? 'w-72' : 'w-0'
-  } bg-white/60 backdrop-blur-2xl border-r border-neutral-200/50 flex flex-col transition-all duration-300 ease-out overflow-hidden shadow-2xl md:relative fixed inset-y-0 left-0 z-50`}
+  } bg-white/60 dark:bg-neutral-800/60 backdrop-blur-2xl border-r border-neutral-200/50 dark:border-neutral-700/50 flex flex-col transition-all duration-300 ease-out overflow-hidden shadow-2xl md:relative fixed inset-y-0 left-0 z-50`}
   style={{
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
   }}
 >
         {/* Sidebar Header with Glassmorphism */}
-        <div className="p-6 border-b border-neutral-200/50 bg-white/30 backdrop-blur-xl">
-          <Link 
-            href="/chat" 
+        <div className="p-6 border-b border-neutral-200/50 dark:border-neutral-700/50 bg-white/30 dark:bg-neutral-800/30 backdrop-blur-xl">
+          <Link
+            href="/chat"
             className="flex items-center space-x-3 mb-6 group transition-all duration-250"
           >
-            <div className="w-9 h-9 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-              <span className="text-sm font-bold text-white">N</span>
+            <div className="w-9 h-9 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:from-neutral-100 dark:to-neutral-200 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              <span className="text-sm font-bold text-white dark:text-neutral-900">N</span>
             </div>
-            <span className="text-base font-semibold text-neutral-900 group-hover:text-black transition-colors duration-250">Newton</span>
+            <span className="text-base font-semibold text-neutral-900 dark:text-neutral-100 group-hover:text-black dark:group-hover:text-white transition-colors duration-250">Newton</span>
           </Link>
           
           {currentUserEmail && (
-            <div className="mb-4 p-3 bg-white/50 backdrop-blur-sm rounded-xl border border-neutral-200/50">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-neutral-600 mb-1">Logged in as</p>
-                  <p className="text-sm font-bold text-neutral-900 truncate">{currentUserEmail}</p>
-                </div>
-                <button
-                  onClick={() => {
-                    if (confirm('Log out?')) {
-                      // Clear all localStorage
-                      localStorage.removeItem('newton-auth-token');
-                      localStorage.removeItem('newton-year-group');
-                      localStorage.removeItem('newton-seen-welcome');
-                      localStorage.removeItem('newton-seen-tutorial');
-                      localStorage.removeItem('subjects');
-                      localStorage.removeItem('subject-colors');
-                      localStorage.removeItem('chats-by-subject');
-                      localStorage.removeItem('current-subject');
-                      localStorage.removeItem('current-chat-id');
-                      
-                      // Redirect to login
-                      window.location.href = '/';
-                    }
-                  }}
-                  className="ml-2 p-2 hover:bg-neutral-100 rounded-lg transition-all"
-                  title="Logout"
-                >
-                  <svg className="w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </button>
-              </div>
+            <div className="mb-4 p-3 bg-white/50 dark:bg-neutral-700/50 backdrop-blur-sm rounded-xl border border-neutral-200/50 dark:border-neutral-600/50">
+              <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1">Logged in as</p>
+              <p className="text-sm font-bold text-neutral-900 dark:text-neutral-100 truncate">{currentUserEmail}</p>
             </div>
           )}
 
           {currentUserEmail && (
-            <Link 
+            <Link
               href="/dashboard"
               onClick={(e) => {
                 if (showTutorial && tutorialStep === 5) {
@@ -919,7 +1237,7 @@ if (isLoadingData) {
                   nextTutorialStep();
                 }
               }}
-              className={`mb-4 w-full px-4 py-3 bg-white/50 backdrop-blur-sm rounded-xl border border-neutral-200/50 hover:bg-white/70 transition-all flex items-center gap-2 text-sm font-semibold text-neutral-700 hover:text-neutral-900 ${showTutorial && tutorialStep === 5 ? 'relative z-[102]' : ''}`}
+              className={`mb-4 w-full px-4 py-3 bg-white/50 dark:bg-neutral-700/50 backdrop-blur-sm rounded-xl border border-neutral-200/50 dark:border-neutral-600/50 hover:bg-white/70 dark:hover:bg-neutral-600/50 transition-all flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 ${showTutorial && tutorialStep === 5 ? 'relative z-[102]' : ''}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -942,7 +1260,24 @@ if (isLoadingData) {
         {/* Subjects List with Smooth Animations */}
         <div className="flex-1 overflow-y-auto px-3 py-4">
           {subjects.map((subject, subjectIndex) => {
-            const chats = chatsBySubject[subject] || [];
+            let chats = chatsBySubject[subject] || [];
+
+            // Filter chats by search query
+            if (chatSearch.trim()) {
+              chats = chats.filter(chat => {
+                const title = generateChatTitle(chat.messages, chat.title).toLowerCase();
+                const content = chat.messages.map(m => m.content).join(' ').toLowerCase();
+                const query = chatSearch.toLowerCase();
+                return title.includes(query) || content.includes(query);
+              });
+            }
+
+            // Sort: pinned first, then by date
+            chats = [...chats].sort((a, b) => {
+              if (a.pinned && !b.pinned) return -1;
+              if (!a.pinned && b.pinned) return 1;
+              return new Date(b.date) - new Date(a.date);
+            });
             const isExpanded = expandedSubject === subject;
             const hasChats = chats.some(c => c.messages.length > 0);
             
@@ -959,9 +1294,9 @@ if (isLoadingData) {
                 <div className="relative">
                   <div className={`
                     flex items-center justify-between rounded-xl transition-all duration-250
-                    ${currentSubject === subject 
-                      ? 'bg-white/80 backdrop-blur-sm shadow-md' 
-                      : 'hover:bg-white/40 backdrop-blur-sm'
+                    ${currentSubject === subject
+                      ? 'bg-white/80 dark:bg-neutral-700/80 backdrop-blur-sm shadow-md'
+                      : 'hover:bg-white/40 dark:hover:bg-neutral-700/40 backdrop-blur-sm'
                     }
                   `}>
                     <button
@@ -973,7 +1308,7 @@ if (isLoadingData) {
                     >
                       {hasChats && (
                         <svg
-                          className={`w-4 h-4 text-neutral-600 transition-all duration-300 ${
+                          className={`w-4 h-4 text-neutral-600 dark:text-white transition-all duration-300 ${
                             isExpanded ? 'rotate-90' : ''
                           }`}
                           fill="none"
@@ -984,7 +1319,7 @@ if (isLoadingData) {
                         </svg>
                       )}
                       <span className={`text-sm font-semibold transition-colors duration-250 ${
-                        currentSubject === subject ? 'text-black' : 'text-neutral-700'
+                        currentSubject === subject ? 'text-black dark:text-white' : 'text-neutral-700 dark:text-white'
                       }`}>
                         {subject}
                       </span>
@@ -997,27 +1332,28 @@ if (isLoadingData) {
                       }}
                       className="p-2.5 mr-2 hover:bg-neutral-100/80 rounded-lg transition-all duration-250 hover:scale-105 active:scale-95"
                     >
-                      <span className="text-neutral-600 font-bold text-lg">⋯</span>
+                      <span className="text-neutral-600 dark:text-white font-bold text-lg">⋯</span>
                     </button>
                   </div>
 
                   {/* Three-dot Menu Dropdown */}
                   {menuOpen === `subject-${subject}` && (
-                     <div 
-                       className="absolute right-2 top-14 bg-white border border-neutral-200/50 rounded-xl shadow-2xl z-50 min-w-[140px] overflow-hidden animate-scaleIn"                      style={{
+                     <div
+                       className="absolute right-2 top-14 bg-white dark:bg-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50 rounded-xl shadow-2xl z-50 min-w-[140px] overflow-hidden animate-scaleIn"
+                       style={{
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)'
                       }}
                     >
                       <button
                         onClick={(e) => renameSubject(subject, e)}
-                        className="w-full text-left px-4 py-3 hover:bg-neutral-50 text-neutral-900 text-sm font-medium transition-all duration-200"
+                        className="w-full text-left px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-sm font-medium transition-all duration-200"
                       >
                         Rename
                       </button>
-                      <div className="h-px bg-neutral-200/50"></div>
+                      <div className="h-px bg-neutral-200/50 dark:bg-neutral-700/50"></div>
                       <button
                         onClick={(e) => deleteSubject(subject, e)}
-                        className="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600 text-sm font-medium transition-all duration-200"
+                        className="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium transition-all duration-200"
                       >
                         Delete
                       </button>
@@ -1029,13 +1365,13 @@ if (isLoadingData) {
                 {isExpanded && hasChats && (
                   <div className="mt-2 ml-4 space-y-1 animate-slideDown overflow-hidden">
                     {chats.filter(c => c.messages.length > 0).map((chat, chatIndex) => (
-                      <div 
+                      <div
   key={chat.id}
   draggable
   onDragStart={(e) => handleChatDragStart(e, chat.id, subject)}
   onDragOver={(e) => handleChatDragOver(e, chat.id, subject)}
   onDragEnd={handleChatDragEnd}
-  className={`relative group animate-fadeIn cursor-move ${draggedChat?.id === chat.id ? 'opacity-50' : ''}`}
+  className={`relative group animate-fadeIn cursor-move ${draggedChat?.id === chat.id ? 'opacity-50' : ''} ${menuOpen === `chat-${chat.id}` ? 'z-50' : ''}`}
   style={{ animationDelay: `${chatIndex * 40}ms` }}
 >
                         <button
@@ -1043,30 +1379,78 @@ if (isLoadingData) {
                           className={`
                             w-full px-4 py-3 text-left rounded-xl transition-all duration-250
                             ${currentChatId === chat.id
-                              ? 'bg-white/90 backdrop-blur-sm shadow-md scale-[1.01]'
-                              : 'hover:bg-white/50 backdrop-blur-sm hover:scale-[1.01]'
+                              ? 'bg-white/90 dark:bg-neutral-700/90 backdrop-blur-sm shadow-md scale-[1.01]'
+                              : 'hover:bg-white/50 dark:hover:bg-neutral-700/50 backdrop-blur-sm hover:scale-[1.01]'
                             }
                           `}
                         >
-                          <div className="text-xs font-medium text-neutral-900 truncate pr-8">
-                            {generateChatTitle(chat.messages, chat.title)}
+                          <div className="flex items-center gap-2">
+                            {chat.pinned && (
+                              <svg className="w-3 h-3 text-amber-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5v6l1 1 1-1v-6h5v-2l-2-2z"/>
+                              </svg>
+                            )}
+                            <span className="text-xs font-medium text-neutral-900 dark:text-white truncate pr-6">
+                              {generateChatTitle(chat.messages, chat.title)}
+                            </span>
                           </div>
-                          <div className="text-xs text-neutral-500 mt-1.5">
-                            {new Date(chat.date).toLocaleDateString('en-GB', { 
-                              day: 'numeric', 
-                              month: 'short' 
+                          <div className="text-xs text-neutral-500 dark:text-neutral-300 mt-1.5">
+                            {new Date(chat.date).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short'
                             })}
                           </div>
                         </button>
-                        
+
+                        {/* Chat Menu Button */}
                         <button
-                          onClick={(e) => deleteChat(subject, chat.id, e)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-2 hover:bg-neutral-200/80 rounded-lg transition-all duration-250 hover:scale-110 active:scale-90"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuOpen(menuOpen === `chat-${chat.id}` ? null : `chat-${chat.id}`);
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-neutral-200/80 rounded-lg transition-all duration-250"
                         >
-                          <svg className="w-3.5 h-3.5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                          <svg className="w-4 h-4 text-neutral-500 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                           </svg>
                         </button>
+
+                        {/* Chat Context Menu */}
+                        {menuOpen === `chat-${chat.id}` && (
+                          <div
+                            className="absolute right-2 top-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50 rounded-xl shadow-2xl z-50 min-w-[140px] overflow-hidden animate-scaleIn"
+                            style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)' }}
+                          >
+                            <button
+                              onClick={(e) => pinChat(subject, chat.id, e)}
+                              className="w-full text-left px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm font-medium transition-colors flex items-center gap-2"
+                            >
+                              <svg className="w-4 h-4 text-amber-500" fill={chat.pinned ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5v6l1 1 1-1v-6h5v-2l-2-2z"/>
+                              </svg>
+                              {chat.pinned ? 'Unpin' : 'Pin'}
+                            </button>
+                            <button
+                              onClick={(e) => archiveChat(subject, chat.id, e)}
+                              className="w-full text-left px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm font-medium transition-colors flex items-center gap-2"
+                            >
+                              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                              </svg>
+                              Archive
+                            </button>
+                            <div className="h-px bg-neutral-200/50 dark:bg-neutral-700/50"></div>
+                            <button
+                              onClick={(e) => deleteChat(subject, chat.id, e)}
+                              className="w-full text-left px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium transition-colors flex items-center gap-2"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1084,16 +1468,31 @@ if (isLoadingData) {
           >
             + Add Subject
           </button>
-          <button
-            onClick={() => setShowSettings(true)}
-            className="w-full px-5 py-3 bg-white/70 backdrop-blur-sm border border-neutral-200/50 text-neutral-900 rounded-2xl text-sm font-medium hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2.5 shadow-sm hover:shadow-md"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span>Settings</span>
-          </button>
+          <div className="flex gap-2">
+            <Link
+              href="/chat/archive"
+              className="flex-1 px-4 py-3 bg-white/70 backdrop-blur-sm border border-neutral-200/50 text-neutral-700 rounded-2xl text-sm font-medium hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              <span>Archive</span>
+              {Object.values(archivedChats).flat().length > 0 && (
+                <span className="bg-neutral-200 text-neutral-600 text-xs px-1.5 py-0.5 rounded-full">
+                  {Object.values(archivedChats).flat().length}
+                </span>
+              )}
+            </Link>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="px-4 py-3 bg-white/70 backdrop-blur-sm border border-neutral-200/50 text-neutral-900 rounded-2xl text-sm font-medium hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1105,10 +1504,10 @@ if (isLoadingData) {
       )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="flex-1 flex flex-col bg-white dark:bg-neutral-900">
         {/* Premium Glassmorphism Header */}
-        <div 
-          className="h-16 border-b border-neutral-200/50 flex items-center justify-between px-8 bg-white/70 backdrop-blur-2xl"
+        <div
+          className="h-16 border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between px-8 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl"
           style={{
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
           }}
@@ -1116,15 +1515,15 @@ if (isLoadingData) {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2.5 hover:bg-neutral-100/80 rounded-xl transition-all duration-250 hover:scale-105 active:scale-95"
+              className="p-2.5 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 rounded-xl transition-all duration-250 hover:scale-105 active:scale-95"
             >
-              <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-neutral-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <div>
-              <h1 className="text-base font-bold text-neutral-900">{currentSubject}</h1>
-              <p className="text-xs text-neutral-500 mt-0.5">Learning together</p>
+              <h1 className="text-base font-bold text-neutral-900 dark:text-neutral-100">{currentSubject}</h1>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Learning together</p>
             </div>
           </div>
           
@@ -1153,50 +1552,14 @@ if (isLoadingData) {
     </svg>
     Report Issue
   </button>
-  <Link 
-    href="/chat" 
-    className="text-sm font-bold text-neutral-900 hover:text-black transition-colors duration-250"
+  <Link
+    href="/chat"
+    className="text-sm font-bold text-neutral-900 dark:text-neutral-100 hover:text-black dark:hover:text-white transition-colors duration-250"
   >
     Newton
   </Link>
 </div>
         </div>
-
-        {/* Suggestion Banner with Smooth Animation */}
-        {suggestedSubject && !dismissedSuggestion && (
-          <div className="bg-neutral-100/80 backdrop-blur-xl border-b border-neutral-200/50 px-8 py-4 flex items-center justify-between animate-slideDown">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-sm">
-                <svg className="w-4 h-4 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <span className="text-sm font-medium text-neutral-700">
-                Move to <strong className="text-black font-bold">{suggestedSubject}</strong>?
-              </span>
-            </div>
-            <div className="flex gap-2.5">
-              <button
-                onClick={() => {
-                  switchSubject(suggestedSubject);
-                  setSuggestedSubject(null);
-                }}
-                className="px-5 py-2 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white text-xs font-semibold rounded-full hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow-md"
-              >
-                Move
-              </button>
-              <button
-                onClick={() => {
-                  setDismissedSuggestion(true);
-                  setSuggestedSubject(null);
-                }}
-                className="px-5 py-2 bg-white/70 backdrop-blur-sm border border-neutral-200 text-neutral-700 text-xs font-semibold rounded-full hover:bg-white hover:border-neutral-300 transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Messages Area */}
         <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-8 py-10">
@@ -1204,18 +1567,18 @@ if (isLoadingData) {
             !hasSeenWelcome ? (
               /* Premium Welcome Screen */
               <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto animate-fadeIn">
-                <div 
-                  className="w-24 h-24 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-3xl flex items-center justify-center mb-8 shadow-2xl animate-float"
+                <div
+                  className="w-24 h-24 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:from-neutral-100 dark:to-neutral-200 rounded-3xl flex items-center justify-center mb-8 shadow-2xl animate-float"
                   style={{
                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2)'
                   }}
                 >
-                  <span className="text-4xl font-bold text-white">N</span>
+                  <span className="text-4xl font-bold text-white dark:text-neutral-900">N</span>
                 </div>
-                <h2 className="text-5xl font-extrabold text-neutral-900 mb-5 tracking-tight">
+                <h2 className="text-5xl font-extrabold text-neutral-900 dark:text-neutral-100 mb-5 tracking-tight">
                   Welcome to Newton
                 </h2>
-                <p className="text-xl text-neutral-600 mb-12 leading-relaxed max-w-2xl px-4">
+                <p className="text-xl text-neutral-600 dark:text-neutral-400 mb-12 leading-relaxed max-w-2xl px-4">
                   I&apos;m here to help you truly learn. I won&apos;t do your work—instead, I&apos;ll guide you to understand it yourself through questions and step-by-step thinking.
                 </p>
                 
@@ -1296,108 +1659,12 @@ if (isLoadingData) {
             /* Messages List with Premium Styling */
             <div className="max-w-4xl mx-auto space-y-6">
               {messages.map((message, index) => (
-                <div
+                <MessageItem
                   key={index}
-                  className={`flex gap-5 ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                  } animate-slideUp`}
-                  style={{ 
-                    animationDelay: `${Math.min(index * 40, 400)}ms`,
-                    animationFillMode: 'both'
-                  }}
-                >
-                  {message.role === 'assistant' && (
-                    <div 
-                      className="w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
-                      style={{
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-                      }}
-                    >
-                      <span className="text-sm font-bold text-white">N</span>
-                    </div>
-                  )}
-                  <div
-                    className={`max-w-[75%] rounded-3xl px-6 py-5 shadow-lg transition-all duration-300 hover:shadow-xl ${
-                      message.role === 'user'
-                        ? 'bg-gradient-to-br from-neutral-100 to-neutral-50 text-neutral-900 border border-neutral-200/50'
-                        : 'bg-white/90 backdrop-blur-sm border border-neutral-200/50 text-neutral-900'
-                    }`}
-                    style={{
-                      boxShadow: message.role === 'user' 
-                        ? '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
-                        : '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
-                    }}
-                  >
-                    <ReactMarkdown
-  remarkPlugins={[remarkMath, remarkGfm]}
-  rehypePlugins={[rehypeKatex]}
-  components={{
-    a: ({node, ...props}) => (
-      <a 
-        {...props} 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        className="text-neutral-900 underline hover:text-black font-semibold transition-colors duration-200" 
-      />
-    ),
-    p: ({node, ...props}) => <p {...props} className="mb-4 last:mb-0 leading-relaxed" />,
-    ul: ({node, ...props}) => <ul {...props} className="list-disc ml-5 mb-4 space-y-2" />,
-    ol: ({node, ...props}) => <ol {...props} className="list-decimal ml-5 mb-4 space-y-2" />,
-    li: ({node, ...props}) => <li {...props} className="mb-1.5 leading-relaxed" />,
-    strong: ({node, ...props}) => <strong {...props} className="font-bold text-black" />,
-    h1: ({node, ...props}) => <h1 {...props} className="text-xl font-bold my-4 text-neutral-900" />,
-    h2: ({node, ...props}) => <h2 {...props} className="text-lg font-bold my-3 text-neutral-900" />,
-    h3: ({node, ...props}) => <h3 {...props} className="text-base font-semibold my-2 text-neutral-800" />,
-    code: ({node, inline, children, ...props}) => 
-      inline ? (
-        <code {...props} className="bg-neutral-100 text-pink-600 px-2 py-0.5 rounded font-mono text-sm">
-          {children}
-        </code>
-      ) : (
-        <pre className="bg-neutral-50 border border-neutral-200 p-4 rounded-xl my-3 overflow-x-auto">
-          <code {...props} className="text-sm font-mono text-neutral-800 block whitespace-pre-wrap leading-relaxed">
-            {children}
-          </code>
-        </pre>
-      ),
-  }}
->
-  {message.content}
-</ReactMarkdown>
-
-                    {/* Display attached files */}
-                    {message.files && message.files.length > 0 && (
-                      <div className="mt-3 space-y-2">
-                        {message.files.map((file, fileIndex) => (
-                          <div key={fileIndex} className="bg-neutral-100/80 border border-neutral-200 rounded-xl p-3">
-                            {file.type === 'image' ? (
-                              <div>
-                                <img 
-                                  src={file.data} 
-                                  alt={file.name}
-                                  className="rounded-lg max-w-full h-auto max-h-64 object-contain"
-                                />
-                                <p className="text-xs text-neutral-600 mt-2">{file.name}</p>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                                <span className="text-sm font-semibold text-neutral-700">{file.name}</span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  {message.role === 'user' && (
-                    <div className="w-10 h-10 bg-neutral-200/80 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
-                      <span className="text-xs font-bold text-neutral-700">You</span>
-                    </div>
-                  )}
-                </div>
+                  message={message}
+                  index={index}
+                  markdownComponents={markdownComponents}
+                />
               ))}
               
               {/* Premium Typing Indicator with Gradient Animation */}
@@ -1441,8 +1708,8 @@ if (isLoadingData) {
         </div>
 
         {/* Premium Input Area with Glassmorphism */}
-        <div 
-          className="border-t border-neutral-200/50 p-8 bg-white/70 backdrop-blur-2xl"
+        <div
+          className="border-t border-neutral-200/50 dark:border-neutral-700/50 p-8 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl"
           style={{
             boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.04)'
           }}
@@ -1504,10 +1771,10 @@ if (isLoadingData) {
                     }
                   }}
                   placeholder={`Ask about ${currentSubject.toLowerCase()}...`}
-                  className="w-full px-6 py-4 bg-white/90 backdrop-blur-sm border-2 border-neutral-200/50 rounded-3xl resize-none focus:outline-none focus:border-neutral-400/70 focus:bg-white focus:shadow-lg transition-all duration-300 text-neutral-900 placeholder-neutral-400 font-medium shadow-md"
+                  className="w-full px-6 py-4 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm border-2 border-neutral-200/50 dark:border-neutral-600/50 rounded-3xl resize-none focus:outline-none focus:border-neutral-400/70 dark:focus:border-neutral-500/70 focus:bg-white dark:focus:bg-neutral-800 focus:shadow-lg transition-all duration-300 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 font-medium shadow-md"
                   rows={1}
-                  style={{ 
-                    minHeight: '60px', 
+                  style={{
+                    minHeight: '60px',
                     maxHeight: '200px',
                     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)'
                   }}
@@ -1533,7 +1800,7 @@ if (isLoadingData) {
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="px-8 py-4 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-3xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3 hover:scale-105 active:scale-95 disabled:hover:scale-100"
+                className="px-8 py-4 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:bg-white dark:from-transparent dark:to-transparent text-white dark:text-neutral-900 rounded-3xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3 hover:scale-105 active:scale-95 disabled:hover:scale-100"
                 style={{
                   minWidth: '140px',
                   boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15)'
@@ -1607,12 +1874,12 @@ if (isLoadingData) {
       
 {/* Settings Modal */}
       {showSettings && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-6 animate-fadeIn"
           onClick={() => setShowSettings(false)}
         >
-          <div 
-            className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
+          <div
+            className="bg-white/95 dark:bg-neutral-800/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
             style={{
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2)'
@@ -1620,19 +1887,19 @@ if (isLoadingData) {
           >
             <div className="p-10">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-extrabold text-neutral-900 tracking-tight">Settings</h2>
+                <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-neutral-100 tracking-tight">Settings</h2>
                 <button
                   onClick={() => setShowSettings(false)}
-                  className="p-3 hover:bg-neutral-100/80 rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
+                  className="p-3 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
                 >
-                  <svg className="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-neutral-600 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-              
+
               <div>
-                <label className="text-sm font-bold text-neutral-900 block mb-4">Year Group</label>
+                <label className="text-sm font-bold text-neutral-900 dark:text-neutral-100 block mb-4">Year Group</label>
                 <div className="grid grid-cols-2 gap-3">
                   {yearOptions.map((option) => (
                     <button
@@ -1643,11 +1910,11 @@ if (isLoadingData) {
                       }}
                       className={`px-5 py-4 rounded-2xl text-left font-semibold transition-all duration-300 hover:scale-105 active:scale-95 ${
                         yearGroup === option.value
-                          ? 'bg-gradient-to-r from-neutral-900 to-neutral-800 text-white shadow-xl'
-                          : 'bg-neutral-100/80 backdrop-blur-sm text-neutral-700 hover:bg-neutral-200/80 border border-neutral-200/50 shadow-sm'
+                          ? 'bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 text-white dark:text-neutral-900 shadow-xl'
+                          : 'bg-neutral-100/80 dark:bg-neutral-700/80 backdrop-blur-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200/80 dark:hover:bg-neutral-600/80 border border-neutral-200/50 dark:border-neutral-600/50 shadow-sm'
                       }`}
                       style={{
-                        boxShadow: yearGroup === option.value 
+                        boxShadow: yearGroup === option.value
                           ? '0 8px 24px rgba(0, 0, 0, 0.2)'
                           : '0 2px 8px rgba(0, 0, 0, 0.04)'
                       }}
@@ -1656,12 +1923,61 @@ if (isLoadingData) {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-neutral-500 mt-5 font-medium">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-5 font-medium">
                   Current: {yearOptions.find(y => y.value === yearGroup)?.label || 'Not set'}
                 </p>
               </div>
 
-              <div className="mt-8 pt-8 border-t border-neutral-200">
+              <div className="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+                <label className="text-sm font-bold text-neutral-900 dark:text-neutral-100 block mb-4">Preferences</label>
+                <div
+                  className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-2xl cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                  onClick={() => setShowLinkRecommendations(!showLinkRecommendations)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center">
+                      <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Link Recommendations</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">Show helpful learning resources after each response</p>
+                    </div>
+                  </div>
+                  <div className={`w-12 h-7 rounded-full transition-colors duration-200 ${showLinkRecommendations ? 'bg-blue-600' : 'bg-neutral-300 dark:bg-neutral-600'}`}>
+                    <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${showLinkRecommendations ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </div>
+                </div>
+
+                <div
+                  className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-700/50 rounded-2xl cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors mt-3"
+                  onClick={toggleTheme}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-neutral-200 dark:bg-neutral-600 rounded-xl flex items-center justify-center">
+                      {theme === 'dark' ? (
+                        <svg className="w-5 h-5 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 text-neutral-700 dark:text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Dark Mode</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">Switch between light and dark themes</p>
+                    </div>
+                  </div>
+                  <div className={`w-12 h-7 rounded-full transition-colors duration-200 ${theme === 'dark' ? 'bg-blue-600' : 'bg-neutral-300 dark:bg-neutral-600'}`}>
+                    <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
                 <button
                   onClick={() => {
                     setShowSettings(false);
@@ -1675,6 +1991,24 @@ if (isLoadingData) {
                   Retake Tutorial
                 </button>
               </div>
+
+              {currentUserEmail && (
+                <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('newton-auth-token');
+                      setCurrentUserEmail(null);
+                      window.location.href = '/';
+                    }}
+                    className="w-full px-5 py-4 bg-red-500 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 text-white rounded-2xl font-semibold transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Log Out
+                  </button>
+                </div>
+              )}
 
             </div>
           </div>
@@ -1764,24 +2098,24 @@ if (isLoadingData) {
           {/* Tutorial content cards */}
           {tutorialStep === 0 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-12 text-center animate-scaleIn">
-                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
-                  <span className="text-4xl font-bold text-white">N</span>
+              <div className="bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl max-w-2xl w-full p-12 text-center animate-scaleIn">
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-neutral-800 to-neutral-900 dark:from-neutral-100 dark:to-neutral-200 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
+                  <span className="text-4xl font-bold text-white dark:text-neutral-900">N</span>
                 </div>
-                <h2 className="text-4xl font-extrabold text-neutral-900 mb-4">Welcome to Newton!</h2>
-                <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
+                <h2 className="text-4xl font-extrabold text-neutral-900 dark:text-neutral-100 mb-4">Welcome to Newton!</h2>
+                <p className="text-xl text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed">
                   Let's take a quick tour. This will only take a minute!
                 </p>
                 <div className="flex gap-4 justify-center">
                   <button
                     onClick={skipTutorial}
-                    className="px-6 py-3 bg-neutral-100 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-200 transition-all"
+                    className="px-6 py-3 bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-all"
                   >
                     Skip Tour
                   </button>
                   <button
                     onClick={nextTutorialStep}
-                    className="px-8 py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-xl font-semibold hover:scale-105 transition-all shadow-lg"
+                    className="px-8 py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 text-white dark:text-neutral-900 rounded-xl font-semibold hover:scale-105 transition-all shadow-lg"
                   >
                     Start Tour →
                   </button>
@@ -1791,8 +2125,8 @@ if (isLoadingData) {
           )}
 
           {tutorialStep === 1 && (
-  <div 
-    className="absolute bg-white rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+  <div
+    className="absolute bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '285px',
       left: sidebarOpen ? '300px' : '50px',
@@ -1802,8 +2136,8 @@ if (isLoadingData) {
               <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 1
               </div>
-              <h3 className="text-xl font-bold text-neutral-900 mb-2">New Conversations</h3>
-              <p className="text-neutral-600 mb-4">
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">New Conversations</h3>
+              <p className="text-neutral-600 dark:text-neutral-400 mb-4">
                 Click "New conversation" to start a fresh chat. Each is automatically saved by subject!
               </p>
               <div className="flex gap-3 justify-end">
@@ -1822,7 +2156,7 @@ if (isLoadingData) {
 
           {tutorialStep === 2 && (
   <div 
-    className="absolute bg-white rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+    className="absolute bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '315px',
       left: sidebarOpen ? '265px' : '50px',
@@ -1852,19 +2186,19 @@ if (isLoadingData) {
 
           {tutorialStep === 3 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full p-10 animate-scaleIn">
+              <div className="bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl max-w-3xl w-full p-10 animate-scaleIn">
                 <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                   3
                 </div>
-                <h3 className="text-2xl font-bold text-neutral-900 mb-6">How Newton Helps You Learn</h3>
-                
-                <div className="bg-neutral-50 rounded-2xl p-6 mb-6">
+                <h3 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-6">How Newton Helps You Learn</h3>
+
+                <div className="bg-neutral-50 dark:bg-neutral-700/50 rounded-2xl p-6 mb-6">
                   <div className="flex gap-4 mb-4">
                     <div className="w-10 h-10 bg-neutral-400 rounded-xl flex items-center justify-center flex-shrink-0">
       <span className="text-xs font-bold text-white">You</span>
     </div>
-                    <div className="flex-1 bg-white rounded-xl p-4 shadow-sm">
-                      <p className="text-neutral-900">What's the answer to 2x + 5 = 15?</p>
+                    <div className="flex-1 bg-white dark:bg-neutral-700 rounded-xl p-4 shadow-sm">
+                      <p className="text-neutral-900 dark:text-neutral-100">What's the answer to 2x + 5 = 15?</p>
                     </div>
                   </div>
                   
@@ -1926,7 +2260,7 @@ if (isLoadingData) {
 
           {tutorialStep === 4 && (
             <div 
-              className="absolute bg-white rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+              className="absolute bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
               style={{
                 top: '80px',
                 right: '50px',
@@ -1956,7 +2290,7 @@ if (isLoadingData) {
 
           {tutorialStep === 5 && currentUserEmail && (
   <div 
-    className="absolute bg-white rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+    className="absolute bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '230px',
       left: sidebarOpen ? '300px' : '50px',
@@ -1988,14 +2322,14 @@ if (isLoadingData) {
 
           {tutorialStep === 6 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-10 text-center animate-scaleIn">
+              <div className="bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl max-w-2xl w-full p-10 text-center animate-scaleIn">
                 <div className="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-green-600 rounded-3xl flex items-center justify-center mb-6 shadow-xl">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-3xl font-bold text-neutral-900 mb-4">You're All Set!</h3>
-                <p className="text-xl text-neutral-600 mb-8">
+                <h3 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">You're All Set!</h3>
+                <p className="text-xl text-neutral-600 dark:text-neutral-400 mb-8">
                   Ready to start learning? Ask Newton your first question!
                 </p>
                 <button
@@ -2012,12 +2346,12 @@ if (isLoadingData) {
 
       {/* Report Issue Modal */}
       {showReportIssue && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-6 animate-fadeIn"
           onClick={() => setShowReportIssue(false)}
         >
-          <div 
-            className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-scaleIn"
+          <div
+            className="bg-white/95 dark:bg-neutral-800/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
             style={{
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2)'
@@ -2025,13 +2359,13 @@ if (isLoadingData) {
           >
             <div className="p-10">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-extrabold text-neutral-900 tracking-tight">Report Issue</h2>
+                <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-neutral-100 tracking-tight">Report Issue</h2>
                 <button
                   onClick={() => {
                     setShowReportIssue(false);
                     setScreenshot(null);
                   }}
-                  className="p-3 hover:bg-neutral-100/80 rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
+                  className="p-3 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/80 rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
                 >
                   <svg className="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />

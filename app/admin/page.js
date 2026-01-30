@@ -21,6 +21,7 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterYearGroup, setFilterYearGroup] = useState('all');
   const [unviewedReportsCount, setUnviewedReportsCount] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
   if (currentTab === 'reports' && unviewedReportsCount > 0) {
@@ -184,8 +185,44 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-neutral-900">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-neutral-800 border-b border-neutral-700 px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
+            <span className="text-sm font-bold text-white">A</span>
+          </div>
+          <span className="text-white font-semibold">Admin Panel</span>
+        </div>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 text-neutral-400 hover:text-white transition-colors"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {sidebarOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar Navigation */}
-      <div className="w-64 bg-neutral-800 border-r border-neutral-700 flex flex-col">
+      <div className={`
+        fixed md:relative z-50 md:z-auto
+        w-64 bg-neutral-800 border-r border-neutral-700 flex flex-col
+        h-full md:h-screen
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
         <div className="p-6 border-b border-neutral-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
@@ -200,7 +237,7 @@ export default function AdminDashboard() {
 
         <nav className="flex-1 p-4 space-y-1">
           <button
-            onClick={() => setCurrentTab('overview')}
+            onClick={() => { setCurrentTab('overview'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'overview'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -214,7 +251,7 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            onClick={() => setCurrentTab('users')}
+            onClick={() => { setCurrentTab('users'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'users'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -231,7 +268,7 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            onClick={() => setCurrentTab('conversations')}
+            onClick={() => { setCurrentTab('conversations'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'conversations'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -245,7 +282,7 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            onClick={() => setCurrentTab('reports')}
+            onClick={() => { setCurrentTab('reports'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'reports'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -264,7 +301,7 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            onClick={() => setCurrentTab('analytics')}
+            onClick={() => { setCurrentTab('analytics'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'analytics'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -281,6 +318,7 @@ export default function AdminDashboard() {
         <div className="p-4 border-t border-neutral-700">
           <Link
             href="/"
+            onClick={() => setSidebarOpen(false)}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 rounded-xl transition-all font-semibold"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,9 +330,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden pt-14 md:pt-0">
         {/* Header */}
-        <div className="bg-neutral-800 border-b border-neutral-700 px-8 py-6">
+        <div className="bg-neutral-800 border-b border-neutral-700 px-4 md:px-8 py-4 md:py-6">
           <h2 className="text-2xl font-bold text-white capitalize">{currentTab}</h2>
           <p className="text-neutral-400 text-sm mt-1">
             {currentTab === 'overview' && 'System overview and key metrics'}
@@ -306,7 +344,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-neutral-900 p-8">
+        <div className="flex-1 overflow-y-auto bg-neutral-900 p-4 md:p-8">
           {currentTab === 'overview' && analytics && (
             <div className="max-w-7xl mx-auto space-y-6">
               {/* Stats Grid */}
@@ -470,7 +508,7 @@ export default function AdminDashboard() {
           {currentTab === 'users' && (
             <div className="max-w-7xl mx-auto space-y-6">
               {/* Search and Filter */}
-              <div className="flex gap-4 items-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
                 <div className="flex-1 relative">
                   <input
                     type="text"
@@ -486,7 +524,7 @@ export default function AdminDashboard() {
                 <select
                   value={filterYearGroup}
                   onChange={(e) => setFilterYearGroup(e.target.value)}
-                  className="px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white focus:outline-none focus:border-blue-600 transition-all"
+                  className="w-full sm:w-auto px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white focus:outline-none focus:border-blue-600 transition-all"
                 >
                   <option value="all">All Year Groups</option>
                   <option value="year7">Year 7</option>
@@ -563,20 +601,20 @@ export default function AdminDashboard() {
                                 </span>
                               )}
                             </td>
-                            <td className="py-4 px-6 text-right">
-                              <div className="flex justify-end gap-2">
+                            <td className="py-4 px-4 md:px-6 text-right">
+                              <div className="flex flex-col sm:flex-row justify-end gap-1.5 sm:gap-2">
                                 <button
                                   onClick={() => {
                                     setSelectedUser(user);
                                     setCurrentTab('conversations');
                                   }}
-                                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-all"
+                                  className="px-2 sm:px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-all"
                                 >
-                                  View Chats
+                                  View
                                 </button>
                                 <button
                                   onClick={() => banUser(user.id, !user.banned)}
-                                  className={`px-3 py-1.5 ${
+                                  className={`px-2 sm:px-3 py-1.5 ${
                                     user.banned
                                       ? 'bg-green-600 hover:bg-green-700'
                                       : 'bg-yellow-600 hover:bg-yellow-700'
@@ -586,7 +624,7 @@ export default function AdminDashboard() {
                                 </button>
                                 <button
                                   onClick={() => deleteUser(user.id)}
-                                  className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-all"
+                                  className="px-2 sm:px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-all"
                                 >
                                   Delete
                                 </button>
@@ -603,90 +641,93 @@ export default function AdminDashboard() {
           )}
 
           {currentTab === 'conversations' && (
-            <div className="flex h-full gap-6">
-              {/* User Selection */}
-              <div className="w-60 bg-neutral-800 border border-neutral-700 rounded-2xl p-4 space-y-2 overflow-y-auto">
-                <h3 className="text-sm font-bold text-white mb-3 px-2">Select User</h3>
-                {users.filter(u => !u.is_admin).map((user) => (
-                  <button
-                    key={user.id}
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setSelectedSubject(null);
-                      setSelectedChat(null);
-                    }}
-                    className={`w-full p-3 rounded-xl text-left transition-all ${
-                      selectedUser?.id === user.id
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
-                    }`}
-                  >
-                    <p className="text-sm font-medium truncate">{user.email}</p>
-                    <p className="text-xs opacity-70">
-                      {user.chat_data?.chatsBySubject
-                        ? Object.values(user.chat_data.chatsBySubject).reduce((acc, chats) => acc + chats.length, 0)
-                        : 0}{' '}
-                      chats
-                    </p>
-                  </button>
-                ))}
-              </div>
-
-              {/* Subject Selection */}
-              {selectedUser && selectedUser.chat_data?.chatsBySubject && (
-                <div className="w-60 bg-neutral-800 border border-neutral-700 rounded-2xl p-4 space-y-2 overflow-y-auto">
-                  <h3 className="text-sm font-bold text-white mb-3 px-2">Select Subject</h3>
-                  {Object.keys(selectedUser.chat_data.chatsBySubject).map((subject) => (
+            <div className="flex flex-col lg:flex-row h-full gap-4 lg:gap-6">
+              {/* Selection Panels - Horizontal scroll on mobile */}
+              <div className="flex lg:flex-col gap-3 lg:gap-4 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+                {/* User Selection */}
+                <div className="min-w-[200px] lg:min-w-0 w-[200px] lg:w-60 flex-shrink-0 bg-neutral-800 border border-neutral-700 rounded-2xl p-3 lg:p-4 space-y-2 max-h-48 lg:max-h-none overflow-y-auto">
+                  <h3 className="text-sm font-bold text-white mb-2 lg:mb-3 px-2">Select User</h3>
+                  {users.filter(u => !u.is_admin).map((user) => (
                     <button
-                      key={subject}
+                      key={user.id}
                       onClick={() => {
-                        setSelectedSubject(subject);
+                        setSelectedUser(user);
+                        setSelectedSubject(null);
                         setSelectedChat(null);
                       }}
-                      className={`w-full p-3 rounded-xl text-left transition-all ${
-                        selectedSubject === subject
+                      className={`w-full p-2 lg:p-3 rounded-xl text-left transition-all ${
+                        selectedUser?.id === user.id
                           ? 'bg-blue-600 text-white'
                           : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
                       }`}
                     >
-                      <p className="text-sm font-medium">{subject}</p>
+                      <p className="text-xs lg:text-sm font-medium truncate">{user.email}</p>
                       <p className="text-xs opacity-70">
-                        {selectedUser.chat_data.chatsBySubject[subject].length} chats
+                        {user.chat_data?.chatsBySubject
+                          ? Object.values(user.chat_data.chatsBySubject).reduce((acc, chats) => acc + chats.length, 0)
+                          : 0}{' '}
+                        chats
                       </p>
                     </button>
                   ))}
                 </div>
-              )}
 
-              {/* Chat Selection */}
-              {selectedSubject && selectedUser.chat_data?.chatsBySubject[selectedSubject] && (
-                <div className="w-60 bg-neutral-800 border border-neutral-700 rounded-2xl p-4 space-y-2 overflow-y-auto">
-                  <h3 className="text-sm font-bold text-white mb-3 px-2">Select Chat</h3>
-                  {selectedUser.chat_data.chatsBySubject[selectedSubject]
-                    .filter(chat => chat.messages && chat.messages.length > 0)
-                    .map((chat) => (
+                {/* Subject Selection */}
+                {selectedUser && selectedUser.chat_data?.chatsBySubject && (
+                  <div className="min-w-[200px] lg:min-w-0 w-[200px] lg:w-60 flex-shrink-0 bg-neutral-800 border border-neutral-700 rounded-2xl p-3 lg:p-4 space-y-2 max-h-48 lg:max-h-none overflow-y-auto">
+                    <h3 className="text-sm font-bold text-white mb-2 lg:mb-3 px-2">Select Subject</h3>
+                    {Object.keys(selectedUser.chat_data.chatsBySubject).map((subject) => (
                       <button
-                        key={chat.id}
-                        onClick={() => setSelectedChat(chat)}
-                        className={`w-full p-3 rounded-xl text-left transition-all ${
-                          selectedChat?.id === chat.id
+                        key={subject}
+                        onClick={() => {
+                          setSelectedSubject(subject);
+                          setSelectedChat(null);
+                        }}
+                        className={`w-full p-2 lg:p-3 rounded-xl text-left transition-all ${
+                          selectedSubject === subject
                             ? 'bg-blue-600 text-white'
                             : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
                         }`}
                       >
-                        <p className="text-sm line-clamp-2">
-                          {chat.messages[0]?.content?.substring(0, 60)}...
-                        </p>
-                        <p className="text-xs opacity-70 mt-1">
-                          {chat.messages.length} messages • {new Date(chat.date).toLocaleDateString()}
+                        <p className="text-xs lg:text-sm font-medium">{subject}</p>
+                        <p className="text-xs opacity-70">
+                          {selectedUser.chat_data.chatsBySubject[subject].length} chats
                         </p>
                       </button>
                     ))}
-                </div>
-              )}
+                  </div>
+                )}
+
+                {/* Chat Selection */}
+                {selectedSubject && selectedUser.chat_data?.chatsBySubject[selectedSubject] && (
+                  <div className="min-w-[200px] lg:min-w-0 w-[200px] lg:w-60 flex-shrink-0 bg-neutral-800 border border-neutral-700 rounded-2xl p-3 lg:p-4 space-y-2 max-h-48 lg:max-h-none overflow-y-auto">
+                    <h3 className="text-sm font-bold text-white mb-2 lg:mb-3 px-2">Select Chat</h3>
+                    {selectedUser.chat_data.chatsBySubject[selectedSubject]
+                      .filter(chat => chat.messages && chat.messages.length > 0)
+                      .map((chat) => (
+                        <button
+                          key={chat.id}
+                          onClick={() => setSelectedChat(chat)}
+                          className={`w-full p-2 lg:p-3 rounded-xl text-left transition-all ${
+                            selectedChat?.id === chat.id
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+                          }`}
+                        >
+                          <p className="text-xs lg:text-sm line-clamp-2">
+                            {chat.messages[0]?.content?.substring(0, 60)}...
+                          </p>
+                          <p className="text-xs opacity-70 mt-1">
+                            {chat.messages.length} messages • {new Date(chat.date).toLocaleDateString()}
+                          </p>
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
 
               {/* Chat Viewer */}
-              <div className="flex-1 bg-neutral-800 border border-neutral-700 rounded-2xl flex flex-col">
+              <div className="flex-1 bg-neutral-800 border border-neutral-700 rounded-2xl flex flex-col min-h-[400px] lg:min-h-0">
                 {selectedChat ? (
                   <>
                     <div className="p-6 border-b border-neutral-700">

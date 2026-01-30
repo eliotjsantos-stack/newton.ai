@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@/components/ThemeProvider';
 
 export default function SubjectPage({ params }) {
   const router = useRouter();
@@ -33,10 +34,10 @@ export default function SubjectPage({ params }) {
   if (!mounted || !subject) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
       {/* Premium Glassmorphism Header */}
       <header 
-        className="bg-white/70 backdrop-blur-2xl border-b border-neutral-200/50 sticky top-0 z-40"
+        className="bg-white/70 dark:bg-neutral-900/70 backdrop-blur-2xl border-b border-neutral-200/50 dark:border-neutral-700/50 sticky top-0 z-40"
         style={{
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)'
         }}
@@ -44,22 +45,22 @@ export default function SubjectPage({ params }) {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-6">
           <div className="flex items-center justify-between">
             <Link href="/dashboard" className="flex items-center gap-3 group">
-              <svg className="w-6 h-6 text-neutral-600 group-hover:text-black transition-all duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-neutral-600 dark:text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-all duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              <span className="text-base font-bold text-neutral-700 group-hover:text-black transition-colors duration-300">
+              <span className="text-base font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
                 Back to Dashboard
               </span>
             </Link>
 
             <div className="flex items-center gap-3">
               <div 
-                className="w-10 h-10 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-2xl flex items-center justify-center shadow-lg"
+                className="w-10 h-10 bg-gradient-to-br from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 rounded-2xl flex items-center justify-center shadow-lg"
                 style={{
                   boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)'
                 }}
               >
-                <span className="text-base font-bold text-white">{subject.charAt(0)}</span>
+                <span className="text-base font-bold text-white dark:text-neutral-900">{subject.charAt(0)}</span>
               </div>
             </div>
           </div>
@@ -69,10 +70,10 @@ export default function SubjectPage({ params }) {
       {/* Subject Hero Section */}
       <section className="py-16 px-6 sm:px-8 lg:px-12">
         <div className="max-w-7xl mx-auto text-center animate-fadeIn">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-neutral-900 mb-6 tracking-tight">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
             {subject}
           </h1>
-          <p className="text-xl text-neutral-600 max-w-2xl mx-auto font-medium">
+          <p className="text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto font-medium">
             Choose how you want to learn today
           </p>
         </div>
@@ -82,7 +83,7 @@ export default function SubjectPage({ params }) {
       <section className="px-6 sm:px-8 lg:px-12 mb-12">
         <div className="max-w-5xl mx-auto">
           <div 
-            className="flex gap-3 p-2 bg-white/70 backdrop-blur-2xl border border-neutral-200/50 rounded-3xl shadow-xl"
+            className="flex gap-3 p-2 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-xl"
             style={{
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
             }}
@@ -114,8 +115,8 @@ export default function SubjectPage({ params }) {
                 onClick={() => handleTabChange(tab.id)}
                 className={`flex-1 px-6 py-4 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2.5 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-neutral-900 to-neutral-800 text-white shadow-xl scale-105'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-white/80 backdrop-blur-sm hover:scale-105'
+                    ? 'bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 text-white dark:text-neutral-900 shadow-xl scale-105'
+                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-neutral-700/80 backdrop-blur-sm hover:scale-105'
                 } hover:shadow-lg active:scale-95 animate-slideIn`}
                 style={{
                   animationDelay: `${index * 80}ms`,
@@ -137,7 +138,7 @@ export default function SubjectPage({ params }) {
           {/* Quiz Tab */}
           {activeTab === 'quiz' && (
             <div 
-              className="p-12 bg-white/70 backdrop-blur-2xl border border-neutral-200/50 rounded-3xl shadow-2xl animate-fadeIn"
+              className="p-12 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-2xl animate-fadeIn"
               style={{
                 boxShadow: '0 16px 48px rgba(0, 0, 0, 0.1)'
               }}
@@ -154,10 +155,10 @@ export default function SubjectPage({ params }) {
                   </svg>
                 </div>
 
-                <h2 className="text-4xl font-extrabold text-neutral-900 mb-6 tracking-tight">
+                <h2 className="text-4xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
                   Smart Quizzes Coming Soon
                 </h2>
-                <p className="text-lg text-neutral-600 mb-10 leading-relaxed font-medium">
+                <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-10 leading-relaxed font-medium">
                   Upload your homework, notes, or textbook pages, and Newton will generate personalized quizzes to test your understanding.
                 </p>
 
@@ -203,21 +204,21 @@ export default function SubjectPage({ params }) {
                   ].map((feature, i) => (
                     <div 
                       key={i}
-                      className="p-6 bg-neutral-50/70 backdrop-blur-sm border border-neutral-200/50 rounded-2xl text-left shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                      className="p-6 bg-neutral-50/70 dark:bg-neutral-700/50 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl text-left shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
                     >
-                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-4 shadow-sm">
+                      <div className="w-12 h-12 bg-white dark:bg-neutral-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
                         {feature.icon}
                       </div>
-                      <h3 className="font-bold text-neutral-900 mb-2">{feature.title}</h3>
-                      <p className="text-sm text-neutral-600 font-medium">{feature.desc}</p>
+                      <h3 className="font-bold text-neutral-900 dark:text-white mb-2">{feature.title}</h3>
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">{feature.desc}</p>
                     </div>
                   ))}
                 </div>
 
                 <div 
-                  className="p-6 bg-neutral-100/70 backdrop-blur-sm border border-neutral-200/50 rounded-2xl"
+                  className="p-6 bg-neutral-100/70 dark:bg-neutral-700/50 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl"
                 >
-                  <p className="text-sm text-neutral-700 font-semibold">
+                  <p className="text-sm text-neutral-700 dark:text-neutral-300 font-semibold">
                     💡 For now, use AI Chat to ask questions about your {subject.toLowerCase()} work
                   </p>
                 </div>
@@ -228,7 +229,7 @@ export default function SubjectPage({ params }) {
           {/* Progress Tab */}
           {activeTab === 'progress' && (
             <div 
-              className="p-12 bg-white/70 backdrop-blur-2xl border border-neutral-200/50 rounded-3xl shadow-2xl animate-fadeIn"
+              className="p-12 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-2xl animate-fadeIn"
               style={{
                 boxShadow: '0 16px 48px rgba(0, 0, 0, 0.1)'
               }}
@@ -245,10 +246,10 @@ export default function SubjectPage({ params }) {
                   </svg>
                 </div>
 
-                <h2 className="text-4xl font-extrabold text-neutral-900 mb-6 tracking-tight">
+                <h2 className="text-4xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
                   Track Your Learning Journey
                 </h2>
-                <p className="text-lg text-neutral-600 mb-10 leading-relaxed font-medium">
+                <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-10 leading-relaxed font-medium">
                   Your progress dashboard is being built. Soon you&apos;ll see detailed analytics of your learning.
                 </p>
 
@@ -261,12 +262,12 @@ export default function SubjectPage({ params }) {
                   ].map((stat, i) => (
                     <div 
                       key={i}
-                      className="p-8 bg-gradient-to-br from-neutral-50 to-white border border-neutral-200/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                      className="p-8 bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-700 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                     >
                       <div className={`text-4xl font-extrabold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
                         {stat.value}
                       </div>
-                      <div className="text-sm font-semibold text-neutral-600">
+                      <div className="text-sm font-semibold text-neutral-600 dark:text-neutral-400">
                         {stat.label}
                       </div>
                     </div>
@@ -282,14 +283,14 @@ export default function SubjectPage({ params }) {
                   ].map((feature, i) => (
                     <div 
                       key={i}
-                      className="flex items-center gap-3 p-4 bg-neutral-50/70 backdrop-blur-sm border border-neutral-200/50 rounded-xl"
+                      className="flex items-center gap-3 p-4 bg-neutral-50/70 dark:bg-neutral-700/50 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 rounded-xl"
                     >
                       <div className="w-8 h-8 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md">
                         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <span className="text-neutral-700 font-semibold text-left">{feature}</span>
+                      <span className="text-neutral-700 dark:text-neutral-300 font-semibold text-left">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -300,7 +301,7 @@ export default function SubjectPage({ params }) {
           {/* Notes Tab */}
           {activeTab === 'notes' && (
             <div 
-              className="p-12 bg-white/70 backdrop-blur-2xl border border-neutral-200/50 rounded-3xl shadow-2xl animate-fadeIn"
+              className="p-12 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-2xl animate-fadeIn"
               style={{
                 boxShadow: '0 16px 48px rgba(0, 0, 0, 0.1)'
               }}
@@ -317,17 +318,17 @@ export default function SubjectPage({ params }) {
                   </svg>
                 </div>
 
-                <h2 className="text-4xl font-extrabold text-neutral-900 mb-6 tracking-tight">
+                <h2 className="text-4xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
                   Save Important Concepts
                 </h2>
-                <p className="text-lg text-neutral-600 mb-10 leading-relaxed font-medium">
+                <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-10 leading-relaxed font-medium">
                   Soon you&apos;ll be able to bookmark key insights from your conversations with Newton.
                 </p>
 
                 <div 
-                  className="p-10 bg-gradient-to-br from-neutral-50 to-white border border-neutral-200/50 rounded-2xl mb-8 text-left shadow-lg"
+                  className="p-10 bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-700 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl mb-8 text-left shadow-lg"
                 >
-                  <h3 className="text-xl font-bold text-neutral-900 mb-6">How it will work:</h3>
+                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-6">How it will work:</h3>
                   <ol className="space-y-5">
                     {[
                       'Click the bookmark icon on any Newton response',
@@ -339,16 +340,16 @@ export default function SubjectPage({ params }) {
                         <div className="w-8 h-8 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0 text-white font-bold text-sm shadow-md">
                           {i + 1}
                         </div>
-                        <span className="text-neutral-700 font-medium pt-1.5">{step}</span>
+                        <span className="text-neutral-700 dark:text-neutral-300 font-medium pt-1.5">{step}</span>
                       </li>
                     ))}
                   </ol>
                 </div>
 
                 <div 
-                  className="p-6 bg-neutral-100/70 backdrop-blur-sm border border-neutral-200/50 rounded-2xl"
+                  className="p-6 bg-neutral-100/70 dark:bg-neutral-700/50 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl"
                 >
-                  <p className="text-sm text-neutral-700 font-semibold">
+                  <p className="text-sm text-neutral-700 dark:text-neutral-300 font-semibold">
                     💡 For now, keep your own notes from Newton conversations
                   </p>
                 </div>
