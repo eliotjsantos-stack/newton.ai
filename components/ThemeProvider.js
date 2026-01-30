@@ -46,9 +46,6 @@ export default function ThemeProvider({ children }) {
     if (saved) {
       setThemeState(saved);
       applyTheme(saved);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setThemeState('dark');
-      applyTheme('dark');
     }
   }, [applyTheme]);
 

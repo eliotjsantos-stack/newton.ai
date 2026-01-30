@@ -29,8 +29,7 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (localStorage.getItem('newton-theme') === 'dark' ||
-                    (!localStorage.getItem('newton-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                if (localStorage.getItem('newton-theme') === 'dark') {
                   document.documentElement.classList.add('dark');
                 }
               } catch (e) {}
