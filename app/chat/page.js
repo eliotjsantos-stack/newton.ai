@@ -308,6 +308,7 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => {
   if (typeof window !== 'undefined') {
     return window.innerWidth >= 768;
@@ -404,6 +405,17 @@ useChatStorage(chatsBySubject, subjects, currentSubject, currentChatId);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const textareaRef = useRef(null);
+  const abortControllerRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  // Auto-resize textarea when input changes (handles typing + speech)
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+    }
+  }, [input]);
 
   useEffect(() => {
     setMounted(true);
@@ -1066,12 +1078,21 @@ const sendMessage = async (e) => {
       }));
     }
 
+    // Stop speech recognition if active
+    if (recognitionRef.current) {
+      recognitionRef.current.onresult = null;
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+      setIsListening(false);
+    }
     setInput('');
     setUploadedFiles([]);
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsLoading(true);
     setIsTyping(true);
 
     try {
+      abortControllerRef.current = new AbortController();
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1080,6 +1101,7 @@ const sendMessage = async (e) => {
           yearGroup: yearGroup || 'year9',
           showLinks: showLinkRecommendations
         }),
+        signal: abortControllerRef.current.signal,
       });
 
       if (!response.ok) throw new Error('Failed to get response');
@@ -1161,11 +1183,70 @@ const sendMessage = async (e) => {
       }
       
     } catch (error) {
-      console.error('Error:', error);
+      if (error.name !== 'AbortError') {
+        console.error('Error:', error);
+      }
     } finally {
+      abortControllerRef.current = null;
       setIsLoading(false);
       setIsTyping(false);
     }
+  };
+
+  const cancelMessage = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+  };
+
+  const toggleSpeechToText = () => {
+    if (isListening) {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in your browser. Try Chrome or Edge.');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-GB';
+    recognitionRef.current = recognition;
+
+    // Store the input value at the time recording started
+    const startingInput = input;
+
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      const prefix = startingInput ? startingInput.trimEnd() + ' ' : '';
+      setInput(prefix + transcript);
+    };
+
+    recognition.onerror = (event) => {
+      if (event.error === 'aborted') return;
+      if (event.error === 'network') {
+        alert('Speech recognition requires an internet connection. Chrome sends audio to Google for processing. Make sure you are online and try again.');
+      } else if (event.error === 'not-allowed') {
+        alert('Microphone access was denied. Please allow microphone access in your browser settings.');
+      }
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.start();
+    setIsListening(true);
   };
 
   const saveYearGroup = (year) => {
@@ -1199,7 +1280,7 @@ if (isLoadingData) {
   ];
 
   return (
-   <div className="flex h-screen bg-neutral-100 dark:bg-neutral-900 overflow-hidden">
+   <div className="flex h-screen bg-white dark:bg-neutral-900 overflow-hidden">
       {/* Premium Glassmorphism Sidebar */}
       <div
   className={`${
@@ -1504,7 +1585,7 @@ if (isLoadingData) {
       )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-neutral-900">
+      <div className="flex-1 flex flex-col">
         {/* Premium Glassmorphism Header */}
         <div
           className="h-16 border-b border-neutral-200/50 dark:border-neutral-700/50 flex items-center justify-between px-8 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl"
@@ -1707,27 +1788,22 @@ if (isLoadingData) {
           )}
         </div>
 
-        {/* Premium Input Area with Glassmorphism */}
-        <div
-          className="border-t border-neutral-200/50 dark:border-neutral-700/50 p-8 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl"
-          style={{
-            boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.04)'
-          }}
-        >
-          <form onSubmit={sendMessage} className="max-w-4xl mx-auto">
+        {/* Input Area */}
+        <div className="px-4 pb-4 pt-2 max-w-4xl mx-auto w-full">
+          <form onSubmit={sendMessage}>
             {/* File Upload Preview */}
             {uploadedFiles.length > 0 && (
-              <div className="mb-4 flex flex-wrap gap-2">
+              <div className="mb-2 flex flex-wrap gap-2">
                 {uploadedFiles.map((file, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div key={index} className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-xl px-3 py-2">
+                    <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       {file.type.startsWith('image/') ? (
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       ) : (
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                       )}
                     </svg>
-                    <span className="text-sm font-semibold text-blue-900">{file.name}</span>
+                    <span className="text-sm font-semibold text-blue-900 dark:text-blue-200">{file.name}</span>
                     <button
                       type="button"
                       onClick={() => removeFile(index)}
@@ -1742,87 +1818,94 @@ if (isLoadingData) {
               </div>
             )}
 
-            <div className="flex gap-4">
-              <div 
-                className="flex-1 relative"
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                {isDragging && (
-                  <div className="absolute inset-0 bg-blue-100/90 border-4 border-dashed border-blue-400 rounded-3xl flex items-center justify-center z-10 backdrop-blur-sm">
-                    <div className="text-center">
-                      <svg className="w-12 h-12 mx-auto mb-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                      <p className="text-blue-900 font-bold">Drop files here</p>
-                      <p className="text-blue-700 text-sm">PDF or Images (max 10MB)</p>
-                    </div>
+            <div
+              className="relative flex flex-col bg-transparent border border-neutral-300 dark:border-neutral-600 rounded-2xl focus-within:border-neutral-400 dark:focus-within:border-neutral-500 transition-all duration-300"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              {isDragging && (
+                <div className="absolute inset-0 bg-blue-100/90 dark:bg-blue-900/90 border-4 border-dashed border-blue-400 rounded-2xl flex items-center justify-center z-10 backdrop-blur-sm">
+                  <div className="text-center">
+                    <svg className="w-12 h-12 mx-auto mb-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="text-blue-900 dark:text-blue-200 font-bold">Drop files here</p>
+                    <p className="text-blue-700 dark:text-blue-300 text-sm">Images (max 10MB)</p>
                   </div>
-                )}
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      sendMessage(e);
-                    }
-                  }}
-                  placeholder={`Ask about ${currentSubject.toLowerCase()}...`}
-                  className="w-full px-6 py-4 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm border-2 border-neutral-200/50 dark:border-neutral-600/50 rounded-3xl resize-none focus:outline-none focus:border-neutral-400/70 dark:focus:border-neutral-500/70 focus:bg-white dark:focus:bg-neutral-800 focus:shadow-lg transition-all duration-300 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 font-medium shadow-md"
-                  rows={1}
-                  style={{
-                    minHeight: '60px',
-                    maxHeight: '200px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)'
-                  }}
-                />
-                
-                {/* File Upload Button */}
-                <label className="absolute bottom-4 right-4 cursor-pointer">
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload(e.target.files)}
-                    className="hidden"
-                  />
-                  <div className="p-2 bg-white/90 hover:bg-neutral-100 rounded-full transition-all hover:scale-110">
-                    <svg className="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                </div>
+              )}
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(e);
+                  }
+                }}
+                placeholder={`Ask about ${currentSubject.toLowerCase()}...`}
+                className="w-full px-4 pt-3 pb-2 bg-transparent resize-none focus:outline-none text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 font-medium overflow-y-auto"
+                rows={1}
+                style={{
+                  minHeight: '44px',
+                  maxHeight: '200px',
+                }}
+              />
+
+              {/* Bottom row: attach + mic + send */}
+              <div className="px-2 pb-2 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <label className="cursor-pointer p-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors">
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e.target.files)}
+                      className="hidden"
+                    />
+                    <svg className="w-5 h-5 text-neutral-500 dark:text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                     </svg>
-                  </div>
-                </label>
-
-              </div>
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="px-8 py-4 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:bg-white dark:from-transparent dark:to-transparent text-white dark:text-neutral-900 rounded-3xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3 hover:scale-105 active:scale-95 disabled:hover:scale-100"
-                style={{
-                  minWidth: '140px',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15)'
-                }}
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={toggleSpeechToText}
+                    className={`p-2 rounded-lg transition-all duration-200 ${
+                      isListening
+                        ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 animate-pulse'
+                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400'
+                    }`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                     </svg>
-                    <span>Thinking</span>
-                  </>
+                  </button>
+                </div>
+
+                {isLoading ? (
+                  <button
+                    type="button"
+                    onClick={cancelMessage}
+                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200 active:scale-95"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 ) : (
-                  <>
+                  <button
+                    type="submit"
+                    disabled={!input.trim()}
+                    className="p-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neutral-700 dark:hover:bg-neutral-200 transition-all duration-200 active:scale-95"
+                  >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
                     </svg>
-                    <span>Send</span>
-                  </>
+                  </button>
                 )}
-              </button>
+              </div>
             </div>
           </form>
         </div>

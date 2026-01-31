@@ -16,6 +16,7 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [convSearch, setConvSearch] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -642,88 +643,115 @@ export default function AdminDashboard() {
 
           {currentTab === 'conversations' && (
             <div className="flex flex-col lg:flex-row h-full gap-4 lg:gap-6">
-              {/* Selection Panels - Horizontal scroll on mobile */}
-              <div className="flex lg:flex-col gap-3 lg:gap-4 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
-                {/* User Selection */}
-                <div className="min-w-[200px] lg:min-w-0 w-[200px] lg:w-60 flex-shrink-0 bg-neutral-800 border border-neutral-700 rounded-2xl p-3 lg:p-4 space-y-2 max-h-48 lg:max-h-none overflow-y-auto">
-                  <h3 className="text-sm font-bold text-white mb-2 lg:mb-3 px-2">Select User</h3>
-                  {users.filter(u => !u.is_admin).map((user) => (
-                    <button
-                      key={user.id}
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setSelectedSubject(null);
-                        setSelectedChat(null);
-                      }}
-                      className={`w-full p-2 lg:p-3 rounded-xl text-left transition-all ${
-                        selectedUser?.id === user.id
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
-                      }`}
-                    >
-                      <p className="text-xs lg:text-sm font-medium truncate">{user.email}</p>
-                      <p className="text-xs opacity-70">
-                        {user.chat_data?.chatsBySubject
-                          ? Object.values(user.chat_data.chatsBySubject).reduce((acc, chats) => acc + chats.length, 0)
-                          : 0}{' '}
-                        chats
-                      </p>
-                    </button>
-                  ))}
+              {/* Accordion Sidebar */}
+              <div className="w-full lg:w-72 flex-shrink-0 bg-neutral-800 border border-neutral-700 rounded-2xl p-3 overflow-y-auto max-h-[70vh]">
+                {/* Search */}
+                <div className="relative mb-3">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={convSearch}
+                    onChange={(e) => setConvSearch(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded-xl text-sm text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500"
+                  />
                 </div>
 
-                {/* Subject Selection */}
-                {selectedUser && selectedUser.chat_data?.chatsBySubject && (
-                  <div className="min-w-[200px] lg:min-w-0 w-[200px] lg:w-60 flex-shrink-0 bg-neutral-800 border border-neutral-700 rounded-2xl p-3 lg:p-4 space-y-2 max-h-48 lg:max-h-none overflow-y-auto">
-                    <h3 className="text-sm font-bold text-white mb-2 lg:mb-3 px-2">Select Subject</h3>
-                    {Object.keys(selectedUser.chat_data.chatsBySubject).map((subject) => (
-                      <button
-                        key={subject}
-                        onClick={() => {
-                          setSelectedSubject(subject);
-                          setSelectedChat(null);
-                        }}
-                        className={`w-full p-2 lg:p-3 rounded-xl text-left transition-all ${
-                          selectedSubject === subject
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
-                        }`}
-                      >
-                        <p className="text-xs lg:text-sm font-medium">{subject}</p>
-                        <p className="text-xs opacity-70">
-                          {selectedUser.chat_data.chatsBySubject[subject].length} chats
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Chat Selection */}
-                {selectedSubject && selectedUser.chat_data?.chatsBySubject[selectedSubject] && (
-                  <div className="min-w-[200px] lg:min-w-0 w-[200px] lg:w-60 flex-shrink-0 bg-neutral-800 border border-neutral-700 rounded-2xl p-3 lg:p-4 space-y-2 max-h-48 lg:max-h-none overflow-y-auto">
-                    <h3 className="text-sm font-bold text-white mb-2 lg:mb-3 px-2">Select Chat</h3>
-                    {selectedUser.chat_data.chatsBySubject[selectedSubject]
-                      .filter(chat => chat.messages && chat.messages.length > 0)
-                      .map((chat) => (
+                {/* User Accordion List */}
+                <div className="space-y-1">
+                  {users.filter(u => !u.is_admin).filter(u => u.email?.toLowerCase().includes(convSearch.toLowerCase())).map((user) => {
+                    const isOpen = selectedUser?.id === user.id;
+                    const subjects = user.chat_data?.chatsBySubject ? Object.keys(user.chat_data.chatsBySubject) : [];
+                    const totalChats = user.chat_data?.chatsBySubject
+                      ? Object.values(user.chat_data.chatsBySubject).reduce((acc, chats) => acc + chats.length, 0)
+                      : 0;
+                    return (
+                      <div key={user.id}>
+                        {/* User Row */}
                         <button
-                          key={chat.id}
-                          onClick={() => setSelectedChat(chat)}
-                          className={`w-full p-2 lg:p-3 rounded-xl text-left transition-all ${
-                            selectedChat?.id === chat.id
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+                          onClick={() => {
+                            if (isOpen) {
+                              setSelectedUser(null);
+                              setSelectedSubject(null);
+                              setSelectedChat(null);
+                            } else {
+                              setSelectedUser(user);
+                              setSelectedSubject(null);
+                              setSelectedChat(null);
+                            }
+                          }}
+                          className={`w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all ${
+                            isOpen ? 'bg-blue-600 text-white' : 'text-neutral-300 hover:bg-neutral-700'
                           }`}
                         >
-                          <p className="text-xs lg:text-sm line-clamp-2">
-                            {chat.messages[0]?.content?.substring(0, 60)}...
-                          </p>
-                          <p className="text-xs opacity-70 mt-1">
-                            {chat.messages.length} messages • {new Date(chat.date).toLocaleDateString()}
-                          </p>
+                          <svg className={`w-3 h-3 flex-shrink-0 transition-transform ${isOpen ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6 4l8 6-8 6V4z" />
+                          </svg>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium truncate">{user.email}</p>
+                            <p className="text-xs opacity-60">{totalChats} chats</p>
+                          </div>
                         </button>
-                      ))}
-                  </div>
-                )}
+
+                        {/* Subjects (expanded) */}
+                        {isOpen && subjects.length > 0 && (
+                          <div className="ml-4 mt-1 space-y-1">
+                            {subjects.map((subject) => {
+                              const subOpen = selectedSubject === subject;
+                              const chats = user.chat_data.chatsBySubject[subject].filter(c => c.messages && c.messages.length > 0);
+                              return (
+                                <div key={subject}>
+                                  <button
+                                    onClick={() => {
+                                      if (subOpen) {
+                                        setSelectedSubject(null);
+                                        setSelectedChat(null);
+                                      } else {
+                                        setSelectedSubject(subject);
+                                        setSelectedChat(null);
+                                      }
+                                    }}
+                                    className={`w-full flex items-center gap-2 p-1.5 rounded-lg text-left transition-all ${
+                                      subOpen ? 'bg-blue-500/30 text-blue-300' : 'text-neutral-400 hover:bg-neutral-700/50'
+                                    }`}
+                                  >
+                                    <svg className={`w-2.5 h-2.5 flex-shrink-0 transition-transform ${subOpen ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                                      <path d="M6 4l8 6-8 6V4z" />
+                                    </svg>
+                                    <span className="text-xs font-medium">{subject}</span>
+                                    <span className="text-xs opacity-50 ml-auto">{chats.length}</span>
+                                  </button>
+
+                                  {/* Chats (expanded) */}
+                                  {subOpen && chats.length > 0 && (
+                                    <div className="ml-4 mt-1 space-y-1">
+                                      {chats.map((chat) => (
+                                        <button
+                                          key={chat.id}
+                                          onClick={() => setSelectedChat(chat)}
+                                          className={`w-full p-1.5 rounded-lg text-left transition-all ${
+                                            selectedChat?.id === chat.id
+                                              ? 'bg-blue-600 text-white'
+                                              : 'text-neutral-400 hover:bg-neutral-700/50'
+                                          }`}
+                                        >
+                                          <p className="text-xs line-clamp-1">{chat.messages[0]?.content?.substring(0, 50)}...</p>
+                                          <p className="text-xs opacity-50">{chat.messages.length} msgs · {new Date(chat.date).toLocaleDateString()}</p>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Chat Viewer */}
