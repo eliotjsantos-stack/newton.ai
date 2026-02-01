@@ -12,6 +12,8 @@ import { supabase } from '@/lib/supabase';
 import MermaidDiagram from '@/components/MermaidDiagram';
 import ChartDiagram from '@/components/ChartDiagram';
 import { useTheme } from '@/components/ThemeProvider';
+import NewtonMascot from '@/components/NewtonMascot';
+import NewtonTree from '@/components/NewtonTree';
 
 // Convert AI's wrong math delimiters to proper ones for KaTeX rendering
 function fixMathDelimiters(content) {
@@ -170,7 +172,7 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
 });
 
 // Memoized message component to prevent re-renders when typing
-const MessageItem = memo(function MessageItem({ message, index, markdownComponents }) {
+const MessageItem = memo(function MessageItem({ message, index, markdownComponents, assistantRef }) {
   // Extract links section for assistant messages
   const { mainContent, linksContent } = message.role === 'assistant'
     ? extractLinksSection(message.content)
@@ -178,6 +180,7 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
 
   return (
     <div
+      ref={message.role === 'assistant' ? assistantRef : undefined}
       className={`flex gap-5 ${
         message.role === 'user' ? 'justify-end' : 'justify-start'
       } animate-slideUp`}
@@ -186,15 +189,9 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
         animationFillMode: 'both'
       }}
     >
+      {/* Spacer for mascot positioning on assistant messages */}
       {message.role === 'assistant' && (
-        <div
-          className="w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:from-neutral-100 dark:to-neutral-200 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
-          style={{
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-          }}
-        >
-          <span className="text-sm font-bold text-white dark:text-neutral-900">N</span>
-        </div>
+        <div className="w-[52px] h-[52px] flex-shrink-0" />
       )}
       <div
         className={`max-w-[75%] rounded-3xl px-6 py-5 shadow-lg transition-all duration-300 hover:shadow-xl ${
@@ -309,6 +306,14 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [mascotExpression, setMascotExpression] = useState('idle');
+  const [mascotDropping, setMascotDropping] = useState(false);
+  const [showTree, setShowTree] = useState(true);
+  const [treeDetaching, setTreeDetaching] = useState(false);
+  const latestAssistantRef = useRef(null);
+  const typingIndicatorRef = useRef(null);
+  const mascotRef = useRef(null);
+  const [mascotStyle, setMascotStyle] = useState({ top: 0, left: 0, opacity: 0 });
   const [sidebarOpen, setSidebarOpen] = useState(() => {
   if (typeof window !== 'undefined') {
     return window.innerWidth >= 768;
@@ -1021,6 +1026,53 @@ const skipTutorial = () => {
   closeTutorial();
 };
 
+// Position the single floating mascot next to the target element
+  useEffect(() => {
+    const updateMascotPosition = () => {
+      const target = typingIndicatorRef.current || latestAssistantRef.current;
+      const container = messagesContainerRef.current;
+      if (!target || !container) {
+        setMascotStyle(prev => ({ ...prev, opacity: 0 }));
+        return;
+      }
+      const containerRect = container.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const top = targetRect.top - containerRect.top + container.scrollTop;
+      const left = targetRect.left - containerRect.left;
+      setMascotStyle({ top, left, opacity: 1 });
+    };
+
+    updateMascotPosition();
+    const container = messagesContainerRef.current;
+    if (container) container.addEventListener('scroll', updateMascotPosition);
+    window.addEventListener('resize', updateMascotPosition);
+    const observer = new MutationObserver(updateMascotPosition);
+    if (container) observer.observe(container, { childList: true, subtree: true });
+    return () => {
+      if (container) container.removeEventListener('scroll', updateMascotPosition);
+      window.removeEventListener('resize', updateMascotPosition);
+      observer.disconnect();
+    };
+  }, [messages.length, isTyping]);
+
+  // Reset tree when switching to a new empty chat
+  useEffect(() => {
+    if (messages.length === 0) {
+      setShowTree(true);
+      setTreeDetaching(false);
+    }
+  }, [currentChatId]);
+
+  const handleAppleFall = () => {
+    setShowTree(false);
+    setMascotDropping(true);
+    setMascotExpression('falling');
+    setTimeout(() => {
+      setMascotDropping(false);
+      setMascotExpression('thinking');
+    }, 650);
+  };
+
 const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -1090,6 +1142,20 @@ const sendMessage = async (e) => {
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsLoading(true);
     setIsTyping(true);
+
+    // First message: trigger tree detach animation, then floating mascot takes over
+    if (showTree) {
+      setTreeDetaching(true);
+      setMascotExpression('falling');
+      // Tree onAppleFall callback handles the rest
+    } else {
+      setMascotDropping(true);
+      setMascotExpression('falling');
+      setTimeout(() => {
+        setMascotDropping(false);
+        setMascotExpression('thinking');
+      }, 650);
+    }
 
     try {
       abortControllerRef.current = new AbortController();
@@ -1181,7 +1247,57 @@ const sendMessage = async (e) => {
           headers: { 'Authorization': `Bearer ${token}` }
         }).catch(() => {}); // Silent fail
       }
-      
+
+      // Post-processing check: detect if Newton solved the student's exact problem
+      const userText = input.trim();
+      // Extract numbers from the student's message
+      const userNumbers = userText.match(/\d+\.?\d*/g) || [];
+      // Check if response contains a "= [final answer]" pattern using the student's exact numbers
+      if (userNumbers.length >= 2) {
+        // Look for patterns like "x = 6" or "= 30" that solve the student's equation
+        const solutionPatterns = [
+          /(?:^|[=:])\s*-?\d+\.?\d*\s*$/m,  // ends with = number
+          /(?:therefore|so|thus|hence|answer is|equals?|result is)\s*-?\d+\.?\d*/i,
+        ];
+        const hasSolution = solutionPatterns.some(p => p.test(assistantMessage));
+        // Check if most of the student's numbers appear in the response working
+        const numberMatches = userNumbers.filter(n =>
+          new RegExp(`(?<![\\d.])${n.replace('.', '\\.')}(?![\\d.])`).test(assistantMessage)
+        );
+        if (hasSolution && numberMatches.length >= userNumbers.length * 0.7) {
+          // Newton likely solved their exact problem - append a redirect
+          const redirectMsg = "\n\n---\n\n⚠️ *Hmm, I think I got a bit carried away there! Let me step back — I shouldn't solve your exact problem for you. Try applying the method I showed to your numbers, and let me know if you get stuck on a specific step!*";
+          assistantMessage += redirectMsg;
+          setChatsBySubject(prev => ({
+            ...prev,
+            [currentSubject]: prev[currentSubject].map(chat =>
+              chat.id === activeChatId
+                ? {
+                    ...chat,
+                    messages: chat.messages.map((msg, idx) =>
+                      idx === chat.messages.length - 1 && msg.role === 'assistant'
+                        ? { ...msg, content: assistantMessage }
+                        : msg
+                    )
+                  }
+                : chat
+            )
+          }));
+        }
+      }
+
+      // Detect mascot expression from response
+      const lowerResp = assistantMessage.toLowerCase();
+      if (/well done|correct|exactly right|great job|brilliant|that's right|perfect|excellent|nicely done/.test(lowerResp)) {
+        setMascotExpression('celebrating');
+        setTimeout(() => setMascotExpression('idle'), 3000);
+      } else if (/not quite|try again|incorrect|not exactly|close but|almost|not right/.test(lowerResp)) {
+        setMascotExpression('wrong');
+        setTimeout(() => setMascotExpression('idle'), 3000);
+      } else {
+        setMascotExpression('idle');
+      }
+
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.error('Error:', error);
@@ -1643,123 +1759,102 @@ if (isLoadingData) {
         </div>
 
         {/* Messages Area */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-8 py-10">
-          {messages.length === 0 ? (
-            !hasSeenWelcome ? (
-              /* Premium Welcome Screen */
-              <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto animate-fadeIn">
-                <div
-                  className="w-24 h-24 bg-gradient-to-br from-neutral-800 to-neutral-900 dark:from-neutral-100 dark:to-neutral-200 rounded-3xl flex items-center justify-center mb-8 shadow-2xl animate-float"
-                  style={{
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2)'
-                  }}
-                >
-                  <span className="text-4xl font-bold text-white dark:text-neutral-900">N</span>
-                </div>
-                <h2 className="text-5xl font-extrabold text-neutral-900 dark:text-neutral-100 mb-5 tracking-tight">
-                  Welcome to Newton
-                </h2>
-                <p className="text-xl text-neutral-600 dark:text-neutral-400 mb-12 leading-relaxed max-w-2xl px-4">
-                  I&apos;m here to help you truly learn. I won&apos;t do your work—instead, I&apos;ll guide you to understand it yourself through questions and step-by-step thinking.
-                </p>
-                
-                <div className="grid md:grid-cols-2 gap-6 w-full mb-10">
-                  <div 
-                    className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 text-left border border-neutral-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
-                    style={{
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
-                    }}
-                  >
-                    <div className="w-14 h-14 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl flex items-center justify-center mb-5 shadow-lg">
-                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
-                    </div>
-                    <h3 className="font-bold text-neutral-900 mb-3 text-lg">Learn by thinking</h3>
-                    <p className="text-sm text-neutral-600 leading-relaxed">
-                      I ask questions that help you discover answers yourself
-                    </p>
-                  </div>
-                  
-                  <div 
-                    className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 text-left border border-neutral-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
-                    style={{
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
-                    }}
-                  >
-                    <div className="w-14 h-14 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl flex items-center justify-center mb-5 shadow-lg">
-                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                    </div>
-                    <h3 className="font-bold text-neutral-900 mb-3 text-lg">Academic integrity</h3>
-                    <p className="text-sm text-neutral-600 leading-relaxed">
-                      I refuse to do your work, so it stays yours
-                    </p>
-                  </div>
-                </div>
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-8 py-10 relative">
+          {/* Single floating mascot */}
+          {!showTree && messages.length > 0 && messages.some(m => m.role === 'assistant') && (
+            <div
+              ref={mascotRef}
+              className={mascotDropping ? 'newton-apple-drop' : ''}
+              style={{
+                position: 'absolute',
+                top: mascotStyle.top,
+                left: mascotStyle.left,
+                opacity: mascotStyle.opacity,
+                zIndex: 10,
+                transition: mascotDropping ? 'none' : 'top 0.15s ease-out, left 0.15s ease-out',
+                pointerEvents: 'auto',
+              }}
+            >
+              <NewtonMascot size={52} expression={mascotExpression} />
+            </div>
+          )}
+          {/* Floating mascot for typing indicator (before first assistant message) */}
+          {!showTree && isTyping && !messages.some(m => m.role === 'assistant') && (
+            <div
+              ref={mascotRef}
+              className="newton-apple-drop"
+              style={{
+                position: 'absolute',
+                top: mascotStyle.top,
+                left: mascotStyle.left,
+                opacity: mascotStyle.opacity,
+                zIndex: 10,
+                pointerEvents: 'auto',
+              }}
+            >
+              <NewtonMascot size={52} expression={mascotExpression} />
+            </div>
+          )}
+          {(messages.length === 0 || treeDetaching) && showTree ? (
+            /* Tree Scene - Empty Chat */
+            <div className={`flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto animate-fadeIn ${treeDetaching ? 'tree-scene-fade' : ''}`}>
+              <NewtonTree detaching={treeDetaching} onAppleFall={handleAppleFall} />
 
-                <div 
-                  className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-neutral-200/50 w-full shadow-lg"
-                  style={{
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
-                  }}
-                >
-                  <p className="text-sm font-bold text-neutral-900 mb-5">Try asking:</p>
-                  <div className="space-y-3 text-left">
-                    {[
-                      'Can you explain to me how photosynthesis works.',
-                      'Can you help me understand quadratic equations in maths.',
-                      'Help me plan an essay on Macbeth step by step.'
-                    ].map((example, i) => (
-                      <div 
-                        key={i}
-                        className="flex items-center gap-4 text-sm text-neutral-700 bg-neutral-50/70 backdrop-blur-sm px-5 py-3 rounded-xl hover:bg-neutral-100/70 transition-all duration-250 cursor-pointer"
-                        onClick={() => setInput(example)}
-                      >
-                        <div className="w-2 h-2 bg-neutral-400 rounded-full flex-shrink-0"></div>
-                        <span className="font-medium">{example}</span>
-                      </div>
-                    ))}
-                  </div>
+              <h2 className="text-4xl font-extrabold text-neutral-900 dark:text-neutral-100 mb-3 tracking-tight mt-2">
+                {!hasSeenWelcome ? 'Welcome to Newton' : 'New conversation'}
+              </h2>
+              <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed max-w-2xl px-4">
+                {!hasSeenWelcome
+                  ? "I\u2019m here to help you truly learn. I won\u2019t do your work\u2014instead, I\u2019ll guide you to understand it yourself."
+                  : `Ask me anything about ${currentSubject.toLowerCase()}`
+                }
+              </p>
+
+              <div
+                className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-xl rounded-3xl p-6 border border-neutral-200/50 dark:border-neutral-700/50 w-full shadow-lg max-w-xl"
+                style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)' }}
+              >
+                <p className="text-sm font-bold text-neutral-900 dark:text-neutral-100 mb-4">Try asking:</p>
+                <div className="space-y-2 text-left">
+                  {[
+                    'Can you explain to me how photosynthesis works.',
+                    'Can you help me understand quadratic equations in maths.',
+                    'Help me plan an essay on Macbeth step by step.'
+                  ].map((example, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 text-sm text-neutral-700 dark:text-neutral-300 bg-neutral-50/70 dark:bg-neutral-700/50 px-4 py-2.5 rounded-xl hover:bg-neutral-100/70 dark:hover:bg-neutral-600/50 transition-all cursor-pointer"
+                      onClick={() => setInput(example)}
+                    >
+                      <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full flex-shrink-0" />
+                      <span className="font-medium">{example}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ) : (
-              /* Simple Empty State */
-              <div className="flex flex-col items-center justify-center h-full text-center animate-fadeIn">
-                <div className="w-20 h-20 bg-neutral-100/80 backdrop-blur-sm rounded-3xl flex items-center justify-center mb-6 shadow-lg">
-                  <span className="text-3xl font-bold text-neutral-600">N</span>
-                </div>
-                <h2 className="text-2xl font-bold text-neutral-900 mb-3">New conversation</h2>
-                <p className="text-neutral-600 max-w-md text-lg">
-                  Ask me anything about {currentSubject.toLowerCase()}
-                </p>
-              </div>
-            )
+            </div>
           ) : (
             /* Messages List with Premium Styling */
             <div className="max-w-4xl mx-auto space-y-6">
-              {messages.map((message, index) => (
+              {messages.map((message, index) => {
+                const isLastAssistant = message.role === 'assistant' &&
+                  index === messages.reduce((last, m, i) => m.role === 'assistant' ? i : last, -1);
+                return (
                 <MessageItem
                   key={index}
                   message={message}
                   index={index}
                   markdownComponents={markdownComponents}
+                  assistantRef={isLastAssistant ? latestAssistantRef : undefined}
                 />
-              ))}
+                );
+              })}
               
               {/* Premium Typing Indicator with Gradient Animation */}
               {isTyping && (
-                <div className="flex gap-5 justify-start animate-fadeIn">
-                  <div 
-                    className="w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
-                    style={{
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-                    }}
-                  >
-                    <span className="text-sm font-bold text-white">N</span>
-                  </div>
-                  <div 
+                <div ref={typingIndicatorRef} className="flex gap-5 justify-start animate-fadeIn">
+                  <div className="w-[52px] h-[52px] flex-shrink-0" />
+                  <div
                     className="bg-white/90 backdrop-blur-sm border border-neutral-200/50 rounded-3xl px-6 py-5 shadow-lg"
                     style={{
                       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
@@ -2569,6 +2664,29 @@ if (isLoadingData) {
         </div>
       )}
 
+      {/* Apple drop animation (global, not scoped) */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .newton-apple-drop {
+          animation: newton-apple-gravity 0.6s cubic-bezier(0.33, 0, 0.67, 0.33) forwards;
+        }
+        @keyframes newton-apple-gravity {
+          0% { transform: translateY(-80px); opacity: 0; }
+          30% { opacity: 1; }
+          70% { transform: translateY(5px); }
+          85% { transform: translateY(-8px); }
+          95% { transform: translateY(2px); }
+          100% { transform: translateY(0); }
+        }
+        .tree-scene-fade {
+          animation: tree-fade-out 0.8s ease-out forwards;
+          pointer-events: none;
+        }
+        @keyframes tree-fade-out {
+          0% { opacity: 1; }
+          70% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `}} />
       {/* Premium CSS Animations */}
       <style jsx>{`
         @keyframes fadeIn {
