@@ -1291,9 +1291,9 @@ const sendMessage = async (e) => {
       if (/well done|correct|exactly right|great job|brilliant|that's right|perfect|excellent|nicely done/.test(lowerResp)) {
         setMascotExpression('celebrating');
         setTimeout(() => setMascotExpression('idle'), 3000);
-      } else if (/not quite|try again|incorrect|not exactly|close but|almost|not right/.test(lowerResp)) {
+      } else if (/not quite|try again|incorrect|not exactly|close but|almost|not right|not correct|that's not|that isn't|unfortunately|careful there|have another|think again|let's reconsider|reconsider|good attempt but|nice try but|not the answer|wrong/.test(lowerResp)) {
         setMascotExpression('wrong');
-        setTimeout(() => setMascotExpression('idle'), 3000);
+        setTimeout(() => setMascotExpression('idle'), 5000);
       } else {
         setMascotExpression('idle');
       }

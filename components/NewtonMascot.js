@@ -40,10 +40,10 @@ const EXPRESSIONS = {
     sparkles: true,
   },
   wrong: {
-    leftEye: { cx: 38, cy: 49, rx: 4, ry: 4.5 },
-    rightEye: { cx: 62, cy: 49, rx: 4, ry: 4.5 },
+    leftEye: { cx: 38, cy: 50, rx: 4, ry: 4 },
+    rightEye: { cx: 62, cy: 50, rx: 4, ry: 4 },
     eyeType: 'sad',
-    mouth: 'M 42 66 Q 50 60 58 66',
+    mouth: 'M 40 68 Q 50 58 60 68',
     sparkles: false,
     sweat: true,
   },
@@ -96,12 +96,12 @@ export default function NewtonMascot({ expression = 'idle', size = 40 }) {
         {/* Shadow */}
         <ellipse cx="50" cy="92" rx="22" ry="4" fill="rgba(0,0,0,0.12)" />
 
-        {/* Apple body */}
-        <ellipse cx="50" cy="56" rx="30" ry="32" fill="url(#appleGrad)" />
-        {/* Apple top indent */}
-        <path d="M 42 26 Q 50 30 58 26" fill="#D32F2F" opacity="0.4" />
+        {/* Apple body - slightly taller than wide, narrower at bottom */}
+        <path d="M 50 24 C 38 24 19 35 19 55 C 19 72 32 88 50 88 C 68 88 81 72 81 55 C 81 35 62 24 50 24 Z" fill="url(#appleGrad)" />
+        {/* Top indent / dimple */}
+        <path d="M 43 26 Q 50 32 57 26" fill="#C62828" opacity="0.5" />
         {/* Highlight overlay */}
-        <ellipse cx="50" cy="56" rx="30" ry="32" fill="url(#appleHighlight)" />
+        <path d="M 50 24 C 38 24 19 35 19 55 C 19 72 32 88 50 88 C 68 88 81 72 81 55 C 81 35 62 24 50 24 Z" fill="url(#appleHighlight)" />
 
         {/* Stem */}
         <path d="M 50 24 Q 51 18 49 14" fill="none" stroke="#5D4037" strokeWidth="2.5" strokeLinecap="round" />
@@ -232,7 +232,7 @@ export default function NewtonMascot({ expression = 'idle', size = 40 }) {
           animation: newton-bounce 0.5s ease-out;
         }
         .newton-wobble {
-          animation: newton-wobble 0.5s ease-out;
+          animation: newton-wobble 0.6s ease-out 3;
         }
         .newton-drop {
           animation: newton-drop 0.6s cubic-bezier(0.55, 0, 1, 0.45) forwards;
