@@ -6,24 +6,33 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:jailbreak": "python3 tests/jailbreak_check.py",
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.91.0",
     "ai": "^5.0.68",
     "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.1",
     "chartjs-plugin-zoom": "^2.2.0",
+    "framer-motion": "^12.33.0",
+    "jose": "^5.10.0",
     "jsonwebtoken": "^9.0.3",
+    "jspdf": "^4.1.0",
     "katex": "^0.16.25",
+    "lenis": "^1.3.17",
     "mermaid": "^11.12.2",
     "next": "^16.1.4",
     "openai": "^6.3.0",
+    "pdf-parse": "^2.4.5",
     "react": "^19.2.3",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
+    "recharts": "^3.7.0",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
@@ -34,6 +43,8 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "husky": "^9.1.0",
+    "pg": "^8.18.0",
     "tailwindcss": "^4"
   }
 }
