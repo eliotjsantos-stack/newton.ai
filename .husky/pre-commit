@@ -1,0 +1,44 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh" 2>/dev/null || true
+
+echo "🔒 Running Newton Jailbreak Tests..."
+
+# Check if Python 3 is available
+if command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+else
+    echo "⚠️  Python not found, skipping jailbreak tests"
+    exit 0
+fi
+
+# Check if dev server is running (tests need the API)
+if ! curl -s http://localhost:3000 > /dev/null 2>&1; then
+    echo "⚠️  Dev server not running on localhost:3000"
+    echo "   Skipping jailbreak tests (start server with 'npm run dev' to enable)"
+    exit 0
+fi
+
+# Install test dependencies if needed
+if [ -f "tests/requirements.txt" ]; then
+    $PYTHON_CMD -m pip install -q -r tests/requirements.txt 2>/dev/null
+fi
+
+# Run jailbreak tests
+$PYTHON_CMD tests/jailbreak_check.py
+
+# Capture exit code
+JAILBREAK_EXIT=$?
+
+if [ $JAILBREAK_EXIT -ne 0 ]; then
+    echo ""
+    echo "❌ Jailbreak tests failed!"
+    echo "   The AI may be revealing answers to homework problems."
+    echo "   Please review and fix the system prompt before committing."
+    echo ""
+    exit 1
+fi
+
+echo "✅ Jailbreak tests passed"
+exit 0

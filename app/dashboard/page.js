@@ -2,546 +2,525 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useTheme } from '@/components/ThemeProvider';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ClassIcon } from '@/components/ClassIcons';
+import SkeletonDashboard from '@/components/dashboard/SkeletonDashboard';
+import NavigationDock from '@/components/NavigationDock';
+
+/* ── Knowledge Radar (SVG pentagon chart) ── */
+function KnowledgeRadar({ data }) {
+  const labels = ['Recall', 'Application', 'Analysis', 'Accuracy', 'Consistency'];
+  const keys = ['recall', 'application', 'analysis', 'accuracy', 'consistency'];
+  const cx = 80, cy = 80, r = 60;
+  const n = 5;
+
+  const pointOnPentagon = (i, scale = 1) => {
+    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+    return {
+      x: cx + r * scale * Math.cos(angle),
+      y: cy + r * scale * Math.sin(angle),
+    };
+  };
+
+  const rings = [0.2, 0.4, 0.6, 0.8, 1.0];
+  const gridPaths = rings.map(s => {
+    const pts = Array.from({ length: n }, (_, i) => pointOnPentagon(i, s));
+    return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ') + ' Z';
+  });
+
+  const values = keys.map(k => Math.min((data[k] || 0) / 5, 1));
+  const dataPts = values.map((v, i) => pointOnPentagon(i, Math.max(v, 0.05)));
+  const dataPath = dataPts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ') + ' Z';
+  const spokes = Array.from({ length: n }, (_, i) => pointOnPentagon(i, 1));
+
+  return (
+    <div className="flex flex-col items-center">
+      <svg viewBox="0 0 160 160" className="w-full max-w-[200px]">
+        {gridPaths.map((d, i) => (
+          <path key={i} d={d} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
+        ))}
+        {spokes.map((p, i) => (
+          <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
+        ))}
+        <path d={dataPath} fill="rgba(0,113,227,0.15)" stroke="#0071e3" strokeWidth="1.5" />
+        {dataPts.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#0071e3" />
+        ))}
+      </svg>
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-2">
+        {labels.map((label, i) => (
+          <span key={label} className="text-[10px] text-white/40 uppercase tracking-wider">
+            {label} <span className="text-white/60 font-semibold">{((values[i] || 0) * 5).toFixed(1)}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
-  const defaultSubjects = ['General'];
-  
-  const [subjects, setSubjects] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('subjects');
-      return saved ? JSON.parse(saved) : defaultSubjects;
-    }
-    return defaultSubjects;
-  });
-  
-  const [userEmail, setUserEmail] = useState(null);
-  const [subjectColors, setSubjectColors] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('subject-colors');
-      return saved ? JSON.parse(saved) : {};
-    }
-    return {};
-  });
-
-  const [menuOpen, setMenuOpen] = useState(null);
-  const [colorPickerOpen, setColorPickerOpen] = useState(null);
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [tutorialStep, setTutorialStep] = useState(0);
+  const [classes, setClasses] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
+  const [quizStats, setQuizStats] = useState({});
+  const [streak, setStreak] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const [mastery, setMastery] = useState(null);
+  const [observation, setObservation] = useState(null);
+  const [radarData, setRadarData] = useState(null);
+
+  const [upcoming, setUpcoming] = useState([]);
+
+  const [showJoin, setShowJoin] = useState(false);
+  const [joinCode, setJoinCode] = useState('');
+  const [joinError, setJoinError] = useState('');
+  const [joining, setJoining] = useState(false);
+  const [joinSuccess, setJoinSuccess] = useState(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Load user email from auth
-  useEffect(() => {
-    const loadUserEmail = async () => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('newton-auth-token') : null;
-      if (!token) return;
-
+    if (!mounted) return;
+    const load = async () => {
+      const token = localStorage.getItem('newton-auth-token');
+      if (!token) { setLoading(false); return; }
       try {
-        const response = await fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (response.ok) {
-          const userData = await response.json();
-          setUserEmail(userData.email);
-        }
-      } catch (error) {
-        console.error('Failed to load user email:', error);
-      }
-    };
+        // Redirect teachers to the teacher dashboard
+        const meRes = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+        const meData = await meRes.json();
+        if (meData.accountType === 'teacher') { router.push('/teacher/classes'); return; }
 
-    if (mounted) {
-      loadUserEmail();
-    }
+        const headers = { Authorization: `Bearer ${token}` };
+        const [classRes, quizRes, actRes, masteryRes, upcomingRes] = await Promise.all([
+          fetch('/api/student/classes', { headers }),
+          fetch('/api/quiz/user', { headers }),
+          fetch('/api/student/activity', { headers }),
+          fetch('/api/chat/analyze', { headers }).catch(() => null),
+          fetch('/api/student/all-assignments', { headers }).catch(() => null),
+        ]);
+        const classData = await classRes.json();
+        const quizData = await quizRes.json();
+        setClasses(classData.classes || []);
+        setQuizzes(quizData.quizzes || []);
+        if (quizData.stats) setQuizStats(quizData.stats);
+        try {
+          const actData = await actRes.json();
+          setStreak(actData.streak || 0);
+        } catch {}
+
+        if (upcomingRes && upcomingRes.ok) {
+          try {
+            const upcomingData = await upcomingRes.json();
+            setUpcoming((upcomingData.assignments || []).filter(a => !a.completed));
+          } catch {}
+        }
+
+        if (masteryRes && masteryRes.ok) {
+          try {
+            const masteryData = await masteryRes.json();
+            setMastery(masteryData);
+
+            if (masteryData.records && masteryData.records.length > 0) {
+              const records = masteryData.records;
+              const latest = records[0];
+
+              const avgMastery = records.reduce((sum, r) => sum + (r.mastery_level || 3), 0) / records.length;
+              const avgConfidence = records.reduce((sum, r) => sum + (r.confidence_score || 5), 0) / records.length;
+              const totalSessions = records.length;
+              const blindSpotCount = records.reduce((sum, r) => sum + (r.blind_spots?.length || 0), 0);
+
+              setRadarData({
+                recall: Math.min(avgMastery, 5),
+                application: Math.min(avgMastery * 0.85, 5),
+                analysis: Math.min(avgConfidence / 2, 5),
+                accuracy: Math.min(5 - (blindSpotCount / Math.max(totalSessions, 1)), 5),
+                consistency: Math.min(totalSessions / 4, 5),
+              });
+
+              if (latest.summary) {
+                setObservation({
+                  text: latest.summary,
+                  subject: latest.subject,
+                  focus: latest.recommended_focus?.[0] || null,
+                });
+              } else if (masteryData.summary?.topBlindSpots?.length > 0) {
+                const topSpot = masteryData.summary.topBlindSpots[0];
+                setObservation({
+                  text: `You tend to struggle with: ${topSpot.spot}`,
+                  subject: topSpot.subjects?.[0] || 'General',
+                  focus: null,
+                });
+              }
+            }
+          } catch {}
+        }
+      } catch {}
+      finally { setLoading(false); }
+    };
+    load();
   }, [mounted]);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('tutorial') === 'true') {
-      setShowTutorial(true);
-      setTutorialStep(0);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('subjects', JSON.stringify(subjects));
-      
-      // Also save to Supabase for cross-page sync
-      const saveToSupabase = async () => {
-        const email = userEmail;
-        if (!email) return;
-        
-        try {
-          await fetch('/api/save-chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email,
-              subjects,
-              // Don't overwrite existing chat data
-              preserveChats: true
-            })
-          });
-        } catch (error) {
-          console.error('Failed to sync subjects:', error);
-        }
-      };
-      
-      saveToSupabase();
-    }
-  }, [subjects, mounted]);
-
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('subject-colors', JSON.stringify(subjectColors));
-    }
-  }, [subjectColors, mounted]);
-// Close menu when clicking outside
-useEffect(() => {
-  const handleClickOutside = () => {
-    if (menuOpen) {
-      setMenuOpen(null);
-    }
-  };
-  
-  if (menuOpen) {
-    document.addEventListener('click', handleClickOutside);
-  }
-  
-  return () => {
-    document.removeEventListener('click', handleClickOutside);
-  };
-}, [menuOpen]);
-
-  const colorOptions = [
-    { name: 'Neutral', from: 'from-neutral-100', to: 'to-neutral-50', border: 'border-neutral-200' },
-    { name: 'Blue', from: 'from-blue-100', to: 'to-blue-50', border: 'border-blue-200' },
-    { name: 'Green', from: 'from-green-100', to: 'to-green-50', border: 'border-green-200' },
-    { name: 'Purple', from: 'from-purple-100', to: 'to-purple-50', border: 'border-purple-200' },
-    { name: 'Red', from: 'from-red-100', to: 'to-red-50', border: 'border-red-200' },
-    { name: 'Yellow', from: 'from-yellow-100', to: 'to-yellow-50', border: 'border-yellow-200' },
-    { name: 'Pink', from: 'from-pink-100', to: 'to-pink-50', border: 'border-pink-200' },
-    { name: 'Indigo', from: 'from-indigo-100', to: 'to-indigo-50', border: 'border-indigo-200' },
-  ];
-
-  const getSubjectColor = (subject) => {
-    return subjectColors[subject] || colorOptions[0];
+  const handleCodeInput = (val) => {
+    const clean = val.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (clean.length <= 4) setJoinCode(clean);
+    else setJoinCode(clean.slice(0, 4) + '-' + clean.slice(4, 8));
   };
 
-const addSubject = () => {
-  const name = prompt('Enter new subject name:');
-  if (name && !subjects.includes(name)) {
-    setSubjects([...subjects, name].sort());
-  }
-};
-
-  const renameSubject = (oldName) => {
-    const newName = prompt('Rename subject:', oldName);
-    if (newName && newName !== oldName && !subjects.includes(newName)) {
-      setSubjects(subjects.map(s => s === oldName ? newName : s));
-      if (subjectColors[oldName]) {
-        setSubjectColors(prev => {
-          const updated = { ...prev };
-          updated[newName] = updated[oldName];
-          delete updated[oldName];
-          return updated;
-        });
-      }
-    }
-    setMenuOpen(null);
-  };
-
-  const deleteSubject = (subject) => {
-    if (subjects.length === 1) {
-      alert('You must have at least one subject!');
-      return;
-    }
-    if (confirm(`Delete "${subject}"?`)) {
-      setSubjects(subjects.filter(s => s !== subject));
-      setSubjectColors(prev => {
-        const updated = { ...prev };
-        delete updated[subject];
-        return updated;
+  const handleJoin = async (e) => {
+    e.preventDefault();
+    setJoinError('');
+    if (!joinCode.trim()) { setJoinError('Please enter a class code.'); return; }
+    setJoining(true);
+    try {
+      const token = localStorage.getItem('newton-auth-token');
+      const res = await fetch('/api/student/join-class', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ code: joinCode.trim() }),
       });
-    }
-    setMenuOpen(null);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to join class');
+      const existing = JSON.parse(localStorage.getItem('newton-subjects') || '["General"]');
+      if (!existing.includes(data.class.subject)) {
+        localStorage.setItem('newton-subjects', JSON.stringify([...existing, data.class.subject].sort()));
+      }
+      setJoinSuccess(data.class);
+      const clsRes = await fetch('/api/student/classes', { headers: { Authorization: `Bearer ${token}` } });
+      const clsData = await clsRes.json();
+      setClasses(clsData.classes || []);
+    } catch (err) { setJoinError(err.message); }
+    finally { setJoining(false); }
   };
 
-  const changeColor = (subject, color) => {
-    setSubjectColors(prev => ({
-      ...prev,
-      [subject]: color
-    }));
-    setColorPickerOpen(null);
-    setMenuOpen(null);
-  };
+  const closeJoinModal = () => { setShowJoin(false); setJoinCode(''); setJoinError(''); setJoinSuccess(null); };
 
   if (!mounted) return null;
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
-      {/* Premium Glassmorphism Header */}
-      <header 
-        className="bg-white/70 dark:bg-neutral-900/70 backdrop-blur-2xl border-b border-neutral-200/50 dark:border-neutral-700/50 sticky top-0 z-40"
-        style={{
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)'
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-6">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div 
-                className="w-11 h-11 bg-gradient-to-br from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110"
-                style={{
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
-                }}
-              >
-                <span className="text-lg font-bold text-white dark:text-neutral-900">N</span>
-              </div>
-              <span className="text-xl font-extrabold text-neutral-900 dark:text-white tracking-tight">Newton</span>
-            </Link>
+  const activeClasses = classes.filter(c => !c.archived);
 
-            <Link
-              href="/chat"
-              className="px-6 py-3 bg-white/70 dark:bg-neutral-700/70 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 text-neutral-700 dark:text-neutral-200 font-semibold rounded-2xl hover:bg-white dark:hover:bg-neutral-600 hover:border-neutral-300 transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+  const lastQuiz = quizzes.find(q => q.status === 'completed');
+  const lastQuizScore = lastQuiz && lastQuiz.total_questions
+    ? Math.round(((lastQuiz.correct_count || 0) / lastQuiz.total_questions) * 100)
+    : null;
+
+  return (
+    <div className="min-h-screen" style={{ background: '#0B0B0C' }}>
+      {/* Header */}
+      <header className="sticky top-0 z-40 border-b border-white/5 backdrop-blur-xl" style={{ background: 'rgba(11,11,12,0.85)' }}>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center">
+              <span className="text-sm font-bold text-black">N</span>
+            </div>
+            <span className="text-[15px] font-semibold text-white tracking-tight">Newton</span>
+          </Link>
+          <div className="flex items-center gap-4 shrink-0">
+            {streak > 0 && (
+              <span className="text-[11px] font-medium text-white/40 whitespace-nowrap">
+                {streak} day streak
+              </span>
+            )}
+            <button
+              onClick={() => setShowJoin(true)}
+              className="p-2 text-white/40 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+              title="Join Class"
             >
-              Open Chat
-            </Link>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
-        {/* Hero Section */}
-        <div className="text-center mb-16 animate-fadeIn">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
-            Your Subjects
-          </h1>
-          <p className="text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed font-medium">
-            Choose a subject to start learning
-          </p>
-        </div>
-
-        {/* Subject Grid with Premium Cards */}
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {subjects.map((subject, index) => {
-            const color = getSubjectColor(subject);
-            return (
-              <div
-                key={subject}
-                className={`animate-scaleIn overflow-visible ${menuOpen === subject ? 'relative z-50' : ''}`}
-                style={{ 
-                  animationDelay: `${index * 60}ms`,
-                  animationFillMode: 'both'
-                }}
-              >
-                <Link
-                  href={subject === 'General' ? '/chat' : `/subject/${encodeURIComponent(subject)}`}
-                  className="block group"
-                >
-                  <div 
-                    className={`relative p-8 bg-gradient-to-br ${color.from} ${color.to} dark:from-neutral-800 dark:to-neutral-750 backdrop-blur-xl border ${color.border}/50 dark:border-neutral-700/50 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-visible`}
-                    style={{
-                      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.08)'
-                    }}
-                  >
-                    {/* Subject Icon */}
-                    <div
-                      className="w-14 h-14 bg-white/90 dark:bg-neutral-700/90 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110"
-                      style={{
-                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)'
-                      }}
-                    >
-                      <span className="text-2xl font-bold text-neutral-900 dark:text-white">
-                        {subject.charAt(0)}
-                      </span>
-                    </div>
-
-                    {/* Subject Name */}
-                    <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
-                      {subject}
-                    </h3>
-
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">
-                      Start learning →
-                    </p>
-
-                    {/* Three-dot Menu Button */}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setMenuOpen(menuOpen === subject ? null : subject);
-                      }}
-                      className="absolute top-6 right-6 p-3 hover:bg-white/70 backdrop-blur-sm rounded-xl transition-all duration-300 hover:scale-110 active:scale-90 z-10"
-                    >
-                      <span className="text-neutral-700 dark:text-neutral-300 font-bold text-xl">⋯</span>
-                    </button>
-
-                    {/* Premium Three-dot Dropdown Menu */}
-                    {menuOpen === subject && (
-                      <div 
-                        className="absolute top-16 right-6 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl shadow-2xl z-50 min-w-[160px] animate-scaleIn"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                        style={{
-                          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)'
-                        }}
-                      >
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            renameSubject(subject);
-                          }}
-                          className="w-full text-left px-5 py-3.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-sm font-semibold transition-all duration-200 flex items-center gap-3"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                          Rename
-                        </button>
-                        
-                        <div className="h-px bg-neutral-200/50 dark:bg-neutral-700/50"></div>
-
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setColorPickerOpen(colorPickerOpen === subject ? null : subject);
-                          }}
-                          className="w-full text-left px-5 py-3.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-sm font-semibold transition-all duration-200 flex items-center gap-3"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                          </svg>
-                          Change Color
-                        </button>
-                        
-                        {colorPickerOpen === subject && (
-                          <div className="px-3 py-3 bg-neutral-50/50 dark:bg-neutral-700/50 border-t border-neutral-200/50 dark:border-neutral-600/50">
-                            <div className="grid grid-cols-4 gap-2">
-                              {colorOptions.map((colorOption) => (
-                                <button
-                                  key={colorOption.name}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    changeColor(subject, colorOption);
-                                  }}
-                                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colorOption.from} ${colorOption.to} border-2 ${
-                                    color.name === colorOption.name 
-                                      ? 'border-neutral-900 scale-110' 
-                                      : 'border-neutral-200 hover:border-neutral-300'
-                                  } transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg`}
-                                  title={colorOption.name}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="h-px bg-neutral-200/50 dark:bg-neutral-700/50"></div>
-
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            deleteSubject(subject);
-                          }}
-                          className="w-full text-left px-5 py-3.5 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-semibold transition-all duration-200 flex items-center gap-3"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                          Delete
-                        </button>
+      <main className="max-w-7xl mx-auto px-6 py-8 pb-24 md:pb-28 space-y-8">
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div
+              key="skeleton"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            >
+              <SkeletonDashboard />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-8"
+            >
+              {/* Your Insights */}
+              <div>
+                <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-4">Your Insights</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0">
+                  {/* Knowledge Radar */}
+                  <div className="border border-white/5 rounded-xl p-6 sm:p-8 min-w-0" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-4">Knowledge Radar</h3>
+                    {radarData ? (
+                      <KnowledgeRadar data={radarData} />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-32 text-center">
+                        <p className="text-sm text-white/20">No data yet</p>
+                        <p className="text-xs text-white/10 mt-1">Start chatting to build your profile</p>
                       </div>
                     )}
                   </div>
-                </Link>
+
+                  {/* Mastery Overview */}
+                  <div className="lg:col-span-2 border border-white/5 rounded-xl p-6 sm:p-8 min-w-0" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-4">Your Mastery</h3>
+                    <div className="flex flex-col items-center justify-center h-32 text-center">
+                      <p className="text-sm text-white/20">No active tasks — Ready to start?</p>
+                      <p className="text-xs text-white/10 mt-1">Complete quizzes to see your progress here</p>
+                    </div>
+                  </div>
+
+                  {/* Newton's Observation */}
+                  {observation && (
+                    <div className="lg:col-span-3 border border-white/5 rounded-xl p-6 sm:p-8 min-w-0" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                      <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-4">Observation</h3>
+                      <div className="flex flex-col justify-center min-w-0">
+                        <p className="text-white text-[15px] leading-relaxed mb-3 break-words">
+                          &ldquo;{observation.text}&rdquo;
+                        </p>
+                        {observation.focus && (
+                          <p className="text-sm text-white/40 break-words">
+                            Focus next on: <span className="text-[#0071e3] font-medium">{observation.focus}</span>
+                          </p>
+                        )}
+                        {observation.subject && (
+                          <p className="text-[10px] text-white/20 mt-2 uppercase tracking-wider">{observation.subject}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            );
-          })}
 
-          {/* Add Subject Card */}
-          <button
-            onClick={addSubject}
-            className="group p-8 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-xl border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-3xl hover:border-neutral-400 dark:hover:border-neutral-500 hover:bg-white/90 dark:hover:bg-neutral-800/90 transition-all duration-500 hover:scale-105 flex flex-col items-center justify-center min-h-[200px] shadow-lg hover:shadow-xl animate-scaleIn"
-            style={{ 
-              animationDelay: `${subjects.length * 60}ms`,
-              animationFillMode: 'both',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.06)'
-            }}
-          >
-            <div 
-              className="w-14 h-14 bg-neutral-100 dark:bg-neutral-700 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-neutral-200 dark:group-hover:bg-neutral-600 transition-all duration-300 group-hover:scale-110 shadow-md"
-            >
-              <svg className="w-7 h-7 text-neutral-600 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors duration-300">
-              Add Subject
-            </span>
-          </button>
-        </div>
+              {/* Upcoming Assignments */}
+              {upcoming.length > 0 && (
+                <div>
+                  <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-4">Upcoming</h3>
+                  <div className="border border-white/5 rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    {upcoming.slice(0, 8).map((item, i) => {
+                      const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
+                      const isQuiz = item.type === 'quiz';
+                      return (
+                        <Link
+                          key={`${item.type}-${item.id}`}
+                          href={isQuiz ? '/quiz' : `/subject/${encodeURIComponent(item.subject)}`}
+                          className={`flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors ${
+                            i < Math.min(upcoming.length, 8) - 1 ? 'border-b border-white/5' : ''
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className={`text-sm font-medium truncate ${isOverdue ? 'text-red-400' : 'text-white'}`}>
+                                {item.title}
+                              </p>
+                              <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0 ${
+                                isQuiz ? 'bg-[#0071e3]/15 text-[#0071e3]' : 'bg-white/5 text-white/30'
+                              }`}>
+                                {isQuiz ? 'Quiz' : 'Task'}
+                              </span>
+                            </div>
+                            <p className={`text-xs mt-0.5 ${isOverdue ? 'text-red-400/60' : 'text-white/30'}`}>
+                              {item.subject} · {item.className}
+                              {item.dueDate
+                                ? ` · ${isOverdue ? 'Overdue' : 'Due'} ${new Date(item.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`
+                                : ''}
+                            </p>
+                          </div>
+                          <svg className="w-4 h-4 text-white/15 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                          </svg>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-        {/* Quick Actions Section */}
-        <div 
-          className="mt-16 p-8 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-xl"
-          style={{
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.08)'
-          }}
-        >
-          <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">Quick Actions</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Link
-              href="/chat"
-              className="group p-6 bg-gradient-to-br from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-750 border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl hover:shadow-lg transition-all duration-300 hover:scale-105 shadow-md"
-            >
-              <div className="flex items-center gap-4">
-                <div 
-                  className="w-12 h-12 bg-gradient-to-br from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110"
-                  style={{
-                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)'
-                  }}
-                >
-                  <svg className="w-6 h-6 text-white dark:text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              {/* Subject Tiles */}
+              <div>
+                <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-4">Subjects</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {/* General Chat */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0 }}
+                  >
+                    <Link
+                      href="/chat"
+                      className="block border border-white/5 rounded-xl p-5 group hover:border-white/10 transition-colors text-center"
+                      style={{ background: 'rgba(255,255,255,0.02)' }}
+                    >
+                      <div className="w-10 h-10 bg-[#0071e3]/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-5 h-5 text-[#0071e3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-sm font-medium text-white tracking-tight">General</h3>
+                    </Link>
+                  </motion.div>
+
+                  {/* Class subject tiles */}
+                  {activeClasses.map((cls, idx) => (
+                    <motion.div
+                      key={cls.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: (idx + 1) * 0.05 }}
+                    >
+                      <Link
+                        href={`/chat?classId=${cls.id}&new=true`}
+                        className="block border border-white/5 rounded-xl p-5 group hover:border-white/10 transition-colors text-center"
+                        style={{ background: 'rgba(255,255,255,0.02)' }}
+                      >
+                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mx-auto mb-3">
+                          <ClassIcon subject={cls.subject} size={20} />
+                        </div>
+                        <h3 className="text-sm font-medium text-white tracking-tight truncate">{cls.subject}</h3>
+                        {cls.board && (
+                          <p className="text-[10px] text-white/30 mt-0.5 truncate">{cls.board}</p>
+                        )}
+                      </Link>
+                    </motion.div>
+                  ))}
+
+                  {/* Join Class tile */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 100, damping: 20, delay: (activeClasses.length + 1) * 0.05 }}
+                  >
+                    <button
+                      onClick={() => setShowJoin(true)}
+                      className="w-full border border-dashed border-white/10 rounded-xl p-5 group hover:border-white/20 transition-colors text-center"
+                      style={{ background: 'rgba(255,255,255,0.02)' }}
+                    >
+                      <div className="w-10 h-10 border border-dashed border-white/10 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:border-white/20 transition-colors">
+                        <svg className="w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </div>
+                      <h3 className="text-sm font-medium text-white/30 tracking-tight">Join</h3>
+                    </button>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Your Progress */}
+              <Link href="/quiz" className="block border border-white/5 rounded-xl p-6 sm:p-8 group hover:border-white/10 transition-colors min-w-0" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                <div className="flex items-center justify-between min-w-0">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-lg font-semibold text-white tracking-tight">Your Progress</h3>
+                      {quizStats.completed > 0 && (
+                        <span className="text-[11px] font-medium text-white/30">
+                          {quizStats.completed} completed
+                        </span>
+                      )}
+                    </div>
+                    {lastQuiz ? (
+                      <p className="text-sm text-white/40">
+                        Last: {lastQuiz.topic_name || lastQuiz.topicName || 'Untitled'} &middot; {lastQuizScore}%
+                      </p>
+                    ) : (
+                      <p className="text-sm text-white/40">Start your first quiz to track progress</p>
+                    )}
+                  </div>
+                  <svg className="w-5 h-5 text-white/20 group-hover:text-white/40 transition-colors shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                   </svg>
                 </div>
-                <div>
-                  <h3 className="font-bold text-neutral-900 dark:text-white mb-1 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
-                    Start Chatting
-                  </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">
-                    Ask Newton anything
-                  </p>
-                </div>
-              </div>
-            </Link>
+              </Link>
 
-            <Link
-              href="/"
-              className="group p-6 bg-gradient-to-br from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-750 border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl hover:shadow-lg transition-all duration-300 hover:scale-105 shadow-md"
-            >
-              <div className="flex items-center gap-4">
-                <div 
-                  className="w-12 h-12 bg-gradient-to-br from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110"
-                  style={{
-                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)'
-                  }}
-                >
-                  <svg className="w-6 h-6 text-white dark:text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-neutral-900 dark:text-white mb-1 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
-                    Back Home
-                  </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">
-                    Return to landing page
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
-      {/* Dashboard Tutorial */}
-      {showTutorial && (
-        <div className="fixed inset-0 z-[100]">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-          
-          {tutorialStep === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto">
-              <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-12 text-center animate-scaleIn">
-                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
-                  <span className="text-4xl font-bold text-white">N</span>
-                </div>
-                <h2 className="text-4xl font-extrabold text-neutral-900 mb-4">Your Dashboard</h2>
-                <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
-                  This is where you manage all your subjects. You can add new subjects, change colors, and organize your learning!
-                </p>
-                <div className="bg-neutral-50 rounded-2xl p-6 mb-8 text-left">
-                  <h3 className="font-bold text-neutral-900 mb-3">What you can do here:</h3>
-                  <ul className="space-y-2 text-neutral-700">
-                    <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Click any subject to start learning</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Add new subjects with the + button</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Customize colors and rename subjects</span>
-                    </li>
-                  </ul>
-                </div>
-                <button
-                  onClick={() => {
-  setShowTutorial(false);
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('newton-seen-tutorial', 'true');
-  }
-  window.location.href = '/chat';
-}}
-                  className="px-8 py-4 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-xl text-lg"
-                >
-                  Back to Chat →
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      <NavigationDock />
 
-      {/* Premium CSS Animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.8s ease-out forwards;
-        }
-        
-        .animate-scaleIn {
-          animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          opacity: 0;
-        }
-      `}</style>
+      {/* Join Class Modal */}
+      <AnimatePresence>
+        {showJoin && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeJoinModal} />
+            <motion.div
+              className="relative border border-white/10 rounded-2xl max-w-sm w-full p-6"
+              style={{ background: '#121214' }}
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {joinSuccess ? (
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </div>
+                  <h2 className="text-lg font-semibold text-white mb-1">Joined {joinSuccess.name}!</h2>
+                  <p className="text-sm text-white/60 mb-5">{joinSuccess.subject}</p>
+                  <button
+                    onClick={closeJoinModal}
+                    className="w-full py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium rounded-full transition-colors duration-200"
+                  >
+                    Done
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-lg font-semibold text-white mb-1">Join a Class</h2>
+                  <p className="text-sm text-white/60 mb-5">Enter the code from your teacher.</p>
+                  {joinError && (
+                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                      <p className="text-sm text-red-400">{joinError}</p>
+                    </div>
+                  )}
+                  <form onSubmit={handleJoin}>
+                    <input
+                      type="text"
+                      value={joinCode}
+                      onChange={(e) => handleCodeInput(e.target.value)}
+                      placeholder="ABCD-1234"
+                      maxLength={9}
+                      autoFocus
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-center text-xl font-mono font-semibold tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50 focus:border-transparent placeholder:text-white/30 placeholder:tracking-normal"
+                    />
+                    <div className="flex gap-3 mt-5">
+                      <button type="button" onClick={closeJoinModal} className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-white/60 font-medium rounded-full transition-colors">
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={joining || joinCode.replace(/-/g, '').length < 8}
+                        className="flex-1 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] disabled:bg-white/5 text-white disabled:text-white/30 font-medium rounded-full transition-colors duration-200"
+                      >
+                        {joining ? 'Joining...' : 'Join'}
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

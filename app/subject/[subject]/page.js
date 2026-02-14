@@ -1,404 +1,509 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useTheme } from '@/components/ThemeProvider';
+import NavigationDock from '@/components/NavigationDock';
+import { ClassIcon } from '@/components/ClassIcons';
 
+const cardBase = 'bg-slate-950 border border-slate-800 rounded-lg transition-colors duration-200';
+
+/* ── Main Subject Page ── */
 export default function SubjectPage({ params }) {
+  const resolvedParams = use(params);
+  const subject = decodeURIComponent(resolvedParams.subject);
   const router = useRouter();
-  const [subject, setSubject] = useState('');
-  const [activeTab, setActiveTab] = useState('quiz');
   const [mounted, setMounted] = useState(false);
+  const [classData, setClassData] = useState(null);
+  const [assignments, setAssignments] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [mastery, setMastery] = useState([]);
+  const [quizAssignments, setQuizAssignments] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sortCol, setSortCol] = useState('code');
+  const [sortAsc, setSortAsc] = useState(true);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    setMounted(true);
-    // Unwrap params if it's a Promise (Next.js 15)
-    if (params && typeof params.then === 'function') {
-      params.then((unwrappedParams) => {
-        setSubject(decodeURIComponent(unwrappedParams.subject));
-      });
-    } else if (params) {
-      setSubject(decodeURIComponent(params.subject));
-    }
-  }, [params]);
+    if (!mounted) return;
+    const load = async () => {
+      const token = localStorage.getItem('newton-auth-token');
+      if (!token) { router.push('/login'); return; }
+      const headers = { Authorization: `Bearer ${token}` };
 
-  const handleTabChange = (tab) => {
-    if (tab === 'chat') {
-      router.push(`/chat?subject=${encodeURIComponent(subject)}&new=true`);
-    } else {
-      setActiveTab(tab);
-    }
+      try {
+        const classRes = await fetch('/api/student/classes', { headers });
+        const classJson = await classRes.json();
+        const cls = (classJson.classes || []).find(c => c.subject === subject);
+        setClassData(cls || null);
+
+        const fetches = [
+          fetch(`/api/topics/user?subject=${encodeURIComponent(subject)}`, { headers }),
+        ];
+        if (cls) {
+          fetches.push(
+            fetch(`/api/student/class/${cls.id}/assignments`, { headers }),
+            fetch(`/api/student/class/${cls.id}/resources`, { headers }),
+            fetch(`/api/student/quiz-assignments?classId=${cls.id}`, { headers }),
+          );
+        }
+
+        const results = await Promise.all(fetches);
+        const topicsData = await results[0].json();
+        setTopics(topicsData.topics || []);
+
+        if (cls && results[1]) {
+          const aData = await results[1].json();
+          setAssignments(aData.assignments || []);
+        }
+        if (cls && results[2]) {
+          const rData = await results[2].json();
+          setResources(rData.resources || []);
+        }
+        if (cls && results[3]) {
+          try {
+            const qaData = await results[3].json();
+            setQuizAssignments(qaData.assignments || []);
+          } catch {}
+        }
+
+        const mRes = await fetch(`/api/quiz/user?subject=${encodeURIComponent(subject)}`, { headers }).catch(() => null);
+        if (mRes?.ok) {
+          const mData = await mRes.json();
+          const quizTopics = (mData.quizzes || [])
+            .filter(q => q.status === 'completed')
+            .map(q => ({
+              topic: q.topic_name,
+              score: q.correct_count && q.total_questions ? Math.round((q.correct_count / q.total_questions) * 100) : 0,
+              last_quiz_at: q.completed_at || q.created_at,
+            }));
+          setMastery(quizTopics);
+        }
+      } catch (e) {
+        console.error('Subject page load error:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [mounted, subject, router]);
+
+  if (!mounted) return null;
+
+  const syllabusChapters = buildSyllabus(subject, topics, mastery);
+
+  // Sorting
+  const handleSort = (col) => {
+    if (sortCol === col) setSortAsc(!sortAsc);
+    else { setSortCol(col); setSortAsc(true); }
   };
 
-  if (!mounted || !subject) return null;
+  const sortedChapters = [...syllabusChapters].sort((a, b) => {
+    let av, bv;
+    switch (sortCol) {
+      case 'code': av = a.code; bv = b.code; break;
+      case 'name': av = a.title; bv = b.title; break;
+      case 'mastery': av = a.quizScore ?? -1; bv = b.quizScore ?? -1; break;
+      case 'lastAssessment': av = a.lastActivityAt || ''; bv = b.lastActivityAt || ''; break;
+      case 'integrity': av = a.integrityScore ?? 0; bv = b.integrityScore ?? 0; break;
+      default: av = a.code; bv = b.code;
+    }
+    if (av < bv) return sortAsc ? -1 : 1;
+    if (av > bv) return sortAsc ? 1 : -1;
+    return 0;
+  });
+
+  // Coverage stats
+  const completedTopics = syllabusChapters.filter(c => c.status === 'mastered' || c.status === 'review' || c.status === 'active').length;
+  const totalTopics = syllabusChapters.length;
+  const coveragePercent = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+
+  // Merge assignments + quiz assignments
+  const mergedAssignments = [
+    ...assignments.map(a => ({ ...a, _type: 'task' })),
+    ...quizAssignments.map(qa => ({
+      id: qa.id,
+      title: qa.topicName,
+      description: null,
+      due_date: qa.dueDate,
+      created_at: qa.createdAt,
+      completed_at: qa.completed ? qa.createdAt : null,
+      _type: 'quiz',
+      _started: qa.started,
+      _completed: qa.completed,
+      _quizId: qa.quizId,
+    })),
+  ];
+
+  const allAssignments = mergedAssignments.sort((a, b) => {
+    const aOverdue = !a.completed_at && a.due_date && new Date(a.due_date) < new Date();
+    const bOverdue = !b.completed_at && b.due_date && new Date(b.due_date) < new Date();
+    if (aOverdue && !bOverdue) return -1;
+    if (!aOverdue && bOverdue) return 1;
+    return new Date(a.due_date || '9999') - new Date(b.due_date || '9999');
+  });
+
+  const SortHeader = ({ col, label }) => (
+    <th
+      className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-300 select-none"
+      onClick={() => handleSort(col)}
+    >
+      {label} {sortCol === col ? (sortAsc ? '\u2191' : '\u2193') : ''}
+    </th>
+  );
+
+  const masteryColor = (score) => {
+    if (score == null) return '';
+    if (score < 40) return 'bg-red-950/40';
+    if (score < 70) return 'bg-amber-950/40';
+    return 'bg-emerald-950/40';
+  };
+
+  const masteryTextColor = (score) => {
+    if (score == null) return 'text-slate-600';
+    if (score < 40) return 'text-red-400';
+    if (score < 70) return 'text-amber-400';
+    return 'text-emerald-400';
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
-      {/* Premium Glassmorphism Header */}
-      <header 
-        className="bg-white/70 dark:bg-neutral-900/70 backdrop-blur-2xl border-b border-neutral-200/50 dark:border-neutral-700/50 sticky top-0 z-40"
-        style={{
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)'
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-6">
-          <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="flex items-center gap-3 group">
-              <svg className="w-6 h-6 text-neutral-600 dark:text-neutral-400 group-hover:text-black dark:group-hover:text-white transition-all duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    <div className="min-h-screen bg-black">
+      {/* Header */}
+      <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
+        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className="p-1.5 -ml-1.5 rounded-lg hover:bg-slate-800 transition-colors">
+              <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              <span className="text-base font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">
-                Back to Dashboard
-              </span>
             </Link>
-
-            <div className="flex items-center gap-3">
-              <div 
-                className="w-10 h-10 bg-gradient-to-br from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 rounded-2xl flex items-center justify-center shadow-lg"
-                style={{
-                  boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)'
-                }}
-              >
-                <span className="text-base font-bold text-white dark:text-neutral-900">{subject.charAt(0)}</span>
-              </div>
+            <div className="flex items-center gap-2.5">
+              <ClassIcon subject={subject} size={20} />
+              <h1 className="text-base font-bold text-white tracking-tight">{subject}</h1>
             </div>
           </div>
+          <button
+            onClick={() => router.push(classData ? `/chat?classId=${classData.id}&new=true` : `/chat?subject=${encodeURIComponent(subject)}&new=true`)}
+            className="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-semibold rounded-full transition-colors"
+          >
+            Chat
+          </button>
         </div>
       </header>
 
-      {/* Subject Hero Section */}
-      <section className="py-16 px-6 sm:px-8 lg:px-12">
-        <div className="max-w-7xl mx-auto text-center animate-fadeIn">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
-            {subject}
-          </h1>
-          <p className="text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto font-medium">
-            Choose how you want to learn today
-          </p>
-        </div>
-      </section>
-
-      {/* Premium Glassmorphism Tab Navigation */}
-      <section className="px-6 sm:px-8 lg:px-12 mb-12">
-        <div className="max-w-5xl mx-auto">
-          <div 
-            className="flex gap-3 p-2 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-xl"
-            style={{
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
-            }}
-          >
-            {[
-              { id: 'chat', label: 'AI Chat', icon: (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              )},
-              { id: 'quiz', label: 'Quizzes', icon: (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-              )},
-              { id: 'progress', label: 'Progress', icon: (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              )},
-              { id: 'notes', label: 'Notes', icon: (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              )}
-            ].map((tab, index) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex-1 px-6 py-4 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2.5 ${
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-100 dark:to-neutral-200 text-white dark:text-neutral-900 shadow-xl scale-105'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-neutral-700/80 backdrop-blur-sm hover:scale-105'
-                } hover:shadow-lg active:scale-95 animate-slideIn`}
-                style={{
-                  animationDelay: `${index * 80}ms`,
-                  animationFillMode: 'both',
-                  boxShadow: activeTab === tab.id ? '0 8px 24px rgba(0, 0, 0, 0.2)' : 'none'
-                }}
-              >
-                {tab.icon}
-                <span>{tab.label}</span>
-              </button>
+      <main className="max-w-5xl mx-auto px-6 py-6 pb-24 space-y-6">
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className={`${cardBase} p-6 animate-pulse`}>
+                <div className="h-4 w-32 bg-slate-800 rounded mb-3" />
+                <div className="h-3 w-48 bg-slate-800 rounded" />
+              </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Tab Content with Premium Styling */}
-      <section className="px-6 sm:px-8 lg:px-12 pb-20">
-        <div className="max-w-5xl mx-auto">
-          {/* Quiz Tab */}
-          {activeTab === 'quiz' && (
-            <div 
-              className="p-12 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-2xl animate-fadeIn"
-              style={{
-                boxShadow: '0 16px 48px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              <div className="text-center max-w-3xl mx-auto">
-                <div 
-                  className="w-20 h-20 mx-auto bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl flex items-center justify-center mb-8 shadow-2xl animate-float"
-                  style={{
-                    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.25)'
-                  }}
-                >
-                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                  </svg>
-                </div>
-
-                <h2 className="text-4xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
-                  Smart Quizzes Coming Soon
-                </h2>
-                <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-10 leading-relaxed font-medium">
-                  Upload your homework, notes, or textbook pages, and Newton will generate personalized quizzes to test your understanding.
-                </p>
-
-                {/* Feature Preview Grid */}
-                <div className="grid sm:grid-cols-2 gap-6 mb-10">
-                  {[
-                    {
-                      icon: (
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                      ),
-                      title: 'Upload Materials',
-                      desc: 'PDFs, images, or documents'
-                    },
-                    {
-                      icon: (
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                      ),
-                      title: 'AI Analysis',
-                      desc: 'Newton studies your content'
-                    },
-                    {
-                      icon: (
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      ),
-                      title: 'Custom Questions',
-                      desc: 'Personalized to your level'
-                    },
-                    {
-                      icon: (
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                      ),
-                      title: 'Track Progress',
-                      desc: 'See your improvement'
-                    }
-                  ].map((feature, i) => (
-                    <div 
-                      key={i}
-                      className="p-6 bg-neutral-50/70 dark:bg-neutral-700/50 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl text-left shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                    >
-                      <div className="w-12 h-12 bg-white dark:bg-neutral-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
-                        {feature.icon}
-                      </div>
-                      <h3 className="font-bold text-neutral-900 dark:text-white mb-2">{feature.title}</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">{feature.desc}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div 
-                  className="p-6 bg-neutral-100/70 dark:bg-neutral-700/50 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl"
-                >
-                  <p className="text-sm text-neutral-700 dark:text-neutral-300 font-semibold">
-                    💡 For now, use AI Chat to ask questions about your {subject.toLowerCase()} work
-                  </p>
+        ) : (
+          <>
+            {/* Class Info */}
+            {classData && (
+              <div className={`${cardBase} px-6 py-4 flex items-center justify-between`}>
+                <div>
+                  <p className="text-sm font-semibold text-white">{classData.name}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{classData.year_group?.replace('year', 'Year ')} · {classData.teacher_name || 'Teacher'}</p>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Progress Tab */}
-          {activeTab === 'progress' && (
-            <div 
-              className="p-12 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-2xl animate-fadeIn"
-              style={{
-                boxShadow: '0 16px 48px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              <div className="text-center max-w-3xl mx-auto">
-                <div 
-                  className="w-20 h-20 mx-auto bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl flex items-center justify-center mb-8 shadow-2xl animate-float"
-                  style={{
-                    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.25)'
-                  }}
-                >
-                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-
-                <h2 className="text-4xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
-                  Track Your Learning Journey
-                </h2>
-                <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-10 leading-relaxed font-medium">
-                  Your progress dashboard is being built. Soon you&apos;ll see detailed analytics of your learning.
-                </p>
-
-                {/* Preview Stats Grid */}
-                <div className="grid sm:grid-cols-3 gap-6 mb-10">
-                  {[
-                    { label: 'Conversations', value: '—', color: 'from-blue-500 to-blue-600' },
-                    { label: 'Study Time', value: '—', color: 'from-green-500 to-green-600' },
-                    { label: 'Topics Learned', value: '—', color: 'from-purple-500 to-purple-600' }
-                  ].map((stat, i) => (
-                    <div 
-                      key={i}
-                      className="p-8 bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-700 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                    >
-                      <div className={`text-4xl font-extrabold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2`}>
-                        {stat.value}
-                      </div>
-                      <div className="text-sm font-semibold text-neutral-600 dark:text-neutral-400">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  {[
-                    'Detailed conversation analytics',
-                    'Topic mastery breakdown',
-                    'Study streak tracking',
-                    'Personalized insights'
-                  ].map((feature, i) => (
-                    <div 
-                      key={i}
-                      className="flex items-center gap-3 p-4 bg-neutral-50/70 dark:bg-neutral-700/50 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 rounded-xl"
-                    >
-                      <div className="w-8 h-8 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md">
-                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <span className="text-neutral-700 dark:text-neutral-300 font-semibold text-left">{feature}</span>
-                    </div>
-                  ))}
-                </div>
+            {/* Syllabus Coverage Bar + Heatmap */}
+            <div className={`${cardBase} p-5`}>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Syllabus Coverage</h2>
+                <span className="font-sans text-sm text-slate-300">{completedTopics}/{totalTopics} topics</span>
               </div>
-            </div>
-          )}
-
-          {/* Notes Tab */}
-          {activeTab === 'notes' && (
-            <div 
-              className="p-12 bg-white/70 dark:bg-neutral-800/70 backdrop-blur-2xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-2xl animate-fadeIn"
-              style={{
-                boxShadow: '0 16px 48px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              <div className="text-center max-w-3xl mx-auto">
-                <div 
-                  className="w-20 h-20 mx-auto bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl flex items-center justify-center mb-8 shadow-2xl animate-float"
-                  style={{
-                    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.25)'
-                  }}
-                >
-                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </div>
-
-                <h2 className="text-4xl font-extrabold text-neutral-900 dark:text-white mb-6 tracking-tight">
-                  Save Important Concepts
-                </h2>
-                <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-10 leading-relaxed font-medium">
-                  Soon you&apos;ll be able to bookmark key insights from your conversations with Newton.
-                </p>
-
-                <div 
-                  className="p-10 bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-700 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl mb-8 text-left shadow-lg"
-                >
-                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-6">How it will work:</h3>
-                  <ol className="space-y-5">
-                    {[
-                      'Click the bookmark icon on any Newton response',
-                      'Your saved concepts appear here, organized by subject',
-                      'Review your notes anytime before exams',
-                      'Export your notes as study guides'
-                    ].map((step, i) => (
-                      <li key={i} className="flex items-start gap-4">
-                        <div className="w-8 h-8 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-lg flex items-center justify-center flex-shrink-0 text-white font-bold text-sm shadow-md">
-                          {i + 1}
+              {/* Progress bar */}
+              <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-4">
+                <div
+                  className="h-full bg-[#0071e3] rounded-full transition-all duration-500"
+                  style={{ width: `${coveragePercent}%` }}
+                />
+              </div>
+              {/* Knowledge Heatmap */}
+              {syllabusChapters.length > 0 && (
+                <div>
+                  <h3 className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider mb-2">Topic Mastery Heatmap</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {syllabusChapters.map((ch, i) => {
+                      const score = ch.quizScore;
+                      let bg = 'bg-slate-800';
+                      if (score != null) {
+                        if (score >= 70) bg = 'bg-emerald-600';
+                        else if (score >= 40) bg = 'bg-amber-600';
+                        else bg = 'bg-red-600';
+                      }
+                      return (
+                        <div
+                          key={i}
+                          className={`w-6 h-6 rounded-sm ${bg} relative group cursor-default`}
+                          title={`${ch.code}: ${score != null ? score + '%' : 'Unassessed'}`}
+                        >
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-black border border-slate-700 rounded text-[10px] text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-sans">
+                            {ch.code}: {score != null ? score + '%' : '—'}
+                          </div>
                         </div>
-                        <span className="text-neutral-700 dark:text-neutral-300 font-medium pt-1.5">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
+                      );
+                    })}
+                  </div>
                 </div>
-
-                <div 
-                  className="p-6 bg-neutral-100/70 dark:bg-neutral-700/50 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-600/50 rounded-2xl"
-                >
-                  <p className="text-sm text-neutral-700 dark:text-neutral-300 font-semibold">
-                    💡 For now, keep your own notes from Newton conversations
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
-          )}
-        </div>
-      </section>
 
-      {/* Premium CSS Animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-8px);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.6s ease-out forwards;
-        }
-        
-        .animate-slideIn {
-          animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          opacity: 0;
-        }
-        
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
+            {/* Syllabus Matrix Table */}
+            <div className={`${cardBase} overflow-hidden`}>
+              <div className="px-5 py-3 border-b border-slate-800">
+                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Syllabus Matrix</h2>
+              </div>
+              {syllabusChapters.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-800">
+                        <SortHeader col="code" label="Topic Code" />
+                        <SortHeader col="name" label="Topic Name" />
+                        <SortHeader col="mastery" label="Mastery %" />
+                        <SortHeader col="lastAssessment" label="Last Assessment" />
+                        <SortHeader col="integrity" label="Integrity" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedChapters.map((ch, i) => (
+                        <tr
+                          key={i}
+                          className={`border-b border-slate-800/50 hover:bg-slate-900 cursor-pointer ${masteryColor(ch.quizScore)}`}
+                          onClick={() => {
+                            const chatUrl = classData
+                              ? `/chat?classId=${classData.id}&topic=${encodeURIComponent(ch.title)}&new=true`
+                              : `/chat?subject=${encodeURIComponent(subject)}&topic=${encodeURIComponent(ch.title)}&new=true`;
+                            router.push(chatUrl);
+                          }}
+                        >
+                          <td className="px-3 py-2.5 font-sans text-xs text-slate-400">{ch.code}</td>
+                          <td className="px-3 py-2.5 text-sm text-slate-200 max-w-[200px] truncate">{ch.title}</td>
+                          <td className={`px-3 py-2.5 font-sans text-xs font-semibold ${masteryTextColor(ch.quizScore)}`}>
+                            {ch.quizScore != null ? `${ch.quizScore}%` : '—'}
+                          </td>
+                          <td className="px-3 py-2.5 font-sans text-xs text-slate-500">
+                            {ch.lastActivityAt
+                              ? new Date(ch.lastActivityAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
+                              : '—'}
+                          </td>
+                          <td className="px-3 py-2.5 font-sans text-xs text-slate-500">
+                            {ch.integrityScore != null ? ch.integrityScore : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-8 px-5">
+                  <p className="text-sm text-slate-500">Complete quizzes and chat sessions to build your syllabus map.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Incomplete Tasks */}
+            <div className={`${cardBase} overflow-hidden`}>
+              <div className="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tasks</h2>
+                {assignments.length > 0 && (
+                  <span className="font-sans text-xs text-slate-500">{allAssignments.filter(a => !a.completed_at).length} pending</span>
+                )}
+              </div>
+              {allAssignments.length === 0 ? (
+                <div className="text-center py-6 px-5">
+                  <p className="text-sm text-slate-500">No assignments set yet.</p>
+                </div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-800">
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Task Name</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Type</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Due Date</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allAssignments.map(a => {
+                      const isOverdue = !a.completed_at && a.due_date && new Date(a.due_date) < new Date();
+                      const isComplete = a._type === 'quiz' ? !!a._completed : !!a.completed_at;
+                      const isQuiz = a._type === 'quiz';
+                      return (
+                        <tr
+                          key={`${a._type}-${a.id}`}
+                          className={`border-b border-slate-800/50 hover:bg-slate-900 cursor-pointer ${isOverdue ? 'bg-red-950/20' : ''}`}
+                          onClick={() => {
+                            if (isQuiz) {
+                              router.push(a._quizId ? `/quiz/${a._quizId}` : '/quiz');
+                            } else {
+                              const chatUrl = classData
+                                ? `/chat?classId=${classData.id}&topic=${encodeURIComponent(a.title)}&new=true`
+                                : `/chat?subject=${encodeURIComponent(subject)}&new=true`;
+                              router.push(chatUrl);
+                            }
+                          }}
+                        >
+                          <td className={`px-3 py-2.5 text-sm ${isOverdue ? 'text-red-400' : 'text-slate-200'}`}>{a.title}</td>
+                          <td className="px-3 py-2.5 text-xs">
+                            <span className={`px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                              isQuiz ? 'bg-blue-500/10 text-blue-400' : 'bg-white/[0.06] text-slate-500'
+                            }`}>
+                              {isQuiz ? 'Quiz' : 'Task'}
+                            </span>
+                          </td>
+                          <td className={`px-3 py-2.5 font-sans text-xs ${isOverdue ? 'text-red-400' : 'text-slate-500'}`}>
+                            {a.due_date ? new Date(a.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}
+                          </td>
+                          <td className="px-3 py-2.5 text-xs">
+                            {isComplete ? (
+                              <span className="text-emerald-400 font-semibold">DONE</span>
+                            ) : isOverdue ? (
+                              <span className="text-red-400 font-semibold">OVERDUE</span>
+                            ) : isQuiz && a._started ? (
+                              <span className="text-amber-400 font-semibold">IN PROGRESS</span>
+                            ) : (
+                              <span className="text-slate-500">Pending</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Exam Simulation */}
+            <div className={`${cardBase} p-5`}>
+              <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Exam Simulation</h2>
+              <button
+                onClick={() => router.push(`/quiz?subject=${encodeURIComponent(subject)}&mode=exam`)}
+                className="w-full rounded-lg p-4 bg-white text-black border border-slate-200 hover:bg-slate-100 transition-colors text-left group"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-black/40 mb-1">Mock Paper</p>
+                    <p className="text-base font-bold tracking-tight">Simulate {subject} 2026 Paper</p>
+                    <p className="text-xs text-black/40 mt-1">15 questions · Timed</p>
+                  </div>
+                  <svg className="w-5 h-5 text-black/30 group-hover:text-black/60 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+
+            {/* Resource Vault */}
+            <div className={`${cardBase} overflow-hidden`}>
+              <div className="px-5 py-3 border-b border-slate-800">
+                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Resources</h2>
+              </div>
+              {resources.length === 0 ? (
+                <div className="text-center py-6 px-5">
+                  <p className="text-sm text-slate-500">No resources added yet.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-800/50">
+                  {resources.map(r => (
+                    <a
+                      key={r.id}
+                      href={r.url || '#'}
+                      target={r.url ? '_blank' : undefined}
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-slate-900 transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{r.title}</p>
+                        {r.description && <p className="text-xs text-slate-500 truncate mt-0.5">{r.description}</p>}
+                      </div>
+                      <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                        {r.type || 'file'}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </main>
+
+      <NavigationDock />
     </div>
   );
+}
+
+/* ── Build Syllabus Tree from Topics + Mastery ── */
+function buildSyllabus(subject, topics, mastery) {
+  const allTopics = new Map();
+
+  for (const t of topics) {
+    const key = t.topic_name || t.topic || t.name;
+    if (!key) continue;
+    allTopics.set(key, {
+      code: key.split(':').pop()?.trim() || key,
+      title: key,
+      discussed: true,
+      quizScore: null,
+      lastActivityAt: t.last_discussed_at || null,
+      integrityScore: null,
+    });
+  }
+
+  for (const m of mastery) {
+    const key = m.topic;
+    if (!key) continue;
+    const existing = allTopics.get(key) || {
+      code: key.split(':').pop()?.trim() || key,
+      title: key,
+      discussed: false,
+      lastActivityAt: null,
+      integrityScore: null,
+    };
+    existing.quizScore = m.score;
+    const masteryDate = m.last_quiz_at || m.updated_at || m.created_at;
+    if (masteryDate && (!existing.lastActivityAt || new Date(masteryDate) > new Date(existing.lastActivityAt))) {
+      existing.lastActivityAt = masteryDate;
+    }
+    allTopics.set(key, existing);
+  }
+
+  const chapters = [...allTopics.values()].map(ch => {
+    let status = 'locked';
+    if (ch.quizScore != null) {
+      if (ch.quizScore === 100) status = 'mastered';
+      else if (ch.quizScore >= 60) status = 'review';
+      else status = 'active';
+    } else if (ch.discussed) {
+      status = 'active';
+    }
+
+    let decayState = 'fresh';
+    if (ch.lastActivityAt) {
+      const daysSince = Math.floor((Date.now() - new Date(ch.lastActivityAt).getTime()) / (1000 * 60 * 60 * 24));
+      if (daysSince >= 21) decayState = 'decayed';
+      else if (daysSince >= 14) decayState = 'rusting';
+      else if (daysSince >= 7) decayState = 'aging';
+      ch.daysSinceActivity = daysSince;
+    }
+    ch.decayState = decayState;
+
+    return { ...ch, status };
+  });
+
+  const order = { active: 0, review: 1, mastered: 2, locked: 3 };
+  chapters.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
+
+  return chapters;
 }

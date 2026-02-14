@@ -22,7 +22,7 @@ Assistant: ${assistantMessage.substring(0, 200)}...`
     });
 
     const title = completion.choices[0].message.content.trim();
-    
+
     return NextResponse.json({ title });
 
   } catch (error) {

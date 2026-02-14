@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import NewtonMascot from './NewtonMascot';
 
-export default function NewtonTree({ detaching = false, onAppleFall }) {
+export default function NewtonTree({ detaching = false, onAppleFall, masteryPercent = 0 }) {
   const [appleVisible, setAppleVisible] = useState(true);
   const [branchSprung, setBranchSprung] = useState(false);
 
@@ -54,6 +54,16 @@ export default function NewtonTree({ detaching = false, onAppleFall }) {
           </radialGradient>
           {/* Leaf shape for particles */}
           <path id="leafShape" d="M 0 0 Q 4 -3 8 0 Q 4 3 0 0 Z" />
+          {/* Mastery glow filter */}
+          <filter id="masteryGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation={Math.max(2, masteryPercent / 8)} result="blur" />
+            <feFlood floodColor={masteryPercent >= 70 ? '#34d399' : masteryPercent >= 40 ? '#fbbf24' : '#0071e3'} floodOpacity={Math.min(masteryPercent / 100, 0.6)} result="color" />
+            <feComposite in="color" in2="blur" operator="in" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
         {/* Ground shadow */}
@@ -74,7 +84,7 @@ export default function NewtonTree({ detaching = false, onAppleFall }) {
         <ellipse cx="216" cy="419" rx="8" ry="4" fill="#4E342E" />
 
         {/* Canopy layers - back to front for depth */}
-        <g className="tree-canopy-sway">
+        <g className="tree-canopy-sway" filter={masteryPercent > 0 ? 'url(#masteryGlow)' : undefined} style={{ transition: 'filter 1s ease' }}>
           {/* Deep shadow layer */}
           <ellipse cx="200" cy="180" rx="130" ry="95" fill="url(#canopyDark)" opacity="0.9" />
           {/* Main middle layer */}

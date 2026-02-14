@@ -30,11 +30,11 @@ export async function GET(req) {
     // Verify admin
     const { data: requestingUser, error: userError } = await supabase
       .from('users')
-      .select('is_admin')
+      .select('is_admin, account_type')
       .eq('id', decoded.userId)
       .single();
 
-    if (userError || !requestingUser?.is_admin) {
+    if (userError || (!requestingUser?.is_admin && requestingUser?.account_type !== 'teacher')) {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -44,7 +44,7 @@ export async function GET(req) {
     // Get all users for analytics
     const { data: users, error: usersError } = await supabase
       .from('users')
-      .select('id, email, year_group, chat_data, created_at, last_login, is_admin');
+      .select('id, email, year_group, chat_data, created_at, last_login, is_admin, account_type');
 
     if (usersError) {
       console.error('Failed to fetch users:', usersError);
@@ -55,14 +55,14 @@ export async function GET(req) {
     }
 
     // Calculate statistics
-    const totalUsers = users.filter(u => !u.is_admin).length;
+    const totalUsers = users.filter(u => !u.is_admin && u.account_type !== 'teacher').length;
     const totalAdmins = users.filter(u => u.is_admin).length;
     
     // Active users (logged in within last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const activeUsers = users.filter(u => 
-      !u.is_admin && u.last_login && new Date(u.last_login) > sevenDaysAgo
+      !u.is_admin && u.account_type !== 'teacher' && u.last_login && new Date(u.last_login) > sevenDaysAgo
     ).length;
 
     // Calculate total chats and messages
@@ -71,7 +71,7 @@ export async function GET(req) {
     const subjectUsage = {};
     const yearGroupDistribution = {};
 
-    users.filter(u => !u.is_admin).forEach(user => {
+    users.filter(u => !u.is_admin && u.account_type !== 'teacher').forEach(user => {
       if (user.chat_data?.chatsBySubject) {
         Object.entries(user.chat_data.chatsBySubject).forEach(([subject, chats]) => {
           totalChats += chats.length;
@@ -97,7 +97,7 @@ export async function GET(req) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const newUsers = users.filter(u => 
-      !u.is_admin && new Date(u.created_at) > thirtyDaysAgo
+      !u.is_admin && u.account_type !== 'teacher' && new Date(u.created_at) > thirtyDaysAgo
     ).length;
 
     return NextResponse.json({
@@ -112,7 +112,7 @@ export async function GET(req) {
       },
       subjectUsage,
       yearGroupDistribution,
-      users: users.filter(u => !u.is_admin).map(u => ({
+      users: users.filter(u => !u.is_admin && u.account_type !== 'teacher').map(u => ({
         email: u.email,
         yearGroup: u.year_group,
         createdAt: u.created_at,

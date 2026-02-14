@@ -58,8 +58,8 @@ export default function AdminDashboard() {
       
       const meData = await meResponse.json();
       
-      if (!meData.isAdmin) {
-        alert('Access denied. Admin privileges required.');
+      if (!meData.isAdmin && meData.accountType !== 'teacher') {
+        alert('Access denied. Teacher or admin privileges required.');
         localStorage.removeItem('newton-auth-token');
         window.location.href = '/login';
         return;
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesYear = filterYearGroup === 'all' || user.year_group === filterYearGroup;
-    return matchesSearch && matchesYear && !user.is_admin;
+    return matchesSearch && matchesYear && !user.is_admin && user.account_type !== 'teacher';
   });
 
   if (loading) {
@@ -264,7 +264,7 @@ export default function AdminDashboard() {
             </svg>
             <span className="font-semibold">Users</span>
             <span className="ml-auto bg-neutral-700 text-neutral-300 text-xs px-2 py-1 rounded-full">
-              {users.filter(u => !u.is_admin).length}
+              {users.filter(u => !u.is_admin && u.account_type !== 'teacher').length}
             </span>
           </button>
 
@@ -661,7 +661,7 @@ export default function AdminDashboard() {
 
                 {/* User Accordion List */}
                 <div className="space-y-1">
-                  {users.filter(u => !u.is_admin).filter(u => u.email?.toLowerCase().includes(convSearch.toLowerCase())).map((user) => {
+                  {users.filter(u => !u.is_admin && u.account_type !== 'teacher').filter(u => u.email?.toLowerCase().includes(convSearch.toLowerCase())).map((user) => {
                     const isOpen = selectedUser?.id === user.id;
                     const subjects = user.chat_data?.chatsBySubject ? Object.keys(user.chat_data.chatsBySubject) : [];
                     const totalChats = user.chat_data?.chatsBySubject

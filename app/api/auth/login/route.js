@@ -61,6 +61,7 @@ export async function POST(req) {
         id: user.id,
         email: user.email,
         yearGroup: user.year_group,
+        accountType: user.account_type || 'student',
         createdAt: user.created_at
       },
       token

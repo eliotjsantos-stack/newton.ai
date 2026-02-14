@@ -29,11 +29,11 @@ export async function GET(req) {
 
     const { data: requestingUser, error: userError } = await supabase
       .from('users')
-      .select('is_admin')
+      .select('is_admin, account_type')
       .eq('id', decoded.userId)
       .single();
 
-    if (userError || !requestingUser?.is_admin) {
+    if (userError || (!requestingUser?.is_admin && requestingUser?.account_type !== 'teacher')) {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -42,7 +42,7 @@ export async function GET(req) {
 
     const { data: users, error } = await supabase
       .from('users')
-      .select('id, email, year_group, is_admin, chat_data, created_at, last_login')
+      .select('id, email, year_group, is_admin, account_type, chat_data, created_at, last_login, banned')
       .order('created_at', { ascending: false });
 
     if (error) {

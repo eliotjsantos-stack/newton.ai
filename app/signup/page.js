@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -15,6 +15,13 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [devCode, setDevCode] = useState(''); // For development
+  const [accountType, setAccountType] = useState('student');
+  const [teacherCode, setTeacherCode] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [preferredTitle, setPreferredTitle] = useState('');
+  const [customTitle, setCustomTitle] = useState('');
+  const [isCustomTitle, setIsCustomTitle] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const yearGroups = [
     { value: 'year7', label: 'Year 7 (Age 11-12)' },
@@ -51,6 +58,37 @@ export default function SignupPage() {
       }
 
       setStep(2);
+      setResendCooldown(60);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  const handleResendCode = async () => {
+    if (resendCooldown > 0 || loading) return;
+    setError('');
+    setLoading(true);
+    try {
+      const response = await fetch('/api/auth/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to resend code');
+      if (data.devCode) setDevCode(data.devCode);
+      setCode('');
+      setResendCooldown(60);
+      setError('');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -72,10 +110,11 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
+      const titleToSave = isCustomTitle ? customTitle.trim() : preferredTitle;
       const response = await fetch('/api/auth/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code, password, yearGroup })
+        body: JSON.stringify({ email, code, password, yearGroup: accountType === 'teacher' ? null : yearGroup, accountType, teacherCode: accountType === 'teacher' ? teacherCode : undefined, fullName: accountType === 'teacher' ? fullName.trim() : undefined, preferredTitle: accountType === 'teacher' ? titleToSave : undefined })
       });
 
       const data = await response.json();
@@ -84,9 +123,9 @@ export default function SignupPage() {
         throw new Error(data.error || 'Failed to create account');
       }
 
-      // Store token and redirect to chat
+      // Store token and redirect based on account type
       localStorage.setItem('newton-auth-token', data.token);
-      router.push('/chat');
+      router.push(accountType === 'teacher' ? '/teacher/classes' : '/chat');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -95,47 +134,73 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#080808] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block">
-            <h1 className="text-4xl font-bold text-neutral-900 mb-2">Newton</h1>
+          <Link href="/" className="inline-flex items-center justify-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
+              <span className="text-lg font-bold text-black">N</span>
+            </div>
+            <h1 className="text-3xl font-bold text-[#f5f5f7] tracking-tight">Newton</h1>
           </Link>
-          <p className="text-neutral-600">Create your account</p>
+          <p className="text-[#a1a1a6] mt-3">Create your account</p>
         </div>
 
         {/* Card */}
-        <div 
-          className="bg-white/80 backdrop-blur-xl border border-neutral-200/50 rounded-3xl shadow-2xl p-8"
-          style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)' }}
+        <div
+          className="bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-3xl shadow-2xl p-8"
+          style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}
         >
+          {/* Account Type Toggle */}
+          <div className="flex rounded-xl bg-white/[0.04] border border-white/[0.06] p-1 mb-6">
+            <button
+              type="button"
+              onClick={() => { setAccountType('student'); setError(''); }}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${accountType === 'student' ? 'bg-white/[0.1] text-neutral-100' : 'text-neutral-500 hover:text-neutral-300'}`}
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAccountType('teacher'); setError(''); }}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${accountType === 'teacher' ? 'bg-white/[0.1] text-neutral-100' : 'text-neutral-500 hover:text-neutral-300'}`}
+            >
+              Teacher
+            </button>
+          </div>
+          {accountType === 'teacher' && (
+            <div className="mb-6 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+              <p className="text-xs text-amber-400">For authorised teachers only. You will need a teacher access code.</p>
+            </div>
+          )}
+
           {/* Progress Indicator */}
           <div className="flex items-center justify-center mb-8">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${step >= 1 ? 'bg-neutral-900 text-white' : 'bg-neutral-200 text-neutral-500'}`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${step >= 1 ? 'bg-[#0071e3] text-white' : 'bg-white/[0.05] text-neutral-500'}`}>
               1
             </div>
-            <div className={`w-16 h-1 transition-all ${step >= 2 ? 'bg-neutral-900' : 'bg-neutral-200'}`}></div>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${step >= 2 ? 'bg-neutral-900 text-white' : 'bg-neutral-200 text-neutral-500'}`}>
+            <div className={`w-16 h-1 transition-all ${step >= 2 ? 'bg-[#0071e3]' : 'bg-white/[0.05]'}`}></div>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${step >= 2 ? 'bg-[#0071e3] text-white' : 'bg-white/[0.05] text-neutral-500'}`}>
               2
             </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl animate-slideIn">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl animate-slideIn">
+              <p className="text-red-400 text-sm">{error}</p>
             </div>
           )}
 
           {/* Dev Code Display (Development Only) */}
-          
+
 
           {/* Step 1: Email */}
           {step === 1 && (
             <form onSubmit={handleSendCode} className="animate-fadeIn">
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                <label className="block text-sm font-semibold text-neutral-300 mb-2">
                   Email Address
                 </label>
                 <input
@@ -144,7 +209,7 @@ export default function SignupPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your.email@school.ac.uk"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
                 />
                 <p className="text-xs text-neutral-500 mt-2">
                   We&apos;ll send you a 6-digit verification code
@@ -154,8 +219,7 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-semibold rounded-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"
-                style={{ boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)' }}
+                className="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -174,7 +238,7 @@ export default function SignupPage() {
           {step === 2 && (
             <form onSubmit={handleVerifyAndCreate} className="animate-fadeIn">
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                <label className="block text-sm font-semibold text-neutral-300 mb-2">
                   Verification Code
                 </label>
                 <input
@@ -184,15 +248,23 @@ export default function SignupPage() {
                   placeholder="000000"
                   maxLength="6"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-center text-2xl tracking-widest font-mono text-black placeholder:text-neutral-400"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-center text-2xl tracking-widest font-mono text-neutral-100 placeholder:text-neutral-500"
                 />
-                <p className="text-xs text-neutral-500 mt-2">
-                  Sent to: {email}
-                </p>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-neutral-500">Sent to: {email}</p>
+                  <button
+                    type="button"
+                    onClick={handleResendCode}
+                    disabled={resendCooldown > 0 || loading}
+                    className="text-xs font-semibold text-blue-400 hover:text-blue-300 disabled:text-neutral-400 disabled:no-underline transition-colors"
+                  >
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+                  </button>
+                </div>
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                <label className="block text-sm font-semibold text-neutral-300 mb-2">
                   Create Password
                 </label>
                 <input
@@ -201,12 +273,12 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min 8 characters, 1 number"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                <label className="block text-sm font-semibold text-neutral-300 mb-2">
                   Confirm Password
                 </label>
                 <input
@@ -215,32 +287,114 @@ export default function SignupPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
                   required
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
+                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
                 />
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
-                  Year Group
-                </label>
-                <select
-                  value={yearGroup}
-                  onChange={(e) => setYearGroup(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
-                >
-                  {yearGroups.map(({ value, label }) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {accountType === 'teacher' && (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-neutral-300 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="e.g. Sarah Johnson"
+                      required
+                      className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-neutral-300 mb-2">
+                      How should students address you?
+                    </label>
+                    <select
+                      value={isCustomTitle ? 'custom' : preferredTitle}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === 'custom') {
+                          setIsCustomTitle(true);
+                          setPreferredTitle('custom');
+                        } else {
+                          setIsCustomTitle(false);
+                          setPreferredTitle(val);
+                          setCustomTitle('');
+                        }
+                      }}
+                      required
+                      className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium"
+                    >
+                      <option value="">Select a title...</option>
+                      <option value="Mr">Mr</option>
+                      <option value="Mrs">Mrs</option>
+                      <option value="Miss">Miss</option>
+                      <option value="Ms">Ms</option>
+                      <option value="Mx">Mx</option>
+                      <option value="Dr">Dr</option>
+                      <option value="Sir">Sir</option>
+                      <option value="first_name">First name</option>
+                      <option value="last_name">Last name</option>
+                      <option value="custom">Custom...</option>
+                    </select>
+                    {isCustomTitle && (
+                      <input
+                        type="text"
+                        value={customTitle}
+                        onChange={(e) => setCustomTitle(e.target.value)}
+                        placeholder="Enter your custom title"
+                        required
+                        className="w-full mt-2 px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
+                        autoFocus
+                      />
+                    )}
+                  </div>
+                </>
+              )}
+
+              {accountType === 'teacher' ? (
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-neutral-300 mb-2">
+                    Teacher Access Code
+                  </label>
+                  <input
+                    type="text"
+                    value={teacherCode}
+                    onChange={(e) => {
+                      let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                      if (val.length > 4) val = val.slice(0, 4) + '-' + val.slice(4);
+                      setTeacherCode(val.slice(0, 9));
+                    }}
+                    maxLength={9}
+                    placeholder="XXXX-XXXX"
+                    required
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-center text-lg tracking-widest font-mono text-neutral-100 placeholder:text-neutral-500"
+                  />
+                </div>
+              ) : (
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-neutral-300 mb-2">
+                    Year Group
+                  </label>
+                  <select
+                    value={yearGroup}
+                    onChange={(e) => setYearGroup(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium"
+                  >
+                    {yearGroups.map(({ value, label }) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-semibold rounded-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 mb-4"
-                style={{ boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)' }}
+                className="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50 mb-4"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -259,7 +413,7 @@ export default function SignupPage() {
                   setStep(1);
                   setError('');
                 }}
-                className="w-full py-2 text-neutral-600 hover:text-neutral-900 text-sm transition-colors"
+                className="w-full py-2 text-neutral-400 hover:text-neutral-100 text-sm transition-colors"
               >
                 ← Back to email
               </button>
@@ -267,10 +421,10 @@ export default function SignupPage() {
           )}
 
           {/* Login Link */}
-          <div className="mt-6 pt-6 border-t border-neutral-200 text-center">
-            <p className="text-sm text-neutral-600">
+          <div className="mt-6 pt-6 border-t border-white/[0.06] text-center">
+            <p className="text-sm text-neutral-400">
               Already have an account?{' '}
-              <Link href="/login" className="text-neutral-900 font-semibold hover:underline transition-all">
+              <Link href="/login" className="text-blue-400 font-semibold hover:text-blue-300 transition-all">
                 Log in
               </Link>
             </p>

@@ -1,0 +1,2 @@
+# Requirements for Newton test suite
+aiohttp>=3.9.0

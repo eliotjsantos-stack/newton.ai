@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase, supabaseAdmin } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
@@ -18,14 +18,27 @@ function validatePassword(password) {
 
 export async function POST(req) {
   try {
-    const { email, code, password, yearGroup } = await req.json();
+    const { email, code, password, yearGroup, accountType = 'student', teacherCode, fullName, preferredTitle } = await req.json();
+
+    const TEACHER_CODE = '2J9R-P3YX';
 
     // Validate inputs
-    if (!email || !code || !password || !yearGroup) {
+    if (!email || !code || !password || (accountType === 'student' && !yearGroup)) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    // Validate teacher code
+    if (accountType === 'teacher') {
+      const normalized = (teacherCode || '').toUpperCase().replace(/[\s-]/g, '');
+      if (!teacherCode || normalized !== TEACHER_CODE.replace('-', '')) {
+        return NextResponse.json(
+          { error: 'Invalid teacher code' },
+          { status: 400 }
+        );
+      }
     }
 
     // Validate password
@@ -70,8 +83,11 @@ export async function POST(req) {
       .insert({
         email: email.toLowerCase(),
         password_hash: passwordHash,
-        year_group: yearGroup,
-        is_verified: true
+        year_group: accountType === 'teacher' ? 'teacher' : yearGroup,
+        is_verified: true,
+        account_type: accountType,
+        ...(accountType === 'teacher' && fullName ? { full_name: fullName } : {}),
+        ...(accountType === 'teacher' && preferredTitle ? { preferred_title: preferredTitle } : {}),
       })
       .select()
       .single();
@@ -79,9 +95,17 @@ export async function POST(req) {
     if (createError) {
       console.error('Error creating user:', createError);
       return NextResponse.json(
-        { error: 'Failed to create account' },
+        { error: 'Failed to create account: ' + (createError.message || createError.code || JSON.stringify(createError)) },
         { status: 500 }
       );
+    }
+
+    // Enroll new students (not teachers) in the General subject
+    if (accountType !== 'teacher') {
+      await supabaseAdmin
+        .from('student_subjects')
+        .insert({ student_id: newUser.id, subject_id: '00000000-0000-0000-0000-000000000001' })
+        .then(({ error }) => { if (error && error.code !== '23505') console.error('General enroll error:', error); });
     }
 
     // Mark code as used
@@ -103,7 +127,8 @@ export async function POST(req) {
       user: {
         id: newUser.id,
         email: newUser.email,
-        yearGroup: newUser.year_group
+        yearGroup: newUser.year_group,
+        accountType: newUser.account_type || 'student'
       },
       token
     });

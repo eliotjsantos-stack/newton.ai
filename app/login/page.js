@@ -30,22 +30,25 @@ export default function LoginPage() {
       }
 
      localStorage.setItem('newton-auth-token', data.token);
-      
+
       const urlParams = new URLSearchParams(window.location.search);
       const redirect = urlParams.get('redirect');
-      
+
+      // Check account type to route correctly
+      const meResponse = await fetch('/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${data.token}` }
+      });
+      const meData = await meResponse.json();
+
       if (redirect === '/admin') {
-        const meResponse = await fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${data.token}` }
-        });
-        const meData = await meResponse.json();
-        
-        if (meData.isAdmin) {
+        if (meData.isAdmin || meData.accountType === 'teacher') {
           router.push('/admin');
         } else {
           setError('Access denied. Admin only.');
           localStorage.removeItem('newton-auth-token');
         }
+      } else if (meData.accountType === 'teacher') {
+        router.push('/teacher/classes');
       } else {
         router.push('/chat');
       }
@@ -57,31 +60,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#080808] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block">
-            <h1 className="text-4xl font-bold text-neutral-900 mb-2">Newton</h1>
+          <Link href="/" className="inline-flex items-center justify-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
+              <span className="text-lg font-bold text-black">N</span>
+            </div>
+            <h1 className="text-3xl font-bold text-[#f5f5f7] tracking-tight">Newton</h1>
           </Link>
-          <p className="text-neutral-600">Welcome back</p>
+          <p className="text-[#a1a1a6] mt-3">Welcome back</p>
         </div>
 
         {/* Card */}
-        <div 
-          className="bg-white/80 backdrop-blur-xl border border-neutral-200/50 rounded-3xl shadow-2xl p-8"
-          style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)' }}
+        <div
+          className="bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-3xl shadow-2xl p-8"
+          style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}
         >
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl animate-slideIn">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl animate-slideIn">
+              <p className="text-red-400 text-sm">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleLogin}>
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-neutral-700 mb-2">
+              <label className="block text-sm font-semibold text-neutral-300 mb-2">
                 Email Address
               </label>
               <input
@@ -90,12 +96,12 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.email@school.ac.uk"
                 required
-                className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
+                className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
               />
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-neutral-700 mb-2">
+              <label className="block text-sm font-semibold text-neutral-300 mb-2">
                 Password
               </label>
               <input
@@ -104,15 +110,14 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
-                className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all text-black font-medium placeholder:text-neutral-400"
+                className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-neutral-900 to-neutral-800 text-white font-semibold rounded-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"
-              style={{ boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)' }}
+              className="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50"
             >
               {loading ? (
                 <span className="flex items-center justify-center">
@@ -127,10 +132,10 @@ export default function LoginPage() {
           </form>
 
           {/* Signup Link */}
-          <div className="mt-6 pt-6 border-t border-neutral-200 text-center">
-            <p className="text-sm text-neutral-600">
+          <div className="mt-6 pt-6 border-t border-white/[0.06] text-center">
+            <p className="text-sm text-neutral-400">
               Don&apos;t have an account?{' '}
-              <Link href="/signup" className="text-neutral-900 font-semibold hover:underline transition-all">
+              <Link href="/signup" className="text-blue-400 font-semibold hover:text-blue-300 transition-all">
                 Sign up
               </Link>
             </p>

@@ -30,7 +30,7 @@ export async function GET(req) {
 
     const { data: user, error: dbError } = await supabase
       .from('users')
-      .select('id, email, year_group, is_admin, created_at, last_login')
+      .select('id, email, year_group, is_admin, account_type, full_name, preferred_title, created_at, last_login, qan_code')
       .eq('id', decoded.userId)
       .single();
 
@@ -47,8 +47,12 @@ export async function GET(req) {
       email: user.email,
       yearGroup: user.year_group,
       isAdmin: user.is_admin || false,
+      accountType: user.account_type || 'student',
+      fullName: user.full_name || '',
+      preferredTitle: user.preferred_title || '',
       createdAt: user.created_at,
-      lastLogin: user.last_login
+      lastLogin: user.last_login,
+      qanCode: user.qan_code || null
     });
 
   } catch (error) {
