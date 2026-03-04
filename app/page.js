@@ -169,14 +169,8 @@ const boards = [
 ];
 
 function ExamBoardScroll() {
-  const containerRef = useRef(null);
   const [fanSpread, setFanSpread] = useState(260);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  });
 
-  /* Responsive fan spread */
   useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
@@ -187,106 +181,91 @@ function ExamBoardScroll() {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  /* Unstack: stacked → fanned */
-  const fan = useTransform(scrollYProgress, [0.15, 0.45], [0, 1]);
-  const fanSmooth = useSpring(fan, { stiffness: 100, damping: 20 });
-
-  /* Objective slot-in */
-  const slotIn = useTransform(scrollYProgress, [0.5, 0.7], [0, 1]);
-  const slotSmooth = useSpring(slotIn, { stiffness: 100, damping: 20 });
-
   return (
-    <section ref={containerRef} className="relative min-h-[120vh] md:min-h-[150vh] py-24">
-      <div className="sticky top-0 min-h-screen flex items-center justify-center px-6 overflow-hidden">
-        <div className="max-w-6xl mx-auto w-full">
-          <ScrollReveal className="text-center mb-10 md:mb-20">
-            <p className="text-sm font-semibold tracking-widest uppercase text-[#0071e3] mb-4">
-              Grounding Engine
-            </p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter mb-6">
-              Grounded. Not Guessing.
-            </h2>
-            <p className="hidden sm:block text-xl text-[#a1a1a6] max-w-2xl mx-auto font-medium">
-              Every answer is rooted in official 2026 exam board specifications.
-            </p>
-          </ScrollReveal>
+    <section className="py-24 px-6 border-t border-white/[0.04] overflow-hidden">
+      <div className="max-w-6xl mx-auto">
+        <ScrollReveal className="text-center mb-10 md:mb-20">
+          <p className="text-sm font-semibold tracking-widest uppercase text-[#0071e3] mb-4">
+            Grounding Engine
+          </p>
+          <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter mb-6">
+            Grounded. Not Guessing.
+          </h2>
+          <p className="hidden sm:block text-xl text-[#a1a1a6] max-w-2xl mx-auto font-medium">
+            Every answer is rooted in official 2026 exam board specifications.
+          </p>
+        </ScrollReveal>
 
-          {/* Card stack */}
-          <div className="relative h-[220px] sm:h-[280px] max-w-[260px] sm:max-w-lg mx-auto perspective-[1200px]">
-            {boards.map((board, i) => {
-              const total = boards.length;
-              const offset = i - Math.floor(total / 2);
-
-              return (
-                <motion.div
-                  key={board.name}
-                  className="absolute inset-0"
-                  style={{
-                    x: useTransform(fanSmooth, [0, 1], [0, offset * fanSpread]),
-                    rotateY: useTransform(fanSmooth, [0, 1], [0, offset * -8]),
-                    scale: useTransform(fanSmooth, [0, 1], [1 - Math.abs(offset) * 0.03, 1]),
-                    y: useTransform(fanSmooth, [0, 1], [i * -12, 0]),
-                    zIndex: total - i,
-                  }}
-                >
-                  <div
-                    className="w-full h-[200px] sm:h-[240px] rounded-2xl p-6 sm:p-8 flex flex-col justify-between bg-white/5 border border-white/10 backdrop-blur-[64px]"
-                  >
-                    <div>
-                      <div className="text-2xl font-bold text-white tracking-tight">{board.name}</div>
-                      <div className="text-sm text-[#a1a1a6] mt-1">{board.subtitle}</div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-[#a1a1a6] font-semibold tracking-widest uppercase">
-                        2026 Specification
-                      </span>
-                      <div className="w-6 h-6 rounded-full bg-[#0071e3]/20 flex items-center justify-center">
-                        <svg className="w-3.5 h-3.5 text-[#0071e3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
+        {/* Card fan */}
+        <div className="relative h-[220px] sm:h-[280px] max-w-[260px] sm:max-w-lg mx-auto perspective-[1200px]">
+          {boards.map((board, i) => {
+            const total = boards.length;
+            const offset = i - Math.floor(total / 2);
+            return (
+              <motion.div
+                key={board.name}
+                className="absolute inset-0"
+                initial={{ x: 0, rotateY: 0, scale: 1 - Math.abs(offset) * 0.03, y: i * -12 }}
+                whileInView={{ x: offset * fanSpread, rotateY: offset * -8, scale: 1, y: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ ...spring, delay: 0.1 + i * 0.06 }}
+                style={{ zIndex: total - i }}
+              >
+                <div className="w-full h-[200px] sm:h-[240px] rounded-2xl p-6 sm:p-8 flex flex-col justify-between bg-white/5 border border-white/10 backdrop-blur-[64px]">
+                  <div>
+                    <div className="text-2xl font-bold text-white tracking-tight">{board.name}</div>
+                    <div className="text-sm text-[#a1a1a6] mt-1">{board.subtitle}</div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[#a1a1a6] font-semibold tracking-widest uppercase">
+                      2026 Specification
+                    </span>
+                    <div className="w-6 h-6 rounded-full bg-[#0071e3]/20 flex items-center justify-center">
+                      <svg className="w-3.5 h-3.5 text-[#0071e3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
                     </div>
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Curriculum objective slot-in */}
-          <motion.div
-            className="max-w-md mx-auto mt-8 sm:mt-16"
-            style={{
-              opacity: slotSmooth,
-              y: useTransform(slotSmooth, [0, 1], [40, 0]),
-              scale: useTransform(slotSmooth, [0, 1], [0.95, 1]),
-            }}
-          >
-            <div
-              className="rounded-2xl p-6 flex items-start gap-4 bg-white/5 border border-white/10"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#0071e3]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-5 h-5 text-[#0071e3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white mb-1">AQA GCSE Mathematics (8300)</p>
-                <p className="text-sm text-[#a1a1a6] leading-relaxed">
-                  &ldquo;Solve quadratic equations by factorising, completing the square, and using the quadratic formula&rdquo;
-                </p>
-                <div className="mt-3 flex items-center gap-2">
-                  <div className="h-1 flex-1 rounded-full bg-white/[0.06] overflow-hidden">
-                    <motion.div
-                      className="h-full bg-[#0071e3] rounded-full"
-                      style={{ width: useTransform(slotSmooth, [0, 1], ['0%', '100%']) }}
-                    />
-                  </div>
-                  <span className="text-[11px] text-[#0071e3] font-semibold">Loaded</span>
                 </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Curriculum objective slot-in */}
+        <motion.div
+          className="max-w-md mx-auto mt-8 sm:mt-16"
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ ...spring, delay: 0.35 }}
+        >
+          <div className="rounded-2xl p-6 flex items-start gap-4 bg-white/5 border border-white/10">
+            <div className="w-10 h-10 rounded-xl bg-[#0071e3]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg className="w-5 h-5 text-[#0071e3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white mb-1">AQA GCSE Mathematics (8300)</p>
+              <p className="text-sm text-[#a1a1a6] leading-relaxed">
+                &ldquo;Solve quadratic equations by factorising, completing the square, and using the quadratic formula&rdquo;
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <div className="h-1 flex-1 rounded-full bg-white/[0.06] overflow-hidden">
+                  <motion.div
+                    className="h-full bg-[#0071e3] rounded-full"
+                    initial={{ width: '0%' }}
+                    whileInView={{ width: '100%' }}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{ duration: 1, delay: 0.55, ease: 'easeOut' }}
+                  />
+                </div>
+                <span className="text-[11px] text-[#0071e3] font-semibold">Loaded</span>
               </div>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
