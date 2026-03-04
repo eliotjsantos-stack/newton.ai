@@ -1303,11 +1303,18 @@ const startTutorial = () => {
 };
 
 const nextTutorialStep = () => {
-  if (tutorialStep < 6) {
-    setTutorialStep(tutorialStep + 1);
-  } else {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  if (tutorialStep >= 6) {
     closeTutorial();
+    return;
   }
+  let next = tutorialStep + 1;
+  if (isMobile) {
+    // Skip sidebar-dependent steps (1, 2, 5) on mobile
+    if (tutorialStep === 0) next = 3;
+    else if (tutorialStep === 4) next = 6;
+  }
+  setTutorialStep(next);
 };
 
 const closeTutorial = () => {
@@ -2211,7 +2218,7 @@ if (isLoadingData) {
       </div>
 
       {/* ── Input Area (fixed bottom, centered) ── */}
-      <div className={`fixed bottom-0 ${sidebarOpen ? 'md:left-72' : 'left-0'} right-0 z-[100] flex flex-col items-center pb-6 pt-4 pointer-events-none`} style={{ background: 'linear-gradient(to top, #0B0B0C 50%, transparent)' }}>
+      <div className={`fixed bottom-0 ${sidebarOpen ? 'md:left-72' : 'left-0'} right-0 ${sidebarOpen ? 'z-[30] md:z-[100]' : 'z-[100]'} flex flex-col items-center pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 pointer-events-none`} style={{ background: 'linear-gradient(to top, #0B0B0C 50%, transparent)' }}>
         <div className="w-full max-w-3xl px-4 pointer-events-auto">
           <form onSubmit={sendMessage}>
             {/* File Upload Preview */}
@@ -2342,7 +2349,7 @@ if (isLoadingData) {
 
       {/* Premium Year Group Modal */}
       {showYearModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6 animate-fadeIn">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[150] p-6 animate-fadeIn">
           <div
             className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
             style={{
@@ -2382,7 +2389,7 @@ if (isLoadingData) {
 
       {/* Course Selection Modal (onboarding step 2) */}
       {showCourseModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6 animate-fadeIn">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[150] p-6 animate-fadeIn">
           <div
             className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
             style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3)' }}
@@ -2630,12 +2637,12 @@ if (isLoadingData) {
           {/* Tutorial content cards */}
           {tutorialStep === 0 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-2xl w-full p-12 text-center animate-scaleIn">
+              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-12 text-center animate-scaleIn">
                 <div className="w-24 h-24 mx-auto bg-white rounded-3xl flex items-center justify-center mb-8">
                   <span className="text-4xl font-bold text-black">N</span>
                 </div>
-                <h2 className="text-4xl font-extrabold text-neutral-100 mb-4">Welcome to Newton!</h2>
-                <p className="text-xl text-neutral-400 mb-8 leading-relaxed">
+                <h2 className="text-2xl sm:text-4xl font-extrabold text-neutral-100 mb-4">Welcome to Newton!</h2>
+                <p className="text-lg sm:text-xl text-neutral-400 mb-8 leading-relaxed">
                   Let's take a quick tour. This will only take a minute!
                 </p>
                 <div className="flex gap-4 justify-center">
@@ -2718,11 +2725,11 @@ if (isLoadingData) {
 
           {tutorialStep === 3 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-3xl w-full p-10 animate-scaleIn">
+              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-3xl w-full p-5 sm:p-10 animate-scaleIn">
                 <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                   3
                 </div>
-                <h3 className="text-2xl font-bold text-neutral-100 mb-6">How Newton Helps You Learn</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-neutral-100 mb-6">How Newton Helps You Learn</h3>
 
                 <div className="bg-white/[0.04] rounded-2xl p-6 mb-6">
                   <div className="flex gap-4 mb-4">
@@ -2740,13 +2747,13 @@ if (isLoadingData) {
                     </div>
                     <div className="flex-1 bg-blue-500/10 rounded-xl p-4 border-2 border-blue-500/20">
                       <p className="text-neutral-100 mb-3">Great question! Let's work through this together. First, what do you think we should do to get x by itself?</p>
-                      <p className="text-sm text-blue-700 font-semibold">💡 Newton guides you to discover answers yourself!</p>
+                      <p className="text-sm text-blue-400 font-semibold">Newton guides you to discover answers yourself!</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
-  <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
+  <div className="bg-emerald-500/10 border-2 border-emerald-500/20 rounded-xl p-4">
     <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center mb-3">
       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -2760,7 +2767,7 @@ if (isLoadingData) {
     </ul>
   </div>
 
-  <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+  <div className="bg-red-500/10 border-2 border-red-500/20 rounded-xl p-4">
     <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center mb-3">
       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -2792,10 +2799,8 @@ if (isLoadingData) {
 
           {tutorialStep === 4 && (
             <div
-              className="absolute bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+              className="absolute bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl p-6 shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-sm animate-slideIn pointer-events-auto left-1/2 -translate-x-1/2 bottom-24 sm:bottom-auto sm:left-auto sm:translate-x-0 sm:top-[80px] sm:right-[50px]"
               style={{
-                top: '80px',
-                right: '50px',
                 zIndex: 102
               }}
             >
@@ -2854,14 +2859,14 @@ if (isLoadingData) {
 
           {tutorialStep === 6 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-2xl w-full p-10 text-center animate-scaleIn">
+              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-10 text-center animate-scaleIn">
                 <div className="w-20 h-20 mx-auto bg-emerald-500 rounded-3xl flex items-center justify-center mb-6">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-3xl font-bold text-neutral-100 mb-4">You're All Set!</h3>
-                <p className="text-xl text-neutral-400 mb-8">
+                <h3 className="text-2xl sm:text-3xl font-bold text-neutral-100 mb-4">You're All Set!</h3>
+                <p className="text-lg sm:text-xl text-neutral-400 mb-8">
                   Ready to start learning? Ask Newton your first question!
                 </p>
                 <button
@@ -2879,7 +2884,7 @@ if (isLoadingData) {
       {/* Report Issue Modal */}
       {showReportIssue && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6 animate-fadeIn"
+          className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[150] p-6 animate-fadeIn"
           onClick={() => setShowReportIssue(false)}
         >
           <div

@@ -239,10 +239,9 @@ function QuizPageContent({ params }) {
     setTextAnswer('');
     setTimer(0);
     setConfidence(3);
-    setQuestionStartTime(Date.now());
-    loadQuiz();
     setCurrentQuestionIdx(0);
     setAnsweredInLevel(new Set());
+    loadQuiz();
   };
 
   const handleChangeLevel = async (level) => {

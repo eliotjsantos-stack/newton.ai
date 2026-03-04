@@ -75,7 +75,7 @@ export default function LoginPage() {
 
         {/* Card */}
         <div
-          className="bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-3xl shadow-2xl p-8"
+          className="bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-3xl shadow-2xl p-6 sm:p-8"
           style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}
         >
           {/* Error Message */}
@@ -101,9 +101,14 @@ export default function LoginPage() {
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-neutral-300 mb-2">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-neutral-300">
+                  Password
+                </label>
+                <Link href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                  Forgot password?
+                </Link>
+              </div>
               <input
                 type="password"
                 value={password}

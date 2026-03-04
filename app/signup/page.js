@@ -149,7 +149,7 @@ export default function SignupPage() {
 
         {/* Card */}
         <div
-          className="bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-3xl shadow-2xl p-8"
+          className="bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-3xl shadow-2xl p-6 sm:p-8"
           style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}
         >
           {/* Account Type Toggle */}

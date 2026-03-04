@@ -148,7 +148,7 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
     <>
       {/* ── Mobile: Full-width bottom bar ── */}
       <motion.nav
-        className="fixed bottom-0 left-0 right-0 z-[100] md:hidden safe-bottom border-t border-white/10 bg-black/90 backdrop-blur-xl"
+        className="fixed bottom-0 left-0 right-0 z-[100] md:hidden border-t border-white/10 bg-black/90 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
         animate={{ opacity: resolvedOpacity, y: resolvedY }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         style={{ pointerEvents: hidden ? 'none' : 'auto' }}

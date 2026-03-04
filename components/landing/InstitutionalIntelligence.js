@@ -194,10 +194,10 @@ export function LiveHeatmap() {
 
       {/* Grid */}
       <div className="overflow-x-auto">
-        <div className="min-w-[520px]">
+        <div className="min-w-0 sm:min-w-[520px]">
           {/* Column headers */}
           <div className="flex border-b border-white/[0.04]">
-            <div className="w-32 sm:w-36 shrink-0 px-4 sm:px-6 py-2.5">
+            <div className="w-20 sm:w-32 md:w-36 shrink-0 px-2 sm:px-4 md:px-6 py-2.5">
               <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Student</span>
             </div>
             {MODULES.map(m => (
@@ -216,7 +216,7 @@ export function LiveHeatmap() {
                 }`}
                 onClick={() => setSelectedStudent(selectedStudent === ri ? null : ri)}
               >
-                <div className="w-32 sm:w-36 shrink-0 px-4 sm:px-6 py-2 flex items-center gap-2">
+                <div className="w-20 sm:w-32 md:w-36 shrink-0 px-2 sm:px-4 md:px-6 py-2 flex items-center gap-2">
                   <span className={`text-xs font-medium truncate transition-colors ${
                     selectedStudent === ri ? 'text-[#0071e3]' : 'text-white/70 hover:text-white'
                   }`}>{student.name}</span>
