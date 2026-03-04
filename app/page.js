@@ -14,6 +14,7 @@ import {
 import Lenis from 'lenis';
 import ChatDemo from '@/components/landing/ChatDemo';
 import GradeCurveDemo from '@/components/landing/GradeCurveDemo';
+import { LiveHeatmap, ForgettingCurve } from '@/components/landing/InstitutionalIntelligence';
 
 /* ─── Physics ─── */
 const spring = { type: 'spring', stiffness: 100, damping: 20, mass: 1 };
@@ -879,6 +880,118 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ─── Institutional Intelligence (B2B) ─── */}
+      <section id="institutions" className="py-24 px-6 lg:px-12 border-t border-white/[0.04]">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal className="text-center mb-10 md:mb-20">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[#0071e3] mb-4">For Schools</p>
+            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter mb-6">
+              Institutional Intelligence.
+            </h2>
+            <p className="hidden sm:block text-xl text-[#a1a1a6] max-w-2xl mx-auto font-medium">
+              Real-time mastery tracking, academic integrity, and retention — built for departments, not just individuals.
+            </p>
+          </ScrollReveal>
+
+          {/* ── Teacher Dashboard Preview (Heatmap) ── */}
+          <ScrollReveal className="mb-8 md:mb-12">
+            <div className="relative">
+              <LiveHeatmap />
+              <div className="absolute -bottom-3 inset-x-0 flex justify-center">
+                <span className="px-3 py-1 text-[10px] font-medium text-white/30 bg-black/80 rounded-full border border-white/[0.06]">
+                  Demo — your real class data appears in the teacher dashboard
+                </span>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* ── Bento Grid ── */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-8">
+            {/* Integrity & Honesty */}
+            <ScrollReveal>
+              <div className="h-full rounded-2xl p-6 md:p-8 bg-white/[0.03] border border-white/10 hover:border-white/20 transition-colors duration-200">
+                <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center mb-6">
+                  <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 tracking-tight">Session Integrity Monitoring.</h3>
+                <p className="text-sm text-[#a1a1a6] mb-6 leading-relaxed">Every session is logged. Every result is earned.</p>
+                <ul className="space-y-3">
+                  {[
+                    { title: 'Tab-Switch Detection', desc: 'Alerts when students leave the Newton environment mid-session.' },
+                    { title: 'AI-Paste Blocking', desc: 'Prevents external LLM answers from being injected into chat.' },
+                    { title: 'LLM Phrase Detection', desc: 'Flags responses that match known AI-generated patterns.' },
+                  ].map(item => (
+                    <li key={item.title} className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-white">{item.title}</p>
+                        <p className="text-xs text-white/40 mt-0.5">{item.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </ScrollReveal>
+
+            {/* Scientific Retention */}
+            <ScrollReveal delay={0.08}>
+              <div className="h-full rounded-2xl p-6 md:p-8 bg-white/[0.03] border border-white/10 hover:border-white/20 transition-colors duration-200">
+                <div className="w-10 h-10 rounded-xl bg-[#0071e3]/10 flex items-center justify-center mb-6">
+                  <svg className="w-5 h-5 text-[#0071e3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 tracking-tight">Beyond Short-Term Memory.</h3>
+                <p className="text-sm text-[#a1a1a6] mb-5 leading-relaxed">
+                  Spaced repetition quizzes ensure students are ready for June, not just today. Mastery decays over time — Newton resurfaces topics before they&apos;re forgotten.
+                </p>
+                <ForgettingCurve />
+                <div className="mt-5 pt-5 border-t border-white/[0.06]">
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-1">
+                      <div className="w-5 h-5 rounded-full bg-emerald-400/20 border border-emerald-400/30" />
+                      <div className="w-5 h-5 rounded-full bg-amber-400/20 border border-amber-400/30" />
+                      <div className="w-5 h-5 rounded-full bg-red-500/20 border border-red-500/30" />
+                    </div>
+                    <p className="text-xs text-white/30">Red → Amber → Green mastery lifecycle</p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* Teacher Workload */}
+            <ScrollReveal delay={0.16}>
+              <div className="h-full rounded-2xl p-6 md:p-8 bg-white/[0.03] border border-white/10 hover:border-white/20 transition-colors duration-200 md:col-span-2 lg:col-span-1">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-6">
+                  <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 tracking-tight">Less Marking. More Teaching.</h3>
+                <p className="text-sm text-[#a1a1a6] mb-6 leading-relaxed">
+                  Newton tracks topic coverage, flags blind spots, and shows you exactly which students need attention — without reading every chat.
+                </p>
+                <div className="space-y-4">
+                  <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
+                    <p className="text-sm font-semibold text-white">Automatic Gap Analysis</p>
+                    <p className="text-xs text-white/40 mt-1">See which topics each student is struggling with — without reading every chat</p>
+                  </div>
+                  <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
+                    <p className="text-sm font-semibold text-white">Class Mastery Dashboards</p>
+                    <p className="text-xs text-white/40 mt-1">Per-student and class-wide topic mastery views, updated after every session</p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
 
       {/* ─── Work-Refusal Comparison ─── */}
       <section className="py-24 px-6 lg:px-12 border-t border-white/[0.04]">

@@ -164,6 +164,47 @@ export async function GET(req, { params }) {
       };
     }).sort((a, b) => parseFloat(a.averageMastery) - parseFloat(b.averageMastery)); // Lowest mastery first (need help)
 
+    // Build heatmap matrix (student × topic)
+    const uniqueTopics = [...new Set(
+      (masteryRecords || []).map(r => r.curriculum_topic).filter(Boolean)
+    )].slice(0, 10);
+
+    const studentIds = Object.keys(studentMastery);
+
+    // Per-student per-topic lookup
+    const cellLookup = {};
+    (masteryRecords || []).forEach(r => {
+      const key = `${r.user_id}|${r.curriculum_topic}`;
+      if (!cellLookup[key]) cellLookup[key] = { total: 0, count: 0 };
+      cellLookup[key].total += r.mastery_level || 3;
+      cellLookup[key].count++;
+    });
+
+    const toLevel = (avg) => {
+      if (avg >= 4) return 3;   // mastered (green)
+      if (avg >= 2.5) return 2; // learning (amber)
+      return 1;                  // struggling (red)
+    };
+
+    const heatmapStudents = studentIds.map(uid => ({
+      id: uid,
+      name: studentMastery[uid]?.email?.split('@')[0] || 'Unknown',
+    }));
+
+    const heatmapGrid = heatmapStudents.map(student =>
+      uniqueTopics.map(topic => {
+        const cell = cellLookup[`${student.id}|${topic}`];
+        if (!cell || cell.count === 0) return 0;
+        return toLevel(cell.total / cell.count);
+      })
+    );
+
+    const heatmapData = {
+      students: heatmapStudents,
+      topics: uniqueTopics,
+      grid: heatmapGrid,
+    };
+
     // Topic mastery breakdown
     const topicMastery = {};
     (masteryRecords || []).forEach(record => {
@@ -221,6 +262,7 @@ export async function GET(req, { params }) {
       studentMastery: studentList,
       topicMastery: topicList,
       studentsNeedingHelp,
+      heatmapData,
       recentAnalysis: (masteryRecords || [])
         .sort((a, b) => new Date(b.analyzed_at) - new Date(a.analyzed_at))
         .slice(0, 10)

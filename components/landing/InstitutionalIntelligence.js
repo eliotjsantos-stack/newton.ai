@@ -142,16 +142,22 @@ function StudentDecayPanel({ studentIndex, name }) {
 }
 
 /* ─── Live Heatmap ─── */
-export function LiveHeatmap() {
-  const [grid, setGrid] = useState(INITIAL_GRID);
+export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
+  const isReal = !!data;
+  const [grid, setGrid] = useState(isReal ? data.grid : INITIAL_GRID);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [hoveredCell, setHoveredCell] = useState(null);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: false, margin: '-100px' });
 
+  // Sync real data into grid when data changes
+  useEffect(() => {
+    if (isReal && data) setGrid(data.grid);
+  }, [isReal, data]);
+
   // Simulate live data updates
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || isReal) return;
     const interval = setInterval(() => {
       setGrid(prev => {
         const next = prev.map(row => [...row]);
@@ -182,25 +188,34 @@ export function LiveHeatmap() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">AQA Biology — Year 12</p>
-            <p className="text-xs text-white/40">Live Class Mastery</p>
+            <p className="text-sm font-semibold text-white">{label || 'AQA Biology — Year 12'}</p>
+            <p className="text-xs text-white/40">{subtitle || 'Live Class Mastery'}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs text-white/40 font-medium">Live</span>
-        </div>
+        {!isReal && (
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs text-white/40 font-medium">Live</span>
+          </div>
+        )}
       </div>
 
       {/* Grid */}
       <div className="overflow-x-auto">
         <div className="min-w-0 sm:min-w-[520px]">
           {/* Column headers */}
+          {(() => {
+            const displayStudents = isReal
+              ? data.students.map(s => ({ name: s.name, flag: false }))
+              : STUDENTS;
+            const displayModules = isReal ? data.topics.map(t => t.slice(0, 6)) : MODULES;
+            return (
+              <>
           <div className="flex border-b border-white/[0.04]">
             <div className="w-20 sm:w-32 md:w-36 shrink-0 px-2 sm:px-4 md:px-6 py-2.5">
               <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Student</span>
             </div>
-            {MODULES.map(m => (
+            {displayModules.map(m => (
               <div key={m} className="flex-1 px-1 py-2.5 text-center">
                 <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">{m}</span>
               </div>
@@ -208,7 +223,7 @@ export function LiveHeatmap() {
           </div>
 
           {/* Rows */}
-          {STUDENTS.map((student, ri) => (
+          {displayStudents.map((student, ri) => (
             <div key={student.name}>
               <div
                 className={`flex border-b border-white/[0.02] transition-colors cursor-pointer ${
@@ -226,8 +241,8 @@ export function LiveHeatmap() {
                     </svg>
                   )}
                 </div>
-                {MODULES.map((m, ci) => {
-                  const val = grid[ri][ci];
+                {displayModules.map((m, ci) => {
+                  const val = grid[ri]?.[ci] ?? 0;
                   return (
                     <div
                       key={m}
@@ -254,7 +269,7 @@ export function LiveHeatmap() {
                             className="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 rounded-md bg-black/90 border border-white/10 whitespace-nowrap pointer-events-none z-20"
                           >
                             <span className="text-[9px] text-white/70 font-medium">
-                              {m} — {STATUS_LABELS[val]} {MOCK_DAYS_AGO[val] ? `(${MOCK_DAYS_AGO[val]}d ago)` : ''}
+                              {m} — {STATUS_LABELS[val]} {!isReal && MOCK_DAYS_AGO[val] ? `(${MOCK_DAYS_AGO[val]}d ago)` : ''}
                             </span>
                           </motion.div>
                         )}
@@ -265,12 +280,15 @@ export function LiveHeatmap() {
               </div>
               {/* Decay panel */}
               <AnimatePresence>
-                {selectedStudent === ri && (
+                {selectedStudent === ri && !isReal && (
                   <StudentDecayPanel studentIndex={ri} name={student.name} />
                 )}
               </AnimatePresence>
             </div>
           ))}
+              </>
+            );
+          })()}
         </div>
       </div>
 

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ClassIcon } from '@/components/ClassIcons';
 import TopicBarChart from '@/components/topics/TopicBarChart';
 import SyllabusUploader from '@/components/teacher/SyllabusUploader';
+import { LiveHeatmap } from '@/components/landing/InstitutionalIntelligence';
 
 export default function ClassDashboardPage() {
   const { id } = useParams();
@@ -1157,6 +1158,15 @@ export default function ClassDashboardPage() {
                   <p className="text-sm text-white/40">Need Intervention</p>
                 </div>
               </div>
+
+              {/* Class Mastery Heatmap */}
+              {masteryData.heatmapData?.students?.length > 0 && masteryData.heatmapData?.topics?.length > 0 && (
+                <LiveHeatmap
+                  data={masteryData.heatmapData}
+                  label={`${cls?.name || 'Class'} — ${cls?.subject || ''}`}
+                  subtitle="Student Mastery by Topic"
+                />
+              )}
 
               {/* Students Needing Help Alert */}
               {masteryData.studentsNeedingHelp?.length > 0 && (
