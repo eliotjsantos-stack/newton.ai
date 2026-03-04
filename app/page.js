@@ -196,7 +196,7 @@ function ExamBoardScroll() {
   const slotSmooth = useSpring(slotIn, { stiffness: 100, damping: 20 });
 
   return (
-    <section ref={containerRef} className="relative min-h-[150vh] md:min-h-[200vh] py-24">
+    <section ref={containerRef} className="relative min-h-[120vh] md:min-h-[150vh] py-24">
       <div className="sticky top-0 min-h-screen flex items-center justify-center px-6 overflow-hidden">
         <div className="max-w-6xl mx-auto w-full">
           <ScrollReveal className="text-center mb-10 md:mb-20">
