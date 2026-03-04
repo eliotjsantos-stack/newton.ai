@@ -2077,13 +2077,34 @@ if (isLoadingData) {
     </div>
   )}
   <button
-    onClick={() => {
-      setShowReportIssue(true);
+    onClick={async () => {
       if (showTutorial && tutorialStep === 4) {
+        setShowReportIssue(true);
         setTimeout(() => {
           setShowReportIssue(false);
           nextTutorialStep();
         }, 2000);
+        return;
+      }
+      // Capture screenshot BEFORE opening modal so the modal doesn't appear in it
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        await new Promise(resolve => { video.onloadedmetadata = resolve; });
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        stream.getTracks().forEach(t => t.stop());
+        canvas.toBlob(blob => {
+          setScreenshot(blob);
+          setShowReportIssue(true);
+        }, 'image/png');
+      } catch {
+        // Cancelled or not supported — open modal without screenshot
+        setShowReportIssue(true);
       }
     }}
     className={`px-3 py-1.5 border border-white/5 text-white/40 hover:text-red-400 hover:border-red-500/20 rounded-full text-[10px] transition-colors flex items-center gap-1.5 ${showTutorial && tutorialStep === 4 ? 'relative z-[102]' : ''}`}
@@ -2430,32 +2451,33 @@ if (isLoadingData) {
 {/* Settings Modal */}
       {showSettings && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[200] p-6 animate-fadeIn"
+          className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[200] p-4 animate-fadeIn"
           onClick={() => setShowSettings(false)}
         >
           <div
-            className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
+            className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl w-full max-w-[95vw] md:max-w-2xl overflow-hidden animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
-            style={{
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3)'
-            }}
+            style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3)' }}
           >
-            <div className="p-10">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-extrabold text-neutral-100 tracking-tight">Settings</h2>
-                <button
-                  onClick={() => setShowSettings(false)}
-                  className="p-3 hover:bg-white/[0.06] rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
-                >
-                  <svg className="w-6 h-6 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+              <h2 className="text-xl font-bold text-neutral-100 tracking-tight">Settings</h2>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="p-2 hover:bg-white/[0.06] rounded-xl transition-colors"
+              >
+                <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-              <div>
-                <label className="text-sm font-bold text-neutral-100 block mb-4">Year Group</label>
-                <div className="grid grid-cols-2 gap-3">
+            {/* Two-column body on desktop, single column on mobile */}
+            <div className="md:grid md:grid-cols-2 md:divide-x md:divide-white/[0.06]">
+              {/* Left: Year Group */}
+              <div className="p-6">
+                <label className="text-xs font-bold text-white/40 uppercase tracking-wider block mb-3">Year Group</label>
+                <div className="grid grid-cols-2 gap-2">
                   {yearOptions.map((option) => (
                     <button
                       key={option.value}
@@ -2463,92 +2485,70 @@ if (isLoadingData) {
                         saveYearGroup(option.value);
                         setShowSettings(false);
                       }}
-                      className={`px-5 py-4 rounded-2xl text-left font-semibold transition-all duration-300 hover:scale-105 active:scale-95 ${
+                      className={`px-3 py-3 rounded-xl text-left text-sm font-semibold transition-all active:scale-95 ${
                         yearGroup === option.value
                           ? 'bg-[#0071e3] text-white'
-                          : 'bg-white/[0.05] backdrop-blur-sm text-neutral-300 hover:bg-white/[0.1] border border-white/[0.08]'
+                          : 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.08] border border-white/[0.06]'
                       }`}
                     >
                       {option.label}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-neutral-500 mt-5 font-medium">
+                <p className="text-xs text-neutral-500 mt-3">
                   Current: {yearOptions.find(y => y.value === yearGroup)?.label || 'Not set'}
                 </p>
               </div>
 
-              {currentUserEmail && ['year10', 'year11', 'year12', 'year13'].includes(yearGroup) && (
-                <div className="mt-8 pt-8 border-t border-white/[0.06]">
-                  <label className="text-sm font-bold text-neutral-100 block mb-4">My Course</label>
-                  <QualificationSelector
-                    value={currentQanCode}
-                    onSelect={(qan) => saveQanCode(qan)}
-                    levelFilter={['year10', 'year11'].includes(yearGroup) ? 2 : 3}
-                    placeholder={['year10', 'year11'].includes(yearGroup) ? 'Search GCSE courses...' : 'Search A-Level courses...'}
-                  />
-                  <p className="text-xs text-neutral-500 mt-3 font-medium">
-                    This helps Newton tailor its teaching to your exact syllabus.
-                  </p>
-                </div>
-              )}
-
-              <div className="mt-8 pt-8 border-t border-white/[0.06]">
-                <label className="text-sm font-bold text-neutral-100 block mb-4">Preferences</label>
-                <div
-                  className="flex items-center justify-between p-4 bg-white/[0.04] border border-white/[0.06] rounded-2xl cursor-pointer hover:bg-white/[0.06] transition-colors"
-                  onClick={() => setShowLinkRecommendations(!showLinkRecommendations)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-500/15 rounded-xl flex items-center justify-center">
-                      <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                      </svg>
-                    </div>
+              {/* Right: Preferences + Actions */}
+              <div className="p-6 flex flex-col gap-4 border-t border-white/[0.06] md:border-t-0">
+                <div>
+                  <label className="text-xs font-bold text-white/40 uppercase tracking-wider block mb-3">Preferences</label>
+                  <div
+                    className="flex items-center justify-between p-3 bg-white/[0.04] border border-white/[0.06] rounded-xl cursor-pointer hover:bg-white/[0.06] transition-colors"
+                    onClick={() => setShowLinkRecommendations(!showLinkRecommendations)}
+                  >
                     <div>
                       <p className="text-sm font-semibold text-neutral-100">Link Recommendations</p>
-                      <p className="text-xs text-neutral-500">Show helpful learning resources after each response</p>
+                      <p className="text-xs text-neutral-500">Show resources after each response</p>
+                    </div>
+                    <div className={`w-10 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-3 ${showLinkRecommendations ? 'bg-blue-500' : 'bg-white/[0.1]'}`}>
+                      <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${showLinkRecommendations ? 'translate-x-5' : 'translate-x-1'}`} />
                     </div>
                   </div>
-                  <div className={`w-12 h-7 rounded-full transition-colors duration-200 ${showLinkRecommendations ? 'bg-blue-500' : 'bg-white/[0.1]'}`}>
-                    <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${showLinkRecommendations ? 'translate-x-6' : 'translate-x-1'}`} />
-                  </div>
                 </div>
-              </div>
 
-              <div className="mt-6">
-                <button
-                  onClick={() => {
-                    setShowSettings(false);
-                    startTutorial();
-                  }}
-                  className="w-full px-5 py-4 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center gap-3"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  Retake Tutorial
-                </button>
-              </div>
-
-              {currentUserEmail && (
-                <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                <div className="mt-auto space-y-2">
                   <button
                     onClick={() => {
-                      localStorage.removeItem('newton-auth-token');
-                      setCurrentUserEmail(null);
-                      window.location.href = '/';
+                      setShowSettings(false);
+                      startTutorial();
                     }}
-                    className="w-full px-5 py-4 bg-red-500/15 border border-red-500/20 hover:bg-red-500/25 text-red-400 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full px-4 py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    Log Out
+                    Retake Tutorial
                   </button>
-                </div>
-              )}
 
+                  {currentUserEmail && (
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem('newton-auth-token');
+                        setCurrentUserEmail(null);
+                        window.location.href = '/';
+                      }}
+                      className="w-full px-4 py-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Log Out
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2642,7 +2642,7 @@ if (isLoadingData) {
                   <span className="text-4xl font-bold text-black">N</span>
                 </div>
                 <h2 className="text-2xl sm:text-4xl font-extrabold text-neutral-100 mb-4">Welcome to Newton!</h2>
-                <p className="text-lg sm:text-xl text-neutral-400 mb-8 leading-relaxed">
+                <p className="text-lg sm:text-xl text-neutral-300 mb-8 leading-relaxed">
                   Let's take a quick tour. This will only take a minute!
                 </p>
                 <div className="flex gap-4 justify-center">
@@ -2676,11 +2676,11 @@ if (isLoadingData) {
                 1
               </div>
               <h3 className="text-xl font-bold text-neutral-100 mb-2">New Conversations</h3>
-              <p className="text-neutral-400 mb-4">
+              <p className="text-neutral-300 mb-4">
                 Click "New conversation" to start a fresh chat. Each is automatically saved by subject!
               </p>
               <div className="flex gap-3 justify-end">
-                <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-300">
+                <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
                   Skip
                 </button>
                 <button
@@ -2706,11 +2706,11 @@ if (isLoadingData) {
                 2
               </div>
               <h3 className="text-xl font-bold text-neutral-100 mb-2">Organize by Subject</h3>
-              <p className="text-neutral-400 mb-4">
+              <p className="text-neutral-300 mb-4">
                 Your chats are organized by subject. Switch between subjects to see all conversations about each topic!
               </p>
               <div className="flex gap-3 justify-end">
-                <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-300">
+                <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
                   Skip
                 </button>
                 <button
@@ -2783,7 +2783,7 @@ if (isLoadingData) {
 </div>
 
                 <div className="flex gap-3 justify-end">
-                  <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-300">
+                  <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
                     Skip
                   </button>
                   <button
@@ -2808,11 +2808,11 @@ if (isLoadingData) {
                 4
               </div>
               <h3 className="text-xl font-bold text-neutral-100 mb-2">Report Issues</h3>
-              <p className="text-neutral-400 mb-4">
+              <p className="text-neutral-300 mb-4">
                 Encounter a bug? Click "Report Issue" to let us know and we'll fix it right away!
               </p>
               <div className="flex gap-3 justify-end">
-                <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-300">
+                <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
                   Skip
                 </button>
                 <button
@@ -2838,11 +2838,11 @@ if (isLoadingData) {
                 5
               </div>
               <h3 className="text-xl font-bold text-neutral-100 mb-2">Your Dashboard</h3>
-              <p className="text-neutral-400 mb-4">
+              <p className="text-neutral-300 mb-4">
                 Visit your Dashboard to see learning progress and analytics. Let's check it out!
               </p>
               <div className="flex gap-3 justify-end">
-                <button onClick={skipTutorial} className="text-sm text-neutral-500 hover:text-neutral-300">
+                <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
                   Skip
                 </button>
                 <button
@@ -2866,7 +2866,7 @@ if (isLoadingData) {
                   </svg>
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-bold text-neutral-100 mb-4">You're All Set!</h3>
-                <p className="text-lg sm:text-xl text-neutral-400 mb-8">
+                <p className="text-lg sm:text-xl text-neutral-300 mb-8">
                   Ready to start learning? Ask Newton your first question!
                 </p>
                 <button
@@ -2937,67 +2937,22 @@ if (isLoadingData) {
                   </label>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-sm font-bold text-neutral-100 block">
-                    Screenshot (optional)
-                  </label>
-                  
-                  {!screenshot ? (
-                    <button
-                      onClick={async () => {
-                        try {
-                          const stream = await navigator.mediaDevices.getDisplayMedia({
-                            video: { mediaSource: 'screen' }
-                          });
-                          
-                          const video = document.createElement('video');
-                          video.srcObject = stream;
-                          video.play();
-                          
-                          await new Promise(resolve => {
-                            video.onloadedmetadata = resolve;
-                          });
-                          
-                          const canvas = document.createElement('canvas');
-                          canvas.width = video.videoWidth;
-                          canvas.height = video.videoHeight;
-                          canvas.getContext('2d').drawImage(video, 0, 0);
-                          
-                          stream.getTracks().forEach(track => track.stop());
-                          
-                          canvas.toBlob(blob => {
-                            setScreenshot(blob);
-                          }, 'image/png');
-                        } catch (err) {
-                          console.error('Screenshot error:', err);
-                          alert('Screenshot capture cancelled or failed');
-                        }
-                      }}
-                      className="w-full px-4 py-3 bg-white/[0.04] hover:bg-white/[0.08] border-2 border-dashed border-white/[0.1] rounded-xl font-semibold text-neutral-300 transition-all flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                {screenshot && (
+                  <div className="relative p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      Capture Screenshot
-                    </button>
-                  ) : (
-                    <div className="relative p-4 bg-emerald-500/10 border-2 border-emerald-500/20 rounded-xl">
-                      <div className="flex items-center gap-3">
-                        <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-sm font-semibold text-emerald-300">Screenshot captured</span>
-                        <button
-                          onClick={() => setScreenshot(null)}
-                          className="ml-auto text-sm text-red-400 hover:text-red-300 font-semibold"
-                        >
-                          Remove
-                        </button>
-                      </div>
+                      <span className="text-sm font-semibold text-emerald-300">Screenshot attached</span>
+                      <button
+                        onClick={() => setScreenshot(null)}
+                        className="ml-auto text-xs text-white/30 hover:text-red-400 font-semibold transition-colors"
+                      >
+                        Remove
+                      </button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 <div className="flex gap-3">
                   <button

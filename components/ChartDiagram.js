@@ -30,13 +30,16 @@ function evaluateFormula(formula, x) {
   }
 }
 
-// Generate points for a formula across a range
-function generateFormulaPoints(formula, xMin, xMax, numPoints = 300) {
+// Generate points for a formula at exact 0.1-unit intervals
+// so the tooltip always snaps to clean values like 3.8 or 4.1, never 3.89
+function generateFormulaPoints(formula, xMin, xMax) {
   const points = [];
-  const step = (xMax - xMin) / (numPoints - 1);
+  const STEP = 0.1;
+  const iStart = Math.ceil(xMin / STEP);
+  const iEnd = Math.floor(xMax / STEP);
 
-  for (let i = 0; i < numPoints; i++) {
-    const x = xMin + i * step;
+  for (let i = iStart; i <= iEnd; i++) {
+    const x = Math.round(i * STEP * 10) / 10; // exact 0.1-unit steps, no float drift
     const y = evaluateFormula(formula, x);
     if (y !== null) {
       points.push({ x, y });
@@ -175,11 +178,12 @@ function ChartDiagram({ config }) {
     const xShift = (panX / 100) * xRange * 2;
     const yShift = (panY / 100) * yRange * 2;
 
+    // Snap to clean integers so Chart.js generates integer tick positions
     return {
-      xMin: xMin - xRange * 0.1 + xShift,
-      xMax: xMax + xRange * 0.1 + xShift,
-      yMin: yMin - yRange * 0.1 + yShift,
-      yMax: yMax + yRange * 0.1 + yShift,
+      xMin: Math.floor(xMin - xRange * 0.1 + xShift),
+      xMax: Math.ceil(xMax + xRange * 0.1 + xShift),
+      yMin: Math.floor(yMin - yRange * 0.1 + yShift),
+      yMax: Math.ceil(yMax + yRange * 0.1 + yShift),
     };
   }, [parsedConfig, panX, panY]);
 
@@ -198,7 +202,7 @@ function ChartDiagram({ config }) {
 
       // If formula is provided, generate points dynamically
       if (ds.formula) {
-        dataPoints = generateFormulaPoints(ds.formula, extendedXMin, extendedXMax, 500);
+        dataPoints = generateFormulaPoints(ds.formula, extendedXMin, extendedXMax);
       } else {
         // Use provided data points
         const numericXValues = (xValues || []).map(v => typeof v === 'number' ? v : parseFloat(v) || 0);
@@ -285,7 +289,11 @@ function ChartDiagram({ config }) {
         callbacks: {
           label: (context) => {
             const point = context.parsed;
-            return `(${point.x.toFixed(1)}, ${point.y.toFixed(1)})`;
+            const fmt = (n) => {
+              const r = Math.round(n * 10) / 10;
+              return Number.isInteger(r) ? String(r) : r.toFixed(1);
+            };
+            return `(${fmt(point.x)}, ${fmt(point.y)})`;
           }
         }
       },
@@ -306,7 +314,10 @@ function ChartDiagram({ config }) {
         ticks: {
           font: { family: 'system-ui, sans-serif', size: 10 },
           color: '#6b7280',
-          callback: (value) => Number.isInteger(value) ? value : '',
+          callback: (value) => {
+            const r = Math.round(value);
+            return Math.abs(value - r) < 0.001 ? r : '';
+          },
         },
       },
       y: {
@@ -324,7 +335,10 @@ function ChartDiagram({ config }) {
         ticks: {
           font: { family: 'system-ui, sans-serif', size: 10 },
           color: '#6b7280',
-          callback: (value) => Number.isInteger(value) ? value : '',
+          callback: (value) => {
+            const r = Math.round(value);
+            return Math.abs(value - r) < 0.001 ? r : '';
+          },
         },
       },
     },

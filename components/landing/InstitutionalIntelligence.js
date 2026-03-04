@@ -144,7 +144,8 @@ function StudentDecayPanel({ studentIndex, name }) {
 /* ─── Live Heatmap ─── */
 export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
   const isReal = !!data;
-  const [grid, setGrid] = useState(isReal ? data.grid : INITIAL_GRID);
+  const hasData = isReal && data.students?.length > 0 && data.topics?.length > 0;
+  const [grid, setGrid] = useState(isReal ? (data.grid || []) : INITIAL_GRID);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [hoveredCell, setHoveredCell] = useState(null);
   const ref = useRef(null);
@@ -200,7 +201,21 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
         )}
       </div>
 
+      {/* Empty state for real data with no students yet */}
+      {isReal && !hasData && (
+        <div className="px-6 py-12 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mb-4">
+            <svg className="w-6 h-6 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-white/40 mb-1">No mastery data yet</p>
+          <p className="text-xs text-white/20 max-w-xs">Students will appear here as they chat with Newton and build topic mastery.</p>
+        </div>
+      )}
+
       {/* Grid */}
+      {(!isReal || hasData) && (
       <div className="overflow-x-auto">
         <div className="min-w-0 sm:min-w-[520px]">
           {/* Column headers */}
@@ -291,9 +306,10 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
           })()}
         </div>
       </div>
+      )}
 
       {/* Legend */}
-      <div className="px-4 sm:px-6 py-3 border-t border-white/[0.04] flex items-center gap-4 sm:gap-6">
+      {(!isReal || hasData) && <div className="px-4 sm:px-6 py-3 border-t border-white/[0.04] flex items-center gap-4 sm:gap-6">
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-sm bg-emerald-400" />
           <span className="text-[10px] text-white/30 font-medium">Mastered</span>
@@ -312,11 +328,13 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
           </svg>
           <span className="text-[10px] text-white/30 font-medium">Integrity Flag</span>
         </div>
-      </div>
-      {/* Interactive hint */}
+      </div>}
+      {/* Interactive hint — only for mock demo */}
+      {!isReal && (
       <div className="px-4 sm:px-6 py-2 border-t border-white/[0.04]">
         <p className="text-[10px] text-white/20 text-center font-medium">Click a student name to see their knowledge decay timeline</p>
       </div>
+      )}
     </div>
   );
 }

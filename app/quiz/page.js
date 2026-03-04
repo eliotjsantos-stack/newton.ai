@@ -37,6 +37,8 @@ export default function QuizHub() {
   const [creatingQuiz, setCreatingQuiz] = useState(false);
   const [quizMode, setQuizMode] = useState('mini_quiz');
   const [quizMarks, setQuizMarks] = useState(15);
+  const [genProgress, setGenProgress] = useState(0);
+  const [genStep, setGenStep] = useState(0);
 
   // Leaderboard
   const [leaderboardTab, setLeaderboardTab] = useState('Quizzes');
@@ -95,9 +97,33 @@ export default function QuizHub() {
     load();
   }, [mounted, router]);
 
+  const GEN_STEPS = [
+    'Setting up your quiz…',
+    'Generating questions…',
+    'Calibrating difficulty…',
+    'Finalising your quiz…',
+  ];
+
   const handleCreateQuiz = async () => {
     if (!newQuizTopic.trim() || !newQuizSubject) return;
     setCreatingQuiz(true);
+    setGenProgress(0);
+    setGenStep(0);
+
+    // Linear progress: reach 87% evenly over ~18s, then hold until API resolves
+    const TICK_MS = 250;
+    const TOTAL_MS = 18000;
+    const MAX_PROGRESS = 87;
+    const increment = MAX_PROGRESS / (TOTAL_MS / TICK_MS); // ~1.2% per tick
+    let current = 0;
+    const interval = setInterval(() => {
+      current = Math.min(current + increment, MAX_PROGRESS);
+      const rounded = Math.round(current);
+      setGenProgress(rounded);
+      setGenStep(rounded < 25 ? 0 : rounded < 50 ? 1 : rounded < 75 ? 2 : 3);
+      if (current >= MAX_PROGRESS) clearInterval(interval);
+    }, TICK_MS);
+
     try {
       const token = localStorage.getItem('newton-auth-token');
       const matchingClass = classes.find(c => c.subject === newQuizSubject);
@@ -106,11 +132,36 @@ export default function QuizHub() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ topicName: newQuizTopic.trim(), subject: newQuizSubject, classId: matchingClass?.id || null, totalMarks: quizMarks, mode: quizMode }),
       });
+      clearInterval(interval);
       const data = await res.json();
-      if (data.success && data.quiz) router.push(`/quiz/${data.quiz.id}`);
-      else alert('Failed to create quiz: ' + (data.error || 'Unknown error'));
-    } catch (err) { alert('Failed to create quiz: ' + err.message); }
-    finally { setCreatingQuiz(false); setShowNewQuiz(false); setNewQuizTopic(''); setNewQuizSubject(''); setQuizMode('mini_quiz'); setQuizMarks(15); }
+      if (data.success && data.quiz) {
+        setGenProgress(100);
+        setGenStep(3);
+        setTimeout(() => router.push(`/quiz/${data.quiz.id}`), 400);
+      } else {
+        alert('Failed to create quiz: ' + (data.error || 'Unknown error'));
+        setCreatingQuiz(false);
+        setGenProgress(0);
+        setGenStep(0);
+      }
+    } catch (err) {
+      clearInterval(interval);
+      alert('Failed to create quiz: ' + err.message);
+      setCreatingQuiz(false);
+      setGenProgress(0);
+      setGenStep(0);
+    }
+  };
+
+  const resetNewQuizModal = () => {
+    setShowNewQuiz(false);
+    setNewQuizTopic('');
+    setNewQuizSubject('');
+    setCreatingQuiz(false);
+    setGenProgress(0);
+    setGenStep(0);
+    setQuizMode('mini_quiz');
+    setQuizMarks(15);
   };
 
   const startMissionQuiz = (mission) => {
@@ -522,7 +573,7 @@ export default function QuizHub() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowNewQuiz(false); setNewQuizTopic(''); setNewQuizSubject(''); setCreatingQuiz(false); setQuizMode('mini_quiz'); setQuizMarks(15); }} />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { if (!creatingQuiz) resetNewQuizModal(); }} />
             <motion.div
               className="relative bg-neutral-900/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl max-w-sm w-full p-6"
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -531,115 +582,166 @@ export default function QuizHub() {
               transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-lg font-bold text-white mb-1">Create a Quiz</h2>
-              <p className="text-sm text-white/60 mb-5">Choose a subject and topic to test yourself.</p>
-              {creatingQuiz && (
-                <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
-                    <p className="text-sm text-blue-400">Creating your {quizMarks}-mark quiz...</p>
-                  </div>
-                </div>
-              )}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-white/60 mb-1.5">Subject</label>
-                  <select
-                    value={newQuizSubject}
-                    onChange={(e) => setNewQuizSubject(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              <AnimatePresence mode="wait">
+                {creatingQuiz ? (
+                  /* ── Loading State ── */
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                    className="py-4"
                   >
-                    <option value="">Select a subject</option>
-                    {allSubjects.map(s => (
-                      <option key={s} value={s}>
-                        {s}{subjectSpecMap[s] ? ` — ${subjectSpecMap[s].board}` : ''}
-                      </option>
-                    ))}
-                  </select>
-                  {newQuizSubject && subjectSpecMap[newQuizSubject] && (
-                    <p className="mt-1.5 text-xs text-[#0071e3]/70 truncate">
-                      {subjectSpecMap[newQuizSubject].board}: {subjectSpecMap[newQuizSubject].qualTitle}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-white/60 mb-1.5">Topic</label>
-                  <input
-                    type="text"
-                    value={newQuizTopic}
-                    onChange={(e) => setNewQuizTopic(e.target.value)}
-                    placeholder="e.g., Quadratic equations"
-                    className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 placeholder:text-white/30"
-                    onKeyDown={(e) => e.key === 'Enter' && !creatingQuiz && newQuizSubject && handleCreateQuiz()}
-                  />
-                </div>
+                    {/* Topic pill */}
+                    <div className="flex items-center gap-2 mb-6">
+                      <div className="w-7 h-7 rounded-lg bg-[#0071e3]/15 flex items-center justify-center shrink-0">
+                        <ClassIcon subject={newQuizSubject} size={14} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-white/40">{newQuizSubject}</p>
+                        <p className="text-sm font-semibold text-white leading-tight">{newQuizTopic}</p>
+                      </div>
+                    </div>
 
-                {/* Mode selector */}
-                <div>
-                  <label className="block text-sm font-semibold text-white/60 mb-1.5">Mode</label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {[
-                      { id: 'mini_quiz', label: 'Mini Quiz', desc: 'Quick revision', marks: 15 },
-                      { id: 'full_test', label: 'Full Test', desc: 'Exam-style paper', marks: 50 },
-                      { id: 'topic_focus', label: 'Topic Focus', desc: 'Deep dive', marks: 25 },
-                      { id: 'past_paper', label: 'Past Paper', desc: 'Exam layout', marks: 75 },
-                    ].map(m => (
+                    {/* Progress bar */}
+                    <div className="mb-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-xs font-medium text-white/50">{GEN_STEPS[genStep]}</p>
+                        <p className="text-xs font-bold text-[#0071e3] tabular-nums">{genProgress}%</p>
+                      </div>
+                      <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full bg-[#0071e3]"
+                          style={{ width: `${genProgress}%` }}
+                          transition={{ duration: 0.3, ease: 'easeOut' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Step dots */}
+                    <div className="flex items-center gap-1.5 mt-4">
+                      {GEN_STEPS.map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-1 rounded-full transition-all duration-300 ${
+                            i <= genStep ? 'bg-[#0071e3] flex-1' : 'bg-white/10 flex-1'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                ) : (
+                  /* ── Form State ── */
+                  <motion.div
+                    key="form"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <h2 className="text-lg font-bold text-white mb-1">Create a Quiz</h2>
+                    <p className="text-sm text-white/60 mb-5">Choose a subject and topic to test yourself.</p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-white/60 mb-1.5">Subject</label>
+                        <select
+                          value={newQuizSubject}
+                          onChange={(e) => setNewQuizSubject(e.target.value)}
+                          className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        >
+                          <option value="">Select a subject</option>
+                          {allSubjects.map(s => (
+                            <option key={s} value={s}>
+                              {s}{subjectSpecMap[s] ? ` — ${subjectSpecMap[s].board}` : ''}
+                            </option>
+                          ))}
+                        </select>
+                        {newQuizSubject && subjectSpecMap[newQuizSubject] && (
+                          <p className="mt-1.5 text-xs text-[#0071e3]/70 truncate">
+                            {subjectSpecMap[newQuizSubject].board}: {subjectSpecMap[newQuizSubject].qualTitle}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-white/60 mb-1.5">Topic</label>
+                        <input
+                          type="text"
+                          value={newQuizTopic}
+                          onChange={(e) => setNewQuizTopic(e.target.value)}
+                          placeholder="e.g., Quadratic equations"
+                          className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 placeholder:text-white/30"
+                          onKeyDown={(e) => e.key === 'Enter' && !creatingQuiz && newQuizSubject && handleCreateQuiz()}
+                        />
+                      </div>
+
+                      {/* Mode selector */}
+                      <div>
+                        <label className="block text-sm font-semibold text-white/60 mb-1.5">Mode</label>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {[
+                            { id: 'mini_quiz', label: 'Mini Quiz', desc: 'Quick revision', marks: 15 },
+                            { id: 'full_test', label: 'Full Test', desc: 'Exam-style paper', marks: 50 },
+                            { id: 'topic_focus', label: 'Topic Focus', desc: 'Deep dive', marks: 25 },
+                            { id: 'past_paper', label: 'Past Paper', desc: 'Exam layout', marks: 75 },
+                          ].map(m => (
+                            <button
+                              key={m.id}
+                              type="button"
+                              onClick={() => { setQuizMode(m.id); setQuizMarks(m.marks); }}
+                              className={`px-3 py-2 rounded-lg text-left text-xs transition-colors border ${
+                                quizMode === m.id
+                                  ? 'bg-[#0071e3]/15 border-[#0071e3]/40 text-white'
+                                  : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20'
+                              }`}
+                            >
+                              <p className="font-semibold">{m.label}</p>
+                              <p className="text-[10px] opacity-60">{m.desc}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Marks stepper */}
+                      <div>
+                        <label className="block text-sm font-semibold text-white/60 mb-1.5">Total Marks</label>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setQuizMarks(m => Math.max(5, m - 5))}
+                            className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 transition-colors text-lg font-bold"
+                          >
+                            -
+                          </button>
+                          <span className="text-white font-bold text-lg tabular-nums w-10 text-center">{quizMarks}</span>
+                          <button
+                            type="button"
+                            onClick={() => setQuizMarks(m => Math.min(100, m + 5))}
+                            className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 transition-colors text-lg font-bold"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 mt-5">
                       <button
-                        key={m.id}
-                        type="button"
-                        onClick={() => { setQuizMode(m.id); setQuizMarks(m.marks); }}
-                        className={`px-3 py-2 rounded-lg text-left text-xs transition-colors border ${
-                          quizMode === m.id
-                            ? 'bg-[#0071e3]/15 border-[#0071e3]/40 text-white'
-                            : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20'
-                        }`}
+                        onClick={() => resetNewQuizModal()}
+                        className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-white/60 font-semibold rounded-xl transition-colors"
                       >
-                        <p className="font-semibold">{m.label}</p>
-                        <p className="text-[10px] opacity-60">{m.desc}</p>
+                        Cancel
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Marks stepper */}
-                <div>
-                  <label className="block text-sm font-semibold text-white/60 mb-1.5">Total Marks</label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setQuizMarks(m => Math.max(5, m - 5))}
-                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 transition-colors text-lg font-bold"
-                    >
-                      -
-                    </button>
-                    <span className="text-white font-bold text-lg tabular-nums w-10 text-center">{quizMarks}</span>
-                    <button
-                      type="button"
-                      onClick={() => setQuizMarks(m => Math.min(100, m + 5))}
-                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 transition-colors text-lg font-bold"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-3 mt-5">
-                <button
-                  onClick={() => { setShowNewQuiz(false); setNewQuizTopic(''); setNewQuizSubject(''); setCreatingQuiz(false); setQuizMode('mini_quiz'); setQuizMarks(15); }}
-                  className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-white/60 font-semibold rounded-xl transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCreateQuiz}
-                  disabled={!newQuizTopic.trim() || !newQuizSubject || creatingQuiz}
-                  className="flex-1 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] disabled:bg-white/5 text-white disabled:text-white/30 font-semibold rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
-                >
-                  {creatingQuiz ? (
-                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Creating...</>
-                  ) : 'Start Quiz'}
-                </button>
-              </div>
+                      <button
+                        onClick={handleCreateQuiz}
+                        disabled={!newQuizTopic.trim() || !newQuizSubject}
+                        className="flex-1 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] disabled:bg-white/5 text-white disabled:text-white/30 font-semibold rounded-xl transition-colors duration-200"
+                      >
+                        Start Quiz
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </motion.div>
         )}

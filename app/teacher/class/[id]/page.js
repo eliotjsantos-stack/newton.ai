@@ -1139,6 +1139,13 @@ export default function ClassDashboardPage() {
             </div>
           ) : masteryData ? (
             <div className="space-y-6">
+              {/* Class Mastery Heatmap — always shown, empty state handled inside */}
+              <LiveHeatmap
+                data={masteryData.heatmapData || { students: [], topics: [], grid: [] }}
+                label={`${cls?.name || 'Class'} — ${cls?.subject || ''}`}
+                subtitle="Student Mastery by Topic"
+              />
+
               {/* Stats Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white/[0.05] border border-white/[0.06] rounded-2xl p-4">
@@ -1158,15 +1165,6 @@ export default function ClassDashboardPage() {
                   <p className="text-sm text-white/40">Need Intervention</p>
                 </div>
               </div>
-
-              {/* Class Mastery Heatmap */}
-              {masteryData.heatmapData?.students?.length > 0 && masteryData.heatmapData?.topics?.length > 0 && (
-                <LiveHeatmap
-                  data={masteryData.heatmapData}
-                  label={`${cls?.name || 'Class'} — ${cls?.subject || ''}`}
-                  subtitle="Student Mastery by Topic"
-                />
-              )}
 
               {/* Students Needing Help Alert */}
               {masteryData.studentsNeedingHelp?.length > 0 && (
