@@ -322,6 +322,8 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   const [showYearModal, setShowYearModal] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const [hasSeenWelcome, setHasSeenWelcome] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('newton-seen-welcome') === 'true';
@@ -1024,6 +1026,28 @@ useEffect(() => {
   loadUserData();
 }, []);
 
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      const token = localStorage.getItem('newton-auth-token');
+      const res = await fetch('/api/auth/delete-account', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        localStorage.clear();
+        window.location.href = '/';
+      } else {
+        const { error } = await res.json();
+        alert(error || 'Failed to delete account. Please try again.');
+        setDeletingAccount(false);
+      }
+    } catch {
+      alert('Something went wrong. Please try again.');
+      setDeletingAccount(false);
+    }
+  };
 
   const startNewChat = () => {
     const newChatId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -2452,7 +2476,7 @@ if (isLoadingData) {
       {showSettings && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[200] p-4 animate-fadeIn"
-          onClick={() => setShowSettings(false)}
+          onClick={() => { setShowSettings(false); setShowDeleteConfirm(false); }}
         >
           <div
             className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl w-full max-w-[95vw] md:max-w-2xl overflow-hidden animate-scaleIn"
@@ -2463,7 +2487,7 @@ if (isLoadingData) {
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
               <h2 className="text-xl font-bold text-neutral-100 tracking-tight">Settings</h2>
               <button
-                onClick={() => setShowSettings(false)}
+                onClick={() => { setShowSettings(false); setShowDeleteConfirm(false); }}
                 className="p-2 hover:bg-white/[0.06] rounded-xl transition-colors"
               >
                 <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2474,30 +2498,81 @@ if (isLoadingData) {
 
             {/* Two-column body on desktop, single column on mobile */}
             <div className="md:grid md:grid-cols-2 md:divide-x md:divide-white/[0.06]">
-              {/* Left: Year Group */}
-              <div className="p-6">
-                <label className="text-xs font-bold text-white/40 uppercase tracking-wider block mb-3">Year Group</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {yearOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        saveYearGroup(option.value);
-                        setShowSettings(false);
-                      }}
-                      className={`px-3 py-3 rounded-xl text-left text-sm font-semibold transition-all active:scale-95 ${
-                        yearGroup === option.value
-                          ? 'bg-[#0071e3] text-white'
-                          : 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.08] border border-white/[0.06]'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+              {/* Left: Account Settings */}
+              <div className="p-6 flex flex-col gap-5">
+                <div>
+                  <label className="text-xs font-bold text-white/40 uppercase tracking-wider block mb-3">Account Settings</label>
+
+                  {/* Year Group */}
+                  <p className="text-xs text-neutral-500 mb-2">Year Group</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {yearOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          saveYearGroup(option.value);
+                          setShowSettings(false);
+                        }}
+                        className={`px-3 py-3 rounded-xl text-left text-sm font-semibold transition-all active:scale-95 ${
+                          yearGroup === option.value
+                            ? 'bg-[#0071e3] text-white'
+                            : 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.08] border border-white/[0.06]'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-neutral-500 mt-2">
+                    Current: {yearOptions.find(y => y.value === yearGroup)?.label || 'Not set'}
+                  </p>
                 </div>
-                <p className="text-xs text-neutral-500 mt-3">
-                  Current: {yearOptions.find(y => y.value === yearGroup)?.label || 'Not set'}
-                </p>
+
+                {/* Delete Account */}
+                {currentUserEmail && (
+                  <div className="mt-auto">
+                    {!showDeleteConfirm ? (
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="w-full px-4 py-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Account
+                      </button>
+                    ) : (
+                      <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl space-y-3">
+                        <p className="text-sm font-semibold text-red-400">Delete your account?</p>
+                        <p className="text-xs text-red-400/80">This will permanently erase all your chats, quiz history, mastery data, and account. This cannot be undone.</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setShowDeleteConfirm(false)}
+                            disabled={deletingAccount}
+                            className="flex-1 px-3 py-2 bg-white/[0.06] hover:bg-white/[0.1] text-neutral-300 rounded-lg text-sm font-semibold transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handleDeleteAccount}
+                            disabled={deletingAccount}
+                            className="flex-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                          >
+                            {deletingAccount ? (
+                              <>
+                                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                                </svg>
+                                Deleting…
+                              </>
+                            ) : 'Yes, Delete'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Right: Preferences + Actions */}
