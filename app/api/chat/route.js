@@ -1,9 +1,5 @@
-import OpenAI from 'openai';
+import { anthropic, CHAT_MODEL } from '../../../lib/anthropic';
 import { supabase } from '../../../lib/supabase';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 /**
  * Fetch qualification metadata and curriculum objectives for a subject.
@@ -869,61 +865,50 @@ export async function POST(req) {
     // Grounding truth goes FIRST so the LLM sees it before 700+ lines of other instructions
     const fullPrompt = groundingTruth + SYSTEM_PROMPT + (yearGroupNote[yearGroup] || yearGroupNote.year9) + subjectNote + linksNote;
 
-    // Process messages to handle files
+    // Process messages to handle files (convert to Anthropic content format)
     const processedMessages = messages.map(msg => {
       if (msg.files && msg.files.length > 0) {
-        // Create content array with text and files
         const content = [
           { type: 'text', text: msg.content }
         ];
-        
+
         msg.files.forEach(file => {
           if (file.type === 'image') {
+            // file.data is a data URL: "data:image/png;base64,XXXX"
+            const [header, base64] = file.data.split(',');
+            const mediaType = header.match(/data:([^;]+)/)?.[1] || 'image/jpeg';
             content.push({
-              type: 'image_url',
-              image_url: {
-                url: file.data
-              }
+              type: 'image',
+              source: { type: 'base64', media_type: mediaType, data: base64 }
             });
           } else if (file.type === 'document') {
-            // For PDFs, extract base64 data
-            const base64Data = file.data.split(',')[1];
+            const base64Data = file.data.includes(',') ? file.data.split(',')[1] : file.data;
             content.push({
-              type: 'input_pdf',
-              source: {
-                type: 'base64',
-                media_type: file.mimeType,
-                data: base64Data
-              }
+              type: 'document',
+              source: { type: 'base64', media_type: file.mimeType || 'application/pdf', data: base64Data }
             });
           }
         });
-        
-        return {
-          role: msg.role,
-          content: content
-        };
+
+        return { role: msg.role, content };
       }
-      
-      return msg;
+
+      return { role: msg.role, content: msg.content };
     });
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      stream: true,
-      messages: [
-        { role: 'system', content: fullPrompt },
-        ...processedMessages,
-      ],
+    const anthropicStream = anthropic.messages.stream({
+      model: CHAT_MODEL,
+      max_tokens: 4096,
+      system: fullPrompt,
+      messages: processedMessages,
     });
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
-        for await (const chunk of response) {
-          const content = chunk.choices[0]?.delta?.content;
-          if (content) {
-            controller.enqueue(encoder.encode(content));
+        for await (const event of anthropicStream) {
+          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+            controller.enqueue(encoder.encode(event.delta.text));
           }
         }
         controller.close();
@@ -931,9 +916,7 @@ export async function POST(req) {
     });
 
     return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-      },
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     });
   } catch (error) {
     console.error('API Error:', error);

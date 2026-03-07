@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import OpenAI from 'openai';
+import { anthropic, CHAT_MODEL } from '@/lib/anthropic';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 /**
  * POST /api/teacher/student-summary
@@ -36,23 +32,17 @@ export async function POST(req) {
       `${q.date}: ${q.score}/${q.totalMarks} (${Math.round((q.score / q.totalMarks) * 100)}%) — ${q.mode || 'quiz'}`
     ).join('\n');
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a teacher assistant. Provide brief, actionable student performance summaries. Be specific and professional. Always respond in 2-3 sentences only.',
-        },
-        {
-          role: 'user',
-          content: `Summarize ${studentName}'s performance on "${topic}". Note trends, strengths, and weaknesses.\n\nQuiz results (newest first):\n${quizSummary}`,
-        },
-      ],
-      temperature: 0.5,
+    const response = await anthropic.messages.create({
+      model: CHAT_MODEL,
       max_tokens: 200,
+      system: 'You are a teacher assistant. Provide brief, actionable student performance summaries. Be specific and professional. Always respond in 2-3 sentences only.',
+      messages: [{
+        role: 'user',
+        content: `Summarize ${studentName}'s performance on "${topic}". Note trends, strengths, and weaknesses.\n\nQuiz results (newest first):\n${quizSummary}`,
+      }],
     });
 
-    const summary = completion.choices[0].message.content.trim();
+    const summary = response.content[0].text.trim();
 
     return NextResponse.json({ summary });
   } catch (err) {

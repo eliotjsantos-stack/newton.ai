@@ -1,11 +1,7 @@
 import { supabase } from '@/lib/supabase';
-import OpenAI from 'openai';
+import { anthropic, CHAT_MODEL } from '@/lib/anthropic';
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
 
@@ -77,21 +73,18 @@ export async function POST(req) {
       .map(m => `${m.role === 'user' ? 'STUDENT' : 'NEWTON'}: ${m.content}`)
       .join('\n\n');
 
-    // Call GPT-4o-mini for efficient analysis
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: ANALYSIS_PROMPT },
-        { role: 'user', content: `Analyze this conversation:\n\n${conversationText}` }
-      ],
-      temperature: 0.3,
+    const response = await anthropic.messages.create({
+      model: CHAT_MODEL,
       max_tokens: 1000,
-      response_format: { type: 'json_object' }
+      system: ANALYSIS_PROMPT,
+      messages: [{ role: 'user', content: `Analyze this conversation:\n\n${conversationText}` }],
     });
 
     let analysis;
     try {
-      analysis = JSON.parse(response.choices[0].message.content);
+      const text = response.content[0].text.trim()
+        .replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+      analysis = JSON.parse(text);
     } catch {
       return NextResponse.json({ error: 'Parse error' }, { status: 500 });
     }

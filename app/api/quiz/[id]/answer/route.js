@@ -1,14 +1,10 @@
 import { supabase } from '@/lib/supabase';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { anthropic, CHAT_MODEL } from '@/lib/anthropic';
 import { evaluateQuizCompletion } from '@/lib/masteryEngine';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 export async function POST(req, { params }) {
   try {
@@ -71,7 +67,6 @@ export async function POST(req, { params }) {
       marksAwarded = 0;
       feedback = question.explanation || 'This question was skipped.';
     } else if (question.question_type === 'multiple_choice') {
-      // Extract letter from answer (A, B, C, or D)
       const answerLetter = answer.trim().toUpperCase().charAt(0);
       const correctLetter = question.correct_answer.trim().toUpperCase().charAt(0);
       isCorrect = answerLetter === correctLetter;
@@ -104,23 +99,16 @@ Return JSON only:
   "feedback": "Brief encouraging feedback explaining what was good or what was missing"
 }`;
 
-        const evalCompletion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'You are a helpful teacher evaluating student answers. Return only valid JSON.' },
-            { role: 'user', content: evalPrompt }
-          ],
-          temperature: 0.3,
+        const evalResponse = await anthropic.messages.create({
+          model: CHAT_MODEL,
           max_tokens: 300,
+          system: 'You are a helpful teacher evaluating student answers. Return only valid JSON.',
+          messages: [{ role: 'user', content: evalPrompt }],
         });
 
-        const evalResponse = evalCompletion.choices[0].message.content.trim();
-        const cleanedEval = evalResponse
-          .replace(/^```json\s*/i, '')
-          .replace(/^```\s*/i, '')
-          .replace(/\s*```$/i, '')
-          .trim();
-        const evaluation = JSON.parse(cleanedEval);
+        const evalText = evalResponse.content[0].text.trim()
+          .replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+        const evaluation = JSON.parse(evalText);
         isCorrect = evaluation.isCorrect;
         marksAwarded = isCorrect ? questionMarks : 0;
         feedback = evaluation.feedback + '\n\n' + question.explanation;
@@ -131,7 +119,7 @@ Return JSON only:
         feedback = question.explanation;
       }
     } else if (question.question_type === 'explain' || question.question_type === 'structured') {
-      // For explain/structured: use GPT to award partial marks
+      // For explain/structured: use AI to award partial marks
       try {
         const evalPrompt = `Evaluate this student answer for the following question.
 
@@ -152,23 +140,16 @@ Return JSON only:
   "feedback": "Brief encouraging feedback explaining marks awarded"
 }`;
 
-        const evalCompletion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'You are a helpful teacher evaluating student answers. Return only valid JSON.' },
-            { role: 'user', content: evalPrompt }
-          ],
-          temperature: 0.3,
+        const evalResponse = await anthropic.messages.create({
+          model: CHAT_MODEL,
           max_tokens: 400,
+          system: 'You are a helpful teacher evaluating student answers. Return only valid JSON.',
+          messages: [{ role: 'user', content: evalPrompt }],
         });
 
-        const evalResponse = evalCompletion.choices[0].message.content.trim();
-        const cleanedEval = evalResponse
-          .replace(/^```json\s*/i, '')
-          .replace(/^```\s*/i, '')
-          .replace(/\s*```$/i, '')
-          .trim();
-        const evaluation = JSON.parse(cleanedEval);
+        const evalText = evalResponse.content[0].text.trim()
+          .replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+        const evaluation = JSON.parse(evalText);
         marksAwarded = Math.min(questionMarks, Math.max(0, evaluation.marksAwarded || 0));
         isCorrect = evaluation.isCorrect || marksAwarded >= questionMarks / 2;
         feedback = evaluation.feedback + '\n\n' + question.explanation;

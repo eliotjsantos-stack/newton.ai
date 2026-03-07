@@ -1,16 +1,12 @@
-import OpenAI from 'openai';
+import { anthropic, CHAT_MODEL } from '@/lib/anthropic';
 import { NextResponse } from 'next/server';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 export async function POST(req) {
   try {
     const { userMessage, assistantMessage } = await req.json();
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    const response = await anthropic.messages.create({
+      model: CHAT_MODEL,
       max_tokens: 50,
       messages: [{
         role: 'user',
@@ -21,7 +17,7 @@ Assistant: ${assistantMessage.substring(0, 200)}...`
       }]
     });
 
-    const title = completion.choices[0].message.content.trim();
+    const title = response.content[0].text.trim();
 
     return NextResponse.json({ title });
 

@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
+import { anthropic, CHAT_MODEL } from '@/lib/anthropic';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
 
@@ -53,19 +54,11 @@ export async function POST(req) {
     // Truncate to avoid token limits (first 8000 chars should cover most syllabi)
     const truncatedText = pdfText.substring(0, 8000);
 
-    // Send to GPT for structured extraction
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a UK exam syllabus parser. Extract structured syllabus data from the provided text. Return ONLY valid JSON with this structure:
+    // Send to Claude for structured extraction
+    const aiResponse = await anthropic.messages.create({
+      model: CHAT_MODEL,
+      max_tokens: 3000,
+      system: `You are a UK exam syllabus parser. Extract structured syllabus data from the provided text. Return ONLY valid JSON with this structure:
 {
   "examBoard": "AQA|OCR|Pearson|WJEC|Other",
   "qualification": "GCSE|A-Level|BTEC|etc",
@@ -79,23 +72,10 @@ export async function POST(req) {
 }
 
 Extract ALL topics and subtopics. Use the section numbering from the document. If exam board or qualification cannot be determined, use "Unknown".`,
-          },
-          {
-            role: 'user',
-            content: `Parse this syllabus text:\n\n${truncatedText}`,
-          },
-        ],
-        temperature: 0.3,
-        max_tokens: 3000,
-      }),
+      messages: [{ role: 'user', content: `Parse this syllabus text:\n\n${truncatedText}` }],
     });
 
-    if (!response.ok) {
-      throw new Error('OpenAI API error');
-    }
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content?.trim();
+    const content = aiResponse.content[0].text.trim();
 
     let parsed;
     try {

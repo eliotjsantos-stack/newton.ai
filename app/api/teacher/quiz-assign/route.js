@@ -1,15 +1,11 @@
 import { supabaseAdmin } from '@/lib/supabase';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { anthropic, QUIZ_MODEL } from '@/lib/anthropic';
 import { randomizeQuizNumbers } from '@/lib/quizRandomizer';
 import { getQuizGrounding, buildQuizPrompt } from '@/lib/quizGrounding';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 async function authenticateTeacher(req) {
   const authHeader = req.headers.get('authorization');
@@ -78,22 +74,16 @@ export async function POST(req) {
     // Dynamic max_tokens based on total marks
     const maxTokens = Math.min(16000, Math.max(4000, effectiveMarks * 120));
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an educational quiz generator for UK secondary school exams. Generate age-appropriate, curriculum-aligned questions. Always return valid JSON arrays only.'
-        },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7,
+    const completion = await anthropic.messages.create({
+      model: QUIZ_MODEL,
       max_tokens: maxTokens,
+      system: 'You are an educational quiz generator for UK secondary school exams. Generate age-appropriate, curriculum-aligned questions. Always return valid JSON arrays only.',
+      messages: [{ role: 'user', content: prompt }],
     });
 
     let questions;
     try {
-      const responseText = completion.choices[0].message.content.trim();
+      const responseText = completion.content[0].text.trim();
       const cleanedResponse = responseText
         .replace(/^```json\s*/i, '')
         .replace(/^```\s*/i, '')

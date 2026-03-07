@@ -1,10 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { anthropic, CHAT_MODEL } from '@/lib/anthropic';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**
  * POST /api/quiz/retention
@@ -77,19 +76,16 @@ For each question provide this exact JSON structure:
 
 Return ONLY a valid JSON array of 5 question objects.`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: 'You are an educational quiz generator for retention checks. Return only valid JSON arrays.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7,
+    const response = await anthropic.messages.create({
+      model: CHAT_MODEL,
       max_tokens: 2000,
+      system: 'You are an educational quiz generator for retention checks. Return only valid JSON arrays.',
+      messages: [{ role: 'user', content: prompt }],
     });
 
     let questions;
     try {
-      const responseText = completion.choices[0].message.content.trim();
+      const responseText = response.content[0].text.trim();
       const cleaned = responseText
         .replace(/^```json\s*/i, '')
         .replace(/^```\s*/i, '')

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { anthropic, CHAT_MODEL } from '@/lib/anthropic';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
 
@@ -24,18 +25,10 @@ export async function POST(req) {
 
     const diffLabel = difficulty === 'easy' ? 'foundation' : difficulty === 'hard' ? 'higher' : 'intermediate';
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a UK secondary school worksheet generator. Generate a revision worksheet for the topic "${topic}" in ${subject || 'the given subject'} at ${diffLabel} difficulty level. ${studentContext ? `Common student errors: ${studentContext}` : ''}
+    const response = await anthropic.messages.create({
+      model: CHAT_MODEL,
+      max_tokens: 2000,
+      system: `You are a UK secondary school worksheet generator. Generate a revision worksheet for the topic "${topic}" in ${subject || 'the given subject'} at ${diffLabel} difficulty level. ${studentContext ? `Common student errors: ${studentContext}` : ''}
 
 Return ONLY valid JSON with this structure:
 {
@@ -52,23 +45,10 @@ Return ONLY valid JSON with this structure:
 }
 
 Generate exactly 10 questions. Include a mix of recall, application, and analysis questions. Mark allocations should total approximately 30-40 marks. Use UK curriculum terminology and standards.`,
-          },
-          {
-            role: 'user',
-            content: `Generate the ${diffLabel} revision worksheet for "${topic}" now.`,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-      }),
+      messages: [{ role: 'user', content: `Generate the ${diffLabel} revision worksheet for "${topic}" now.` }],
     });
 
-    if (!response.ok) {
-      throw new Error('OpenAI API error');
-    }
-
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content?.trim();
+    const content = response.content[0].text.trim();
 
     let parsed;
     try {
