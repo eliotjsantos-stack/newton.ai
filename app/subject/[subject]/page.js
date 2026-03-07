@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import NavigationDock from '@/components/NavigationDock';
 import { ClassIcon } from '@/components/ClassIcons';
 
-const cardBase = 'bg-slate-950 border border-slate-800 rounded-lg transition-colors duration-200';
+const cardBase = 'bg-white border border-gray-200 rounded-lg transition-colors duration-200';
 
 /* ── Main Subject Page ── */
 export default function SubjectPage({ params }) {
@@ -147,7 +147,7 @@ export default function SubjectPage({ params }) {
 
   const SortHeader = ({ col, label }) => (
     <th
-      className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-300 select-none"
+      className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700 select-none"
       onClick={() => handleSort(col)}
     >
       {label} {sortCol === col ? (sortAsc ? '\u2191' : '\u2193') : ''}
@@ -156,37 +156,37 @@ export default function SubjectPage({ params }) {
 
   const masteryColor = (score) => {
     if (score == null) return '';
-    if (score < 40) return 'bg-red-950/40';
-    if (score < 70) return 'bg-amber-950/40';
-    return 'bg-emerald-950/40';
+    if (score < 40) return 'bg-red-50';
+    if (score < 70) return 'bg-amber-50';
+    return 'bg-emerald-50';
   };
 
   const masteryTextColor = (score) => {
-    if (score == null) return 'text-slate-600';
-    if (score < 40) return 'text-red-400';
-    if (score < 70) return 'text-amber-400';
-    return 'text-emerald-400';
+    if (score == null) return 'text-gray-400';
+    if (score < 40) return 'text-red-500';
+    if (score < 70) return 'text-amber-600';
+    return 'text-emerald-600';
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[#F5F5F7]">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950">
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white">
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="p-1.5 -ml-1.5 rounded-lg hover:bg-slate-800 transition-colors">
-              <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <Link href="/dashboard" className="p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </Link>
             <div className="flex items-center gap-2.5">
               <ClassIcon subject={subject} size={20} />
-              <h1 className="text-base font-bold text-white tracking-tight">{subject}</h1>
+              <h1 className="text-base font-bold text-gray-900 tracking-tight">{subject}</h1>
             </div>
           </div>
           <button
             onClick={() => router.push(classData ? `/chat?classId=${classData.id}&new=true` : `/chat?subject=${encodeURIComponent(subject)}&new=true`)}
-            className="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-semibold rounded-full transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-full transition-colors"
           >
             Chat
           </button>
@@ -198,8 +198,8 @@ export default function SubjectPage({ params }) {
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
               <div key={i} className={`${cardBase} p-6 animate-pulse`}>
-                <div className="h-4 w-32 bg-slate-800 rounded mb-3" />
-                <div className="h-3 w-48 bg-slate-800 rounded" />
+                <div className="h-4 w-32 bg-gray-200 rounded mb-3" />
+                <div className="h-3 w-48 bg-gray-200 rounded" />
               </div>
             ))}
           </div>
@@ -209,8 +209,8 @@ export default function SubjectPage({ params }) {
             {classData && (
               <div className={`${cardBase} px-6 py-4 flex items-center justify-between`}>
                 <div>
-                  <p className="text-sm font-semibold text-white">{classData.name}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{classData.year_group?.replace('year', 'Year ')} · {classData.teacher_name || 'Teacher'}</p>
+                  <p className="text-sm font-semibold text-gray-900">{classData.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{classData.year_group?.replace('year', 'Year ')} · {classData.teacher_name || 'Teacher'}</p>
                 </div>
               </div>
             )}
@@ -218,24 +218,24 @@ export default function SubjectPage({ params }) {
             {/* Syllabus Coverage Bar + Heatmap */}
             <div className={`${cardBase} p-5`}>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Syllabus Coverage</h2>
-                <span className="font-sans text-sm text-slate-300">{completedTopics}/{totalTopics} topics</span>
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Syllabus Coverage</h2>
+                <span className="font-sans text-sm text-gray-600">{completedTopics}/{totalTopics} topics</span>
               </div>
               {/* Progress bar */}
-              <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-4">
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
                 <div
-                  className="h-full bg-[#0071e3] rounded-full transition-all duration-500"
+                  className="h-full bg-blue-600 rounded-full transition-all duration-500"
                   style={{ width: `${coveragePercent}%` }}
                 />
               </div>
               {/* Knowledge Heatmap */}
               {syllabusChapters.length > 0 && (
                 <div>
-                  <h3 className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider mb-2">Topic Mastery Heatmap</h3>
+                  <h3 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Topic Mastery Heatmap</h3>
                   <div className="flex flex-wrap gap-1">
                     {syllabusChapters.map((ch, i) => {
                       const score = ch.quizScore;
-                      let bg = 'bg-slate-800';
+                      let bg = 'bg-gray-200';
                       if (score != null) {
                         if (score >= 70) bg = 'bg-emerald-600';
                         else if (score >= 40) bg = 'bg-amber-600';
@@ -247,7 +247,7 @@ export default function SubjectPage({ params }) {
                           className={`w-6 h-6 rounded-sm ${bg} relative group cursor-default`}
                           title={`${ch.code}: ${score != null ? score + '%' : 'Unassessed'}`}
                         >
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-black border border-slate-700 rounded text-[10px] text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-sans">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-[10px] text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-sans">
                             {ch.code}: {score != null ? score + '%' : '—'}
                           </div>
                         </div>
@@ -260,14 +260,14 @@ export default function SubjectPage({ params }) {
 
             {/* Syllabus Matrix Table */}
             <div className={`${cardBase} overflow-hidden`}>
-              <div className="px-5 py-3 border-b border-slate-800">
-                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Syllabus Matrix</h2>
+              <div className="px-5 py-3 border-b border-gray-200">
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Syllabus Matrix</h2>
               </div>
               {syllabusChapters.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-slate-800">
+                      <tr className="border-b border-gray-200">
                         <SortHeader col="code" label="Topic Code" />
                         <SortHeader col="name" label="Topic Name" />
                         <SortHeader col="mastery" label="Mastery %" />
@@ -279,7 +279,7 @@ export default function SubjectPage({ params }) {
                       {sortedChapters.map((ch, i) => (
                         <tr
                           key={i}
-                          className={`border-b border-slate-800/50 hover:bg-slate-900 cursor-pointer ${masteryColor(ch.quizScore)}`}
+                          className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${masteryColor(ch.quizScore)}`}
                           onClick={() => {
                             const chatUrl = classData
                               ? `/chat?classId=${classData.id}&topic=${encodeURIComponent(ch.title)}&new=true`
@@ -287,17 +287,17 @@ export default function SubjectPage({ params }) {
                             router.push(chatUrl);
                           }}
                         >
-                          <td className="px-3 py-2.5 font-sans text-xs text-slate-400">{ch.code}</td>
-                          <td className="px-3 py-2.5 text-sm text-slate-200 max-w-[200px] truncate">{ch.title}</td>
+                          <td className="px-3 py-2.5 font-sans text-xs text-gray-500">{ch.code}</td>
+                          <td className="px-3 py-2.5 text-sm text-gray-900 max-w-[200px] truncate">{ch.title}</td>
                           <td className={`px-3 py-2.5 font-sans text-xs font-semibold ${masteryTextColor(ch.quizScore)}`}>
                             {ch.quizScore != null ? `${ch.quizScore}%` : '—'}
                           </td>
-                          <td className="px-3 py-2.5 font-sans text-xs text-slate-500">
+                          <td className="px-3 py-2.5 font-sans text-xs text-gray-500">
                             {ch.lastActivityAt
                               ? new Date(ch.lastActivityAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
                               : '—'}
                           </td>
-                          <td className="px-3 py-2.5 font-sans text-xs text-slate-500">
+                          <td className="px-3 py-2.5 font-sans text-xs text-gray-500">
                             {ch.integrityScore != null ? ch.integrityScore : '—'}
                           </td>
                         </tr>
@@ -307,31 +307,31 @@ export default function SubjectPage({ params }) {
                 </div>
               ) : (
                 <div className="text-center py-8 px-5">
-                  <p className="text-sm text-slate-500">Complete quizzes and chat sessions to build your syllabus map.</p>
+                  <p className="text-sm text-gray-500">Complete quizzes and chat sessions to build your syllabus map.</p>
                 </div>
               )}
             </div>
 
             {/* Incomplete Tasks */}
             <div className={`${cardBase} overflow-hidden`}>
-              <div className="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
-                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tasks</h2>
+              <div className="px-5 py-3 border-b border-gray-200 flex items-center justify-between">
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tasks</h2>
                 {assignments.length > 0 && (
-                  <span className="font-sans text-xs text-slate-500">{allAssignments.filter(a => !a.completed_at).length} pending</span>
+                  <span className="font-sans text-xs text-gray-500">{allAssignments.filter(a => !a.completed_at).length} pending</span>
                 )}
               </div>
               {allAssignments.length === 0 ? (
                 <div className="text-center py-6 px-5">
-                  <p className="text-sm text-slate-500">No assignments set yet.</p>
+                  <p className="text-sm text-gray-500">No assignments set yet.</p>
                 </div>
               ) : (
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Task Name</th>
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Type</th>
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Due Date</th>
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Task Name</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Due Date</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -342,7 +342,7 @@ export default function SubjectPage({ params }) {
                       return (
                         <tr
                           key={`${a._type}-${a.id}`}
-                          className={`border-b border-slate-800/50 hover:bg-slate-900 cursor-pointer ${isOverdue ? 'bg-red-950/20' : ''}`}
+                          className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${isOverdue ? 'bg-red-50' : ''}`}
                           onClick={() => {
                             if (isQuiz) {
                               router.push(a._quizId ? `/quiz/${a._quizId}` : '/quiz');
@@ -354,26 +354,26 @@ export default function SubjectPage({ params }) {
                             }
                           }}
                         >
-                          <td className={`px-3 py-2.5 text-sm ${isOverdue ? 'text-red-400' : 'text-slate-200'}`}>{a.title}</td>
+                          <td className={`px-3 py-2.5 text-sm ${isOverdue ? 'text-red-500' : 'text-gray-900'}`}>{a.title}</td>
                           <td className="px-3 py-2.5 text-xs">
                             <span className={`px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
-                              isQuiz ? 'bg-blue-500/10 text-blue-400' : 'bg-white/[0.06] text-slate-500'
+                              isQuiz ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'
                             }`}>
                               {isQuiz ? 'Quiz' : 'Task'}
                             </span>
                           </td>
-                          <td className={`px-3 py-2.5 font-sans text-xs ${isOverdue ? 'text-red-400' : 'text-slate-500'}`}>
+                          <td className={`px-3 py-2.5 font-sans text-xs ${isOverdue ? 'text-red-500' : 'text-gray-500'}`}>
                             {a.due_date ? new Date(a.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}
                           </td>
                           <td className="px-3 py-2.5 text-xs">
                             {isComplete ? (
-                              <span className="text-emerald-400 font-semibold">DONE</span>
+                              <span className="text-emerald-600 font-semibold">DONE</span>
                             ) : isOverdue ? (
-                              <span className="text-red-400 font-semibold">OVERDUE</span>
+                              <span className="text-red-500 font-semibold">OVERDUE</span>
                             ) : isQuiz && a._started ? (
-                              <span className="text-amber-400 font-semibold">IN PROGRESS</span>
+                              <span className="text-amber-600 font-semibold">IN PROGRESS</span>
                             ) : (
-                              <span className="text-slate-500">Pending</span>
+                              <span className="text-gray-500">Pending</span>
                             )}
                           </td>
                         </tr>
@@ -386,10 +386,10 @@ export default function SubjectPage({ params }) {
 
             {/* Exam Simulation */}
             <div className={`${cardBase} p-5`}>
-              <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Exam Simulation</h2>
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Exam Simulation</h2>
               <button
                 onClick={() => router.push(`/quiz?subject=${encodeURIComponent(subject)}&mode=exam`)}
-                className="w-full rounded-lg p-4 bg-white text-black border border-slate-200 hover:bg-slate-100 transition-colors text-left group"
+                className="w-full rounded-lg p-4 bg-white text-black border border-gray-200 hover:bg-gray-100 transition-colors text-left group"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -406,28 +406,28 @@ export default function SubjectPage({ params }) {
 
             {/* Resource Vault */}
             <div className={`${cardBase} overflow-hidden`}>
-              <div className="px-5 py-3 border-b border-slate-800">
-                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Resources</h2>
+              <div className="px-5 py-3 border-b border-gray-200">
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Resources</h2>
               </div>
               {resources.length === 0 ? (
                 <div className="text-center py-6 px-5">
-                  <p className="text-sm text-slate-500">No resources added yet.</p>
+                  <p className="text-sm text-gray-500">No resources added yet.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-800/50">
+                <div className="divide-y divide-gray-100">
                   {resources.map(r => (
                     <a
                       key={r.id}
                       href={r.url || '#'}
                       target={r.url ? '_blank' : undefined}
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-slate-900 transition-colors"
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{r.title}</p>
-                        {r.description && <p className="text-xs text-slate-500 truncate mt-0.5">{r.description}</p>}
+                        <p className="text-sm font-semibold text-gray-900 truncate">{r.title}</p>
+                        {r.description && <p className="text-xs text-gray-500 truncate mt-0.5">{r.description}</p>}
                       </div>
-                      <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                      <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-gray-400">
                         {r.type || 'file'}
                       </span>
                     </a>

@@ -64,8 +64,8 @@ function MathText({ children }) {
 export default function QuizPage({ params }) {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#0B0B0C] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-600 rounded-full animate-spin" />
       </div>
     }>
       <QuizPageContent params={params} />
@@ -320,22 +320,22 @@ function QuizPageContent({ params }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0B0C] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-white/10 border-t-white/60 rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-600 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!quiz) {
     return (
-      <div className="min-h-screen bg-[#0B0B0C] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
         <div className="text-center max-w-sm">
-          <p className="text-white/50 mb-4">{loadError || 'Quiz not found'}</p>
+          <p className="text-gray-500 mb-4">{loadError || 'Quiz not found'}</p>
           <div className="flex gap-3 justify-center">
-            <button onClick={() => { setLoadError(null); setLoading(true); loadQuiz(); }} className="px-4 py-2 text-sm font-medium text-white/60 hover:bg-white/5 rounded-lg transition">
+            <button onClick={() => { setLoadError(null); setLoading(true); loadQuiz(); }} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">
               Retry
             </button>
-            <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-white/60 hover:bg-white/5 rounded-lg transition">
+            <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">
               Dashboard
             </Link>
           </div>
@@ -355,22 +355,22 @@ function QuizPageContent({ params }) {
   );
 
   return (
-    <div className="min-h-screen bg-[#0B0B0C]">
+    <div className="min-h-screen bg-[#F5F5F7]">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-20 bg-[#0B0B0C] border-b border-white/10">
-        <div className="h-1 bg-white/5">
-          <div className="h-full bg-[#0071e3] transition-all duration-300" style={{ width: `${progressPercent}%` }} />
+      <header className="fixed top-0 left-0 right-0 z-20 bg-white border-b border-gray-200">
+        <div className="h-1 bg-gray-200">
+          <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${progressPercent}%` }} />
         </div>
         <div className="max-w-3xl mx-auto px-6 h-12 flex items-center justify-between">
-          <Link href="/dashboard" className="text-white/30 hover:text-white/60 transition">
+          <Link href="/dashboard" className="text-gray-400 hover:text-gray-600 transition">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </Link>
 
           <div className="text-center">
-            <p className="text-sm font-medium text-white">{quiz.topicName}</p>
-            <p className="text-xs text-white/40 font-mono">
+            <p className="text-sm font-medium text-gray-900">{quiz.topicName}</p>
+            <p className="text-xs text-gray-400 font-mono">
               {progress?.marksEarned != null
                 ? `${progress.marksEarned}/${progress.totalMarks} marks`
                 : `${progress?.totalAnswered}/${progress?.totalQuestions} completed`}
@@ -378,11 +378,11 @@ function QuizPageContent({ params }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono text-white/30">{formatTime(timer)}</span>
+            <span className="text-xs font-mono text-gray-400">{formatTime(timer)}</span>
             {isMathSubject && (
               <button
                 onClick={() => setShowCalculator(!showCalculator)}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${showCalculator ? 'bg-[#0071e3] text-white' : 'text-white/30 hover:text-white/60 hover:bg-white/5'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-lg transition ${showCalculator ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z" />
@@ -398,7 +398,7 @@ function QuizPageContent({ params }) {
         <div className="max-w-2xl mx-auto">
           {/* Level tabs */}
           <div className="flex justify-center mb-10">
-            <div className="inline-flex bg-white/5 rounded-lg p-1 border border-white/10">
+            <div className="inline-flex bg-gray-100 rounded-lg p-1 border border-gray-200">
               {['easy', 'medium', 'hard'].map((level) => {
                 const isUnlocked = level === 'easy' || (level === 'medium' ? quiz.mediumUnlocked : quiz.hardUnlocked);
                 const isActive = quiz.currentLevel === level;
@@ -409,16 +409,16 @@ function QuizPageContent({ params }) {
                     disabled={!isUnlocked}
                     className={`relative px-5 py-2 text-sm font-medium rounded-md transition-all ${
                       isActive
-                        ? 'bg-[#242427] text-white border border-white/10'
+                        ? 'bg-white text-gray-900 border border-gray-200 shadow-sm'
                         : isUnlocked
-                        ? 'text-white/50 hover:text-white/80'
-                        : 'text-white/20 cursor-not-allowed'
+                        ? 'text-gray-500 hover:text-gray-800'
+                        : 'text-gray-300 cursor-not-allowed'
                     }`}
                   >
                     <span className="capitalize">{level}</span>
-                    <span className="ml-1.5 text-white/30">{scores[level]}</span>
+                    <span className="ml-1.5 text-gray-400">{scores[level]}</span>
                     {!isUnlocked && (
-                      <svg className="w-3 h-3 absolute -top-1 -right-1 text-white/30" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-3 h-3 absolute -top-1 -right-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                       </svg>
                     )}
@@ -454,25 +454,25 @@ function QuizPageContent({ params }) {
             <div className="space-y-6">
               <div className={`p-6 rounded-lg border ${
                 feedback.isCorrect
-                  ? 'bg-emerald-500/10 border-emerald-500/20'
+                  ? 'bg-emerald-50 border-emerald-200'
                   : feedback.skipped
-                    ? 'bg-white/5 border-white/10'
-                    : 'bg-red-500/10 border-red-500/20'
+                    ? 'bg-gray-50 border-gray-200'
+                    : 'bg-red-50 border-red-200'
               }`}>
                 <div className="flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                     feedback.isCorrect
-                      ? 'bg-emerald-500/20'
+                      ? 'bg-emerald-100'
                       : feedback.skipped
-                        ? 'bg-white/10'
-                        : 'bg-red-500/20'
+                        ? 'bg-gray-200'
+                        : 'bg-red-100'
                   }`}>
                     {feedback.isCorrect ? (
                       <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     ) : feedback.skipped ? (
-                      <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062A1.125 1.125 0 013 16.81V8.688zM12.75 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062a1.125 1.125 0 01-1.683-.977V8.688z" />
                       </svg>
                     ) : (
@@ -485,25 +485,25 @@ function QuizPageContent({ params }) {
                     <div className="flex items-center gap-2">
                       <p className={`font-semibold ${
                         feedback.isCorrect
-                          ? 'text-emerald-400'
+                          ? 'text-emerald-700'
                           : feedback.skipped
-                            ? 'text-white/60'
-                            : 'text-red-400'
+                            ? 'text-gray-500'
+                            : 'text-red-700'
                       }`}>
                         {feedback.isCorrect ? 'Correct' : feedback.skipped ? 'Skipped' : 'Incorrect'}
                       </p>
                       {feedback.marksAvailable > 0 && (
-                        <span className="text-xs font-mono text-white/30">
+                        <span className="text-xs font-mono text-gray-400">
                           {feedback.marksAwarded}/{feedback.marksAvailable} marks
                         </span>
                       )}
                     </div>
                     <div className={`mt-2 text-sm leading-relaxed ${
                       feedback.isCorrect
-                        ? 'text-emerald-300/80'
+                        ? 'text-emerald-800'
                         : feedback.skipped
-                          ? 'text-white/50'
-                          : 'text-red-300/80'
+                          ? 'text-gray-500'
+                          : 'text-red-800'
                     }`}>
                       <MathText>{feedback.feedback}</MathText>
                     </div>
@@ -517,8 +517,8 @@ function QuizPageContent({ params }) {
                   onClick={() => toggleFlag(currentQuestion)}
                   className={`w-full py-3 flex items-center justify-center gap-2 rounded-lg border transition ${
                     isQuestionFlagged(currentQuestion.index)
-                      ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-                      : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20'
+                      ? 'bg-amber-50 border-amber-200 text-amber-600'
+                      : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300'
                   }`}
                 >
                   <svg className="w-4 h-4" fill={isQuestionFlagged(currentQuestion.index) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -536,7 +536,7 @@ function QuizPageContent({ params }) {
 
               <button
                 onClick={handleNextQuestion}
-                className="w-full py-3 bg-[#0071e3] hover:bg-[#0077ED] text-white font-medium rounded-lg transition"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
               >
                 Continue
               </button>
@@ -546,25 +546,25 @@ function QuizPageContent({ params }) {
               <div>
                 {/* Section header for past paper mode */}
                 {currentQuestion.section && (
-                  <div className="mb-4 pb-2 border-b border-white/10">
-                    <p className="text-xs font-bold text-[#0071e3]/60 uppercase tracking-widest">Section {currentQuestion.section}</p>
+                  <div className="mb-4 pb-2 border-b border-gray-200">
+                    <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Section {currentQuestion.section}</p>
                   </div>
                 )}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <p className="text-xs font-medium text-white/30 uppercase tracking-wider font-mono">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider font-mono">
                       {currentQuestion.questionType.replace('_', ' ')}
                     </p>
                     {currentQuestion.marks > 0 && (
-                      <span className="text-xs text-white/20 font-mono">({currentQuestion.marks} {currentQuestion.marks === 1 ? 'mark' : 'marks'})</span>
+                      <span className="text-xs text-gray-400 font-mono">({currentQuestion.marks} {currentQuestion.marks === 1 ? 'mark' : 'marks'})</span>
                     )}
                   </div>
                   <button
                     onClick={() => toggleFlag(currentQuestion)}
                     className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full transition ${
                       isQuestionFlagged(currentQuestion.index)
-                        ? 'bg-amber-500/10 text-amber-400'
-                        : 'text-white/30 hover:text-white/60 hover:bg-white/5'
+                        ? 'bg-amber-50 text-amber-600'
+                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                     }`}
                     title={isQuestionFlagged(currentQuestion.index) ? 'Remove flag' : 'Flag for review'}
                   >
@@ -574,7 +574,7 @@ function QuizPageContent({ params }) {
                     {isQuestionFlagged(currentQuestion.index) ? 'Flagged' : 'Flag'}
                   </button>
                 </div>
-                <h1 className="text-xl font-semibold text-white leading-relaxed">
+                <h1 className="text-xl font-semibold text-gray-900 leading-relaxed">
                   <MathText>{currentQuestion.questionText}</MathText>
                 </h1>
               </div>
@@ -588,8 +588,8 @@ function QuizPageContent({ params }) {
                         onClick={() => setSelectedAnswer(option)}
                         className={`w-full p-4 text-left rounded-lg border transition ${
                           selectedAnswer === option
-                            ? 'border-[#0071e3] bg-[#242427] text-white'
-                            : 'border-white/10 hover:border-white/20 bg-white/[0.03] text-white/80'
+                            ? 'border-blue-500 bg-blue-50 text-blue-900'
+                            : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
                         }`}
                       >
                         <MathText>{option}</MathText>
@@ -606,8 +606,8 @@ function QuizPageContent({ params }) {
                         onClick={() => setSelectedAnswer(option)}
                         className={`py-4 font-medium rounded-lg border transition ${
                           selectedAnswer === option
-                            ? 'border-[#0071e3] bg-[#242427] text-white'
-                            : 'border-white/10 hover:border-white/20 bg-white/[0.03] text-white/80'
+                            ? 'border-blue-500 bg-blue-50 text-blue-900'
+                            : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
                         }`}
                       >
                         {option}
@@ -622,7 +622,7 @@ function QuizPageContent({ params }) {
                     value={textAnswer}
                     onChange={(e) => setTextAnswer(e.target.value)}
                     placeholder="Type your answer..."
-                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3]"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     onKeyDown={(e) => e.key === 'Enter' && handleAnswer()}
                   />
                 )}
@@ -633,16 +633,16 @@ function QuizPageContent({ params }) {
                     onChange={(e) => setTextAnswer(e.target.value)}
                     placeholder={currentQuestion.questionType === 'structured' ? "Write your answer here..." : "Explain your reasoning..."}
                     rows={currentQuestion.questionType === 'structured' ? 6 : 4}
-                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[#0071e3] focus:border-[#0071e3] resize-none"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   />
                 )}
               </div>
 
               {/* Confidence Slider */}
-              <div className="p-4 bg-white/[0.03] border border-white/10 rounded-lg">
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-white/60">How confident are you?</span>
-                  <span className="text-sm font-semibold text-[#0071e3] font-mono">{confidence}/5</span>
+                  <span className="text-sm font-medium text-gray-600">How confident are you?</span>
+                  <span className="text-sm font-semibold text-blue-600 font-mono">{confidence}/5</span>
                 </div>
                 <input
                   type="range"
@@ -651,11 +651,11 @@ function QuizPageContent({ params }) {
                   step="1"
                   value={confidence}
                   onChange={(e) => setConfidence(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#0071e3]"
+                  className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
                 <div className="flex justify-between mt-1">
-                  <span className="text-xs text-white/30">Guessing</span>
-                  <span className="text-xs text-white/30">Very sure</span>
+                  <span className="text-xs text-gray-400">Guessing</span>
+                  <span className="text-xs text-gray-400">Very sure</span>
                 </div>
               </div>
 
@@ -667,14 +667,14 @@ function QuizPageContent({ params }) {
                       ? !selectedAnswer
                       : !textAnswer.trim()
                   )}
-                  className="flex-1 py-3 bg-[#0071e3] hover:bg-[#0077ED] disabled:bg-white/5 disabled:text-white/20 text-white font-medium rounded-lg transition disabled:cursor-not-allowed"
+                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-400 text-white font-medium rounded-lg transition disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Checking...' : 'Submit'}
                 </button>
                 <button
                   onClick={() => handleSkip(currentQuestion)}
                   disabled={submitting}
-                  className="px-6 py-3 text-white/40 hover:text-white/70 hover:bg-white/5 font-medium rounded-lg transition disabled:opacity-50"
+                  className="px-6 py-3 text-gray-400 hover:text-gray-700 hover:bg-gray-100 font-medium rounded-lg transition disabled:opacity-50"
                 >
                   Skip
                 </button>
@@ -682,40 +682,40 @@ function QuizPageContent({ params }) {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-6 bg-[#0071e3]/20">
-                <svg className="w-8 h-8 text-[#0071e3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-6 bg-blue-100">
+                <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </div>
 
-              <h2 className="text-2xl font-semibold text-white mb-2">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
                 Level complete
               </h2>
 
-              <p className="text-4xl font-bold text-white font-mono mb-1">{scores[quiz.currentLevel]}</p>
-              <p className="text-sm text-white/40 mb-8">correct in {quiz.currentLevel} level</p>
+              <p className="text-4xl font-bold text-gray-900 font-mono mb-1">{scores[quiz.currentLevel]}</p>
+              <p className="text-sm text-gray-500 mb-8">correct in {quiz.currentLevel} level</p>
 
               <div className="space-y-3 max-w-xs mx-auto">
                 {quiz.currentLevel !== 'hard' && (
                   <button
                     onClick={() => handleChangeLevel(quiz.currentLevel === 'easy' ? 'medium' : 'hard')}
-                    className="w-full py-3 bg-[#0071e3] hover:bg-[#0077ED] text-white font-medium rounded-lg transition"
+                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
                   >
                     Continue to {quiz.currentLevel === 'easy' ? 'medium' : 'hard'}
                   </button>
                 )}
 
                 {quiz.currentLevel === 'hard' && (
-                  <Link href={`/quiz/${quizId}/results`} className="block w-full py-3 bg-[#0071e3] hover:bg-[#0077ED] text-white font-medium rounded-lg transition text-center">
+                  <Link href={`/quiz/${quizId}/results`} className="block w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition text-center">
                     View results
                   </Link>
                 )}
 
-                <button onClick={handleRetryLevel} className="w-full py-3 text-white/50 hover:text-white hover:bg-white/5 font-medium rounded-lg transition">
+                <button onClick={handleRetryLevel} className="w-full py-3 text-gray-500 hover:text-gray-900 hover:bg-gray-100 font-medium rounded-lg transition">
                   Retry level
                 </button>
 
-                <Link href="/dashboard" className="block w-full py-3 text-white/30 hover:text-white/60 font-medium transition text-center">
+                <Link href="/dashboard" className="block w-full py-3 text-gray-400 hover:text-gray-600 font-medium transition text-center">
                   Exit quiz
                 </Link>
               </div>

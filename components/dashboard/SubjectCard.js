@@ -27,7 +27,7 @@ export default function SubjectCard({ cls, onClick }) {
           {cls.teacherName}
         </p>
       )}
-      <p className="text-[11px] text-white/30 truncate mt-auto pt-2 uppercase tracking-wider font-medium">
+      <p className="text-[11px] text-gray-400 truncate mt-auto pt-2 uppercase tracking-wider font-medium">
         {cls.subject}
       </p>
     </motion.div>

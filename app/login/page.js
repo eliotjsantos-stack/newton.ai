@@ -29,12 +29,11 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to log in');
       }
 
-     localStorage.setItem('newton-auth-token', data.token);
+      localStorage.setItem('newton-auth-token', data.token);
 
       const urlParams = new URLSearchParams(window.location.search);
       const redirect = urlParams.get('redirect');
 
-      // Check account type to route correctly
       const meResponse = await fetch('/api/auth/me', {
         headers: { 'Authorization': `Bearer ${data.token}` }
       });
@@ -60,35 +59,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080808] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-lg font-bold text-black">N</span>
+          <Link href="/" className="inline-flex items-center justify-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center">
+              <span className="text-lg font-bold text-white">N</span>
             </div>
-            <h1 className="text-3xl font-bold text-[#f5f5f7] tracking-tight">Newton</h1>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Newton</h1>
           </Link>
-          <p className="text-[#a1a1a6] mt-3">Welcome back</p>
+          <p className="text-gray-500 text-sm mt-2">Welcome back — sign in to continue</p>
         </div>
 
         {/* Card */}
-        <div
-          className="bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-3xl shadow-2xl p-6 sm:p-8"
-          style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}
-        >
-          {/* Error Message */}
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl animate-slideIn">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-600 text-sm font-medium">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleLogin}>
-            <div className="mb-4">
-              <label className="block text-sm font-semibold text-neutral-300 mb-2">
-                Email Address
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email address
               </label>
               <input
                 type="email"
@@ -96,16 +91,16 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.email@school.ac.uk"
                 required
-                className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-gray-900 placeholder:text-gray-400 text-sm"
               />
             </div>
 
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-neutral-300">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <Link href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                <Link href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors">
                   Forgot password?
                 </Link>
               </div>
@@ -115,53 +110,41 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
-                className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 font-medium placeholder:text-neutral-500"
+                className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-gray-900 placeholder:text-gray-400 text-sm"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50 text-sm mt-2"
             >
               {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Logging in...
+                  Signing in...
                 </span>
-              ) : 'Log In'}
+              ) : 'Sign in'}
             </button>
           </form>
 
-          {/* Signup Link */}
-          <div className="mt-6 pt-6 border-t border-white/[0.06] text-center">
-            <p className="text-sm text-neutral-400">
+          <div className="mt-5 pt-5 border-t border-gray-100 text-center">
+            <p className="text-sm text-gray-500">
               Don&apos;t have an account?{' '}
-              <Link href="/signup" className="text-blue-400 font-semibold hover:text-blue-300 transition-all">
+              <Link href="/signup" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
                 Sign up
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-xs text-neutral-500 mt-6">
-          Secure login for Newton students
+        <p className="text-center text-xs text-gray-400 mt-5">
+          Secure login · Newton Learning Platform
         </p>
       </div>
-
-      <style jsx global>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateX(-10px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .animate-slideIn {
-          animation: slideIn 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

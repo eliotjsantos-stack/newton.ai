@@ -57,12 +57,11 @@ export default function BentoCard({
       style={tiltStyle}
       onClick={onClick}
       className={`
-        bg-white/[0.05]
-        backdrop-blur-xl
-        border border-white/[0.08]
+        bg-white
+        border border-gray-200
         rounded-2xl
-        shadow-[0_2px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]
-        hover:bg-white/[0.07]
+        shadow-sm hover:shadow-md
+        hover:border-gray-300
         transition-all duration-300
         overflow-hidden
         ${colSpan} ${rowSpan} ${className}

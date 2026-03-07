@@ -91,42 +91,42 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <div className="w-8 h-8 border-[3px] border-white/20 border-t-white/60 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-gray-200 border-t-gray-500 rounded-full animate-spin" />
       </div>
     );
   }
   if (!authorized) return null;
 
-  const inputCls = "w-full px-3 py-2 bg-white/[0.05] border border-white/[0.06] rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#0071e3] focus:border-transparent transition-all placeholder:text-white/20";
+  const inputCls = "w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all placeholder:text-gray-400";
 
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-white">Settings</h1>
-        <p className="text-sm text-white/40 mt-1">Manage your account and preferences.</p>
+        <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
+        <p className="text-sm text-gray-400 mt-1">Manage your account and preferences.</p>
       </div>
 
       {error && (
-        <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-2">
-          <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-2">
+          <svg className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Profile */}
-        <section className="bg-white/[0.05] border border-white/[0.06] rounded-2xl p-6 space-y-4">
-          <h2 className="text-base font-semibold text-white mb-4">Profile</h2>
+        <section className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4 shadow-sm">
+          <h2 className="text-base font-semibold text-gray-900 mb-4">Profile</h2>
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
             <input type="email" value={email} disabled className={inputCls + ' opacity-50 cursor-not-allowed'} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
             <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">Preferred Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Preferred Title</label>
             <select
               value={isCustomTitle ? 'custom' : preferredTitle}
               onChange={e => {
@@ -142,9 +142,9 @@ export default function SettingsPage() {
               }}
               className={inputCls}
             >
-              <option value="" className="bg-neutral-900 text-white">Select...</option>
+              <option value="">Select...</option>
               {TITLE_OPTIONS.map(t => (
-                <option key={t.value} value={t.value} className="bg-neutral-900 text-white">{t.label}</option>
+                <option key={t.value} value={t.value}>{t.label}</option>
               ))}
             </select>
             {isCustomTitle && (
@@ -157,21 +157,21 @@ export default function SettingsPage() {
                 autoFocus
               />
             )}
-            <p className="text-xs text-white/40 mt-1">How students should address you.</p>
+            <p className="text-xs text-gray-400 mt-1">How students should address you.</p>
           </div>
         </section>
 
         <button type="submit" disabled={saving}
-          className="w-full py-2.5 bg-[#0071e3] hover:bg-[#0077ED] disabled:bg-white/[0.1] text-white text-sm font-medium rounded-full transition-colors">
+          className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors">
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
         </button>
       </form>
 
       {/* Account */}
-      <section className="mt-8 bg-white/[0.05] border border-white/[0.06] rounded-2xl p-6">
-        <h2 className="text-base font-semibold text-white mb-4">Account</h2>
+      <section className="mt-8 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <h2 className="text-base font-semibold text-gray-900 mb-4">Account</h2>
         <button onClick={handleLogout}
-          className="px-4 py-2 bg-white/[0.05] border border-white/[0.06] hover:bg-white/[0.08] text-white text-sm font-medium rounded-full transition-colors">
+          className="px-4 py-2 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-full transition-colors">
           Log Out
         </button>
       </section>

@@ -20,7 +20,7 @@ function ThinkingDots() {
   );
 }
 
-export default function ChatDemo({ messages, active = false, dark = true, loop = true, onMessageReveal, onReset }) {
+export default function ChatDemo({ messages, active = false, dark = false, loop = true, onMessageReveal, onReset }) {
   const [visible, setVisible] = useState([]);
   const [thinking, setThinking] = useState(false);
   const timeoutsRef = useRef([]);
@@ -107,18 +107,18 @@ export default function ChatDemo({ messages, active = false, dark = true, loop =
               className={`flex gap-2.5 ${isStudent ? 'justify-end' : 'justify-start'}`}
             >
               {!isStudent && (
-                <div className="w-5 h-5 rounded-md bg-white flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-[7px] font-bold text-black">N</span>
+                <div className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 ${dark ? 'bg-white' : 'bg-gray-900'}`}>
+                  <span className={`text-[7px] font-bold ${dark ? 'text-black' : 'text-white'}`}>N</span>
                 </div>
               )}
               <div className={`max-w-[80%] ${isStudent ? 'text-right' : ''}`}>
-                <p className={`text-[12px] leading-relaxed ${dark ? 'text-white/80' : 'text-neutral-800'}`}>
+                <p className={`text-[12px] leading-relaxed ${dark ? 'text-white/80' : 'text-gray-700'}`}>
                   {msg.text}
                 </p>
               </div>
               {isStudent && (
-                <div className="w-5 h-5 rounded-full bg-white/[0.08] flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-[7px] font-semibold text-white/50">You</span>
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${dark ? 'bg-white/[0.08]' : 'bg-gray-200'}`}>
+                  <span className={`text-[7px] font-semibold ${dark ? 'text-white/50' : 'text-gray-500'}`}>You</span>
                 </div>
               )}
             </motion.div>

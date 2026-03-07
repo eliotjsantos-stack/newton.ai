@@ -19,17 +19,17 @@ export default function GradeCurveDemo() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-sm font-semibold text-white">The Active Learning Effect</h3>
-          <p className="text-xs text-[#a1a1a6] mt-0.5">Illustrative grade distribution shift</p>
+          <h3 className="text-sm font-semibold text-gray-900">The Active Learning Effect</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Illustrative grade distribution shift</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
-            <span className="text-[11px] text-[#a1a1a6]">Passive</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-gray-300" />
+            <span className="text-[11px] text-gray-500">Passive</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#0071e3]" />
-            <span className="text-[11px] text-[#a1a1a6]">Active</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+            <span className="text-[11px] text-gray-500">Active</span>
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@ export default function GradeCurveDemo() {
                   y={chartHeight - beforeHeight}
                   width={barWidth}
                   height={beforeHeight}
-                  fill="#374151"
+                  fill="#d1d5db"
                   rx={2}
                 />
                 {/* After bar (blue) */}
@@ -58,7 +58,7 @@ export default function GradeCurveDemo() {
                   y={chartHeight - afterHeight}
                   width={barWidth}
                   height={afterHeight}
-                  fill="#0071e3"
+                  fill="#2563eb"
                   rx={2}
                 />
                 {/* Grade label */}
@@ -66,7 +66,7 @@ export default function GradeCurveDemo() {
                   x={x + barWidth}
                   y={chartHeight + 18}
                   textAnchor="middle"
-                  className="fill-[#a1a1a6]"
+                  className="fill-gray-500"
                   style={{ fontSize: '11px', fontFamily: 'var(--font-jetbrains, monospace)' }}
                 >
                   {grade}
@@ -77,7 +77,7 @@ export default function GradeCurveDemo() {
         </svg>
       </div>
 
-      <p className="text-center text-xs text-white/20 mt-4">
+      <p className="text-center text-xs text-gray-400 mt-4">
         Illustrative model based on active learning research — not measured Newton outcomes
       </p>
     </div>

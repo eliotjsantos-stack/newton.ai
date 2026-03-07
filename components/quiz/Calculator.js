@@ -121,11 +121,11 @@ export default function Calculator({ onClose }) {
   const displayValue = expression || result;
 
   return (
-    <div className="w-64 bg-white rounded-xl shadow-lg border border-neutral-200 overflow-hidden">
+    <div className="w-64 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-neutral-50 border-b border-neutral-200">
-        <span className="text-xs font-medium text-neutral-500">Calculator</span>
-        <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600">
+      <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-gray-200">
+        <span className="text-xs font-medium text-gray-500">Calculator</span>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -133,8 +133,8 @@ export default function Calculator({ onClose }) {
       </div>
 
       {/* Display */}
-      <div className="px-4 py-4 bg-neutral-50 border-b border-neutral-200">
-        <div className="text-right text-2xl font-light text-neutral-900 truncate min-h-[32px]">
+      <div className="px-4 py-4 bg-gray-50 border-b border-gray-200">
+        <div className="text-right text-2xl font-light text-gray-900 truncate min-h-[32px]">
           {displayValue}
         </div>
       </div>
@@ -168,10 +168,10 @@ export default function Calculator({ onClose }) {
             className={`
               h-10 rounded-md text-sm font-medium transition-colors
               ${btn.span === 2 ? 'col-span-2' : ''}
-              ${btn.style === 'fn' ? 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300' : ''}
+              ${btn.style === 'fn' ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : ''}
               ${btn.style === 'op' ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}
               ${btn.style === 'eq' ? 'bg-blue-600 text-white hover:bg-blue-700' : ''}
-              ${!btn.style ? 'bg-neutral-100 text-neutral-800 hover:bg-neutral-200' : ''}
+              ${!btn.style ? 'bg-gray-100 text-gray-800 hover:bg-gray-200' : ''}
             `}
           >
             {btn.label}

@@ -29,7 +29,7 @@ export default function QuizCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-neutral-100">Quizzes</h3>
+          <h3 className="text-sm font-semibold text-gray-900">Quizzes</h3>
           {creatingQuiz && (
             <motion.div
               className="w-2 h-2 bg-blue-500 rounded-full"
@@ -46,14 +46,14 @@ export default function QuizCard({
         </div>
         <button
           onClick={onNewQuiz}
-          className="text-xs font-semibold text-neutral-500 hover:text-neutral-100 transition-colors"
+          className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors"
         >
           + New
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-0.5 bg-white/[0.04] border border-white/[0.06] rounded-lg mb-3">
+      <div className="flex gap-1 p-0.5 bg-gray-100 border border-gray-200 rounded-lg mb-3">
         {[
           { key: 'active', label: 'In Progress', count: pending.length },
           { key: 'completed', label: 'Completed', count: completed.length },
@@ -63,8 +63,8 @@ export default function QuizCard({
             onClick={() => setTab(t.key)}
             className={`flex-1 px-2.5 py-1.5 text-[11px] font-semibold rounded-md transition-all duration-200 ${
               tab === t.key
-                ? 'bg-white/[0.1] text-neutral-100 shadow-sm'
-                : 'text-neutral-500 hover:text-neutral-300'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             {t.label} ({t.count})
@@ -76,12 +76,12 @@ export default function QuizCard({
       <div className="flex-1 space-y-1.5 overflow-y-auto">
         {visible.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-6">
-            <div className="w-10 h-10 bg-white/[0.06] rounded-lg flex items-center justify-center mb-2">
-              <svg className="w-5 h-5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mb-2">
+              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
               </svg>
             </div>
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-gray-400">
               {tab === 'active' ? 'No quizzes in progress' : 'No completed quizzes'}
             </p>
             {tab === 'active' && (
@@ -97,14 +97,14 @@ export default function QuizCard({
           visible.map((quiz) => (
             <div
               key={quiz.id}
-              className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.05] transition-colors"
+              className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
             >
               <div className="flex-1 min-w-0">
                 <Link href={tab === 'active' ? `/quiz/${quiz.id}` : `/quiz/${quiz.id}/results`}>
-                  <p className="text-sm font-medium text-neutral-100 truncate">
+                  <p className="text-sm font-medium text-gray-900 truncate">
                     {quiz.topicName}
                   </p>
-                  <p className="text-[11px] text-neutral-400 truncate">
+                  <p className="text-[11px] text-gray-400 truncate">
                     {quiz.subject}
                   </p>
                 </Link>
@@ -128,7 +128,7 @@ export default function QuizCard({
               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={(e) => onRestart(quiz.id, e)}
-                  className="p-1 text-neutral-400 hover:text-blue-600 rounded-md transition-colors"
+                  className="p-1 text-gray-400 hover:text-blue-600 rounded-md transition-colors"
                   title="Restart"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -137,7 +137,7 @@ export default function QuizCard({
                 </button>
                 <button
                   onClick={(e) => onDelete(quiz.id, e)}
-                  className="p-1 text-neutral-400 hover:text-red-500 rounded-md transition-colors"
+                  className="p-1 text-gray-400 hover:text-red-500 rounded-md transition-colors"
                   title="Delete"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -154,7 +154,7 @@ export default function QuizCard({
       {quizzes.length > 4 && (
         <Link
           href="/quiz"
-          className="mt-3 pt-3 border-t border-white/[0.06] block text-center text-xs font-semibold text-neutral-500 hover:text-neutral-100 transition-colors"
+          className="mt-3 pt-3 border-t border-gray-100 block text-center text-xs font-semibold text-gray-400 hover:text-gray-900 transition-colors"
         >
           View all quizzes →
         </Link>

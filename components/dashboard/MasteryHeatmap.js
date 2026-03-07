@@ -18,14 +18,14 @@ export default function MasteryHeatmap({ students = [], chapters = [], cells = [
     cells.find(c => c.studentId === studentId && c.chapter === chapter);
 
   const getCellColor = (cell) => {
-    if (!cell) return 'bg-white/[0.06]';
+    if (!cell) return 'bg-gray-100';
     if (cell.status === 'green') return 'bg-emerald-400';
     if (cell.status === 'amber') return 'bg-amber-400';
     if (cell.status === 'red') return 'bg-red-400';
     if (cell.masteryLevel >= 4) return 'bg-emerald-400';
     if (cell.masteryLevel >= 2) return 'bg-amber-400';
     if (cell.masteryLevel >= 1) return 'bg-red-400';
-    return 'bg-white/[0.06]';
+    return 'bg-gray-100';
   };
 
   const formatDate = (dateStr) => {
@@ -36,24 +36,24 @@ export default function MasteryHeatmap({ students = [], chapters = [], cells = [
 
   if (students.length === 0 || chapters.length === 0) {
     return (
-      <div className="rounded-3xl border border-white/[0.06] bg-white/[0.05] p-8 text-center">
-        <p className="text-white/40 text-sm">No mastery data yet. Students need to complete quizzes to populate this heatmap.</p>
+      <div className="rounded-3xl border border-gray-200 bg-gray-50 p-8 text-center">
+        <p className="text-gray-400 text-sm">No mastery data yet. Students need to complete quizzes to populate this heatmap.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-3xl border border-white/[0.06] bg-white/[0.05] overflow-hidden">
+    <div className="rounded-3xl border border-gray-200 bg-white overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <div className="min-w-max">
           {/* Header row */}
-          <div className="flex border-b border-white/[0.06]">
-            <div className="w-44 shrink-0 sticky left-0 bg-[#0B0B0C] z-10 px-4 py-3 border-r border-white/[0.06]">
-              <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">Student</span>
+          <div className="flex border-b border-gray-200">
+            <div className="w-44 shrink-0 sticky left-0 bg-gray-50 z-10 px-4 py-3 border-r border-gray-200">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Student</span>
             </div>
             {chapters.map((ch) => (
               <div key={ch} className="w-24 shrink-0 px-2 py-3 text-center">
-                <span className="text-[10px] font-medium text-white/40 leading-tight block truncate" title={ch}>
+                <span className="text-[10px] font-medium text-gray-400 leading-tight block truncate" title={ch}>
                   {ch.split(':').pop()?.trim() || ch}
                 </span>
               </div>
@@ -62,9 +62,9 @@ export default function MasteryHeatmap({ students = [], chapters = [], cells = [
 
           {/* Student rows */}
           {students.map((student) => (
-            <div key={student.id} className="flex border-b border-white/[0.04] hover:bg-white/[0.02]">
-              <div className="w-44 shrink-0 sticky left-0 bg-[#0B0B0C] z-10 px-4 py-2.5 border-r border-white/[0.06] flex items-center gap-2">
-                <span className="text-sm font-medium text-white truncate">{student.name}</span>
+            <div key={student.id} className="flex border-b border-gray-100 hover:bg-gray-50">
+              <div className="w-44 shrink-0 sticky left-0 bg-white z-10 px-4 py-2.5 border-r border-gray-200 flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-900 truncate">{student.name}</span>
                 {(integrityFlags[student.id] || 0) > 3 && (
                   <span className="shrink-0" title={`${integrityFlags[student.id]} tab switches this week`}>
                     <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
@@ -83,14 +83,14 @@ export default function MasteryHeatmap({ students = [], chapters = [], cells = [
                     onMouseLeave={() => setTooltip(null)}
                     onClick={() => onCellClick?.(student.id, ch)}
                   >
-                    <div className={`w-8 h-8 rounded-lg ${getCellColor(cell)} transition-colors ${onCellClick ? 'cursor-pointer hover:ring-2 hover:ring-white/20' : 'cursor-default'}`} />
+                    <div className={`w-8 h-8 rounded-lg ${getCellColor(cell)} transition-colors ${onCellClick ? 'cursor-pointer hover:ring-2 hover:ring-gray-300' : 'cursor-default'}`} />
 
                     {/* Tooltip */}
                     {tooltip?.studentId === student.id && tooltip?.chapter === ch && cell && (
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-xl bg-white/[0.08] backdrop-blur-xl border border-white/[0.1] text-white text-xs whitespace-nowrap z-20 pointer-events-none shadow-lg">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs whitespace-nowrap z-20 pointer-events-none shadow-lg">
                         <p className="font-semibold">{cell.masteryLevel ? `${(cell.masteryLevel / 5 * 100).toFixed(0)}% mastery` : 'No score'}</p>
-                        <p className="text-white/40 mt-0.5">Last quiz: {formatDate(cell.lastQuizAt)}</p>
-                        <p className="text-white/40">Status: {cell.status}</p>
+                        <p className="text-gray-300 mt-0.5">Last quiz: {formatDate(cell.lastQuizAt)}</p>
+                        <p className="text-gray-300">Status: {cell.status}</p>
                       </div>
                     )}
                   </div>
@@ -102,23 +102,23 @@ export default function MasteryHeatmap({ students = [], chapters = [], cells = [
       </div>
 
       {/* Legend */}
-      <div className="px-4 py-3 border-t border-white/[0.06] flex items-center gap-4">
-        <span className="text-xs text-white/40 font-medium">Legend:</span>
+      <div className="px-4 py-3 border-t border-gray-100 flex items-center gap-4">
+        <span className="text-xs text-gray-400 font-medium">Legend:</span>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded bg-emerald-400" />
-          <span className="text-xs text-white/40">Mastered</span>
+          <span className="text-xs text-gray-400">Mastered</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded bg-amber-400" />
-          <span className="text-xs text-white/40">Learning</span>
+          <span className="text-xs text-gray-400">Learning</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded bg-red-400" />
-          <span className="text-xs text-white/40">Struggling</span>
+          <span className="text-xs text-gray-400">Struggling</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded bg-white/[0.06]" />
-          <span className="text-xs text-white/40">No data</span>
+          <div className="w-3 h-3 rounded bg-gray-200" />
+          <span className="text-xs text-gray-400">No data</span>
         </div>
       </div>
     </div>

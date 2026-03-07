@@ -243,8 +243,8 @@ function ChartDiagram({ config }) {
 
   if (!isReady || !isStable || !parsedConfig || !ChartComponent || !chartData) {
     return (
-      <div className="my-4 p-6 bg-neutral-50 border border-neutral-200 rounded-xl">
-        <div className="flex items-center gap-3 text-neutral-500">
+      <div className="my-4 p-6 bg-gray-50 border border-gray-200 rounded-xl">
+        <div className="flex items-center gap-3 text-gray-500">
           <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -372,25 +372,25 @@ function ChartDiagram({ config }) {
   const showPanControls = type !== 'bar';
 
   return (
-    <div className="my-4 bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm">
+    <div className="my-4 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
       <div className="flex">
         {/* Y slider on the left - vertical */}
         {showPanControls && (
-          <div className="flex flex-col items-center justify-center px-2 py-4 bg-neutral-50/50 border-r border-neutral-100">
-            <span className="text-xs text-neutral-500 mb-2">Y</span>
+          <div className="flex flex-col items-center justify-center px-2 py-4 bg-gray-50/50 border-r border-gray-100">
+            <span className="text-xs text-gray-500 mb-2">Y</span>
             <input
               type="range"
               min="-100"
               max="100"
               value={panY}
               onChange={(e) => setPanY(Number(e.target.value))}
-              className="h-48 w-1 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              className="h-48 w-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
               style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
             />
             {panY !== 0 && (
               <button
                 onClick={() => setPanY(0)}
-                className="text-xs text-neutral-400 hover:text-neutral-600 mt-2"
+                className="text-xs text-gray-400 hover:text-gray-600 mt-2"
               >
                 Reset
               </button>
@@ -408,20 +408,20 @@ function ChartDiagram({ config }) {
 
           {/* X slider at bottom - horizontal */}
           {showPanControls && (
-            <div className="px-4 pb-3 flex items-center gap-3 border-t border-neutral-100 pt-3 bg-neutral-50/50">
-              <span className="text-xs text-neutral-500">X</span>
+            <div className="px-4 pb-3 flex items-center gap-3 border-t border-gray-100 pt-3 bg-gray-50/50">
+              <span className="text-xs text-gray-500">X</span>
               <input
                 type="range"
                 min="-100"
                 max="100"
                 value={panX}
                 onChange={(e) => setPanX(Number(e.target.value))}
-                className="flex-1 h-1 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                className="flex-1 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
               />
               {panX !== 0 && (
                 <button
                   onClick={() => setPanX(0)}
-                  className="text-xs text-neutral-400 hover:text-neutral-600"
+                  className="text-xs text-gray-400 hover:text-gray-600"
                 >
                   Reset
                 </button>

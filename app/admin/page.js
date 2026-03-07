@@ -171,12 +171,12 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-neutral-900">
+      <div className="flex h-screen items-center justify-center bg-[#F5F5F7]">
         <div className="text-center">
           <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl flex items-center justify-center shadow-2xl mb-6 mx-auto animate-pulse">
-            <span className="text-3xl font-bold text-white">A</span>
+            <span className="text-3xl font-bold text-gray-900">A</span>
           </div>
-          <p className="text-neutral-300 font-medium text-lg">Loading admin dashboard...</p>
+          <p className="text-gray-600 font-medium text-lg">Loading admin dashboard...</p>
         </div>
       </div>
     );
@@ -185,18 +185,18 @@ export default function AdminDashboard() {
   if (!isAdmin) return null;
 
   return (
-    <div className="flex h-screen bg-neutral-900">
+    <div className="flex h-screen bg-[#F5F5F7]">
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-neutral-800 border-b border-neutral-700 px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
             <span className="text-sm font-bold text-white">A</span>
           </div>
-          <span className="text-white font-semibold">Admin Panel</span>
+          <span className="text-gray-900 font-semibold">Admin Panel</span>
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 text-neutral-400 hover:text-white transition-colors"
+          className="p-2 text-gray-500 hover:text-gray-900 transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {sidebarOpen ? (
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          className="md:hidden fixed inset-0 bg-gray-900/40 z-40"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -219,19 +219,19 @@ export default function AdminDashboard() {
       {/* Sidebar Navigation */}
       <div className={`
         fixed md:relative z-50 md:z-auto
-        w-64 bg-neutral-800 border-r border-neutral-700 flex flex-col
+        w-64 bg-white border-r border-gray-200 flex flex-col
         h-full md:h-screen
         transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        <div className="p-6 border-b border-neutral-700">
+        <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-lg font-bold text-white">A</span>
+              <span className="text-lg font-bold text-gray-900">A</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">Admin Panel</h1>
-              <p className="text-xs text-neutral-400">Newton AI</p>
+              <h1 className="text-lg font-bold text-gray-900">Admin Panel</h1>
+              <p className="text-xs text-gray-500">Newton AI</p>
             </div>
           </div>
      </div>
@@ -242,7 +242,7 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'overview'
                 ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,14 +256,14 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'users'
                 ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
             <span className="font-semibold">Users</span>
-            <span className="ml-auto bg-neutral-700 text-neutral-300 text-xs px-2 py-1 rounded-full">
+            <span className="ml-auto bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
               {users.filter(u => !u.is_admin && u.account_type !== 'teacher').length}
             </span>
           </button>
@@ -273,7 +273,7 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'conversations'
                 ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,7 +287,7 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'reports'
                 ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,7 +306,7 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'analytics'
                 ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,11 +316,11 @@ export default function AdminDashboard() {
           </button>
         </nav>
 
-        <div className="p-4 border-t border-neutral-700">
+        <div className="p-4 border-t border-gray-200">
           <Link
             href="/"
             onClick={() => setSidebarOpen(false)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 rounded-xl transition-all font-semibold"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all font-semibold"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -333,9 +333,9 @@ export default function AdminDashboard() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden pt-14 md:pt-0">
         {/* Header */}
-        <div className="bg-neutral-800 border-b border-neutral-700 px-4 md:px-8 py-4 md:py-6">
-          <h2 className="text-2xl font-bold text-white capitalize">{currentTab}</h2>
-          <p className="text-neutral-400 text-sm mt-1">
+        <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 md:py-6">
+          <h2 className="text-2xl font-bold text-gray-900 capitalize">{currentTab}</h2>
+          <p className="text-gray-500 text-sm mt-1">
             {currentTab === 'overview' && 'System overview and key metrics'}
             {currentTab === 'users' && 'Manage user accounts and permissions'}
             {currentTab === 'conversations' && 'Monitor all user conversations'}
@@ -345,71 +345,71 @@ export default function AdminDashboard() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-neutral-900 p-4 md:p-8">
+        <div className="flex-1 overflow-y-auto bg-[#F5F5F7] p-4 md:p-8">
           {currentTab === 'overview' && analytics && (
             <div className="max-w-7xl mx-auto space-y-6">
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6 hover:border-blue-600 transition-all">
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-blue-600 transition-all">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-neutral-400 text-sm font-medium">Total Users</p>
+                    <p className="text-gray-500 text-sm font-medium">Total Users</p>
                     <div className="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center">
                       <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     </div>
                   </div>
-                  <p className="text-3xl font-bold text-white">{analytics.overview.totalUsers}</p>
-                  <p className="text-xs text-neutral-500 mt-2">
+                  <p className="text-3xl font-bold text-gray-900">{analytics.overview.totalUsers}</p>
+                  <p className="text-xs text-gray-400 mt-2">
                     +{analytics.overview.newUsersLast30Days} in last 30 days
                   </p>
                 </div>
 
-                <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6 hover:border-green-600 transition-all">
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-green-600 transition-all">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-neutral-400 text-sm font-medium">Active Users</p>
+                    <p className="text-gray-500 text-sm font-medium">Active Users</p>
                     <div className="w-10 h-10 bg-green-600/20 rounded-xl flex items-center justify-center">
                       <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                     </div>
                   </div>
-                  <p className="text-3xl font-bold text-white">{analytics.overview.activeUsers}</p>
-                  <p className="text-xs text-neutral-500 mt-2">Last 7 days</p>
+                  <p className="text-3xl font-bold text-gray-900">{analytics.overview.activeUsers}</p>
+                  <p className="text-xs text-gray-400 mt-2">Last 7 days</p>
                 </div>
 
-                <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6 hover:border-purple-600 transition-all">
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-purple-600 transition-all">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-neutral-400 text-sm font-medium">Total Chats</p>
+                    <p className="text-gray-500 text-sm font-medium">Total Chats</p>
                     <div className="w-10 h-10 bg-purple-600/20 rounded-xl flex items-center justify-center">
                       <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </div>
                   </div>
-                  <p className="text-3xl font-bold text-white">{analytics.overview.totalChats}</p>
-                  <p className="text-xs text-neutral-500 mt-2">{analytics.overview.totalMessages} messages</p>
+                  <p className="text-3xl font-bold text-gray-900">{analytics.overview.totalChats}</p>
+                  <p className="text-xs text-gray-400 mt-2">{analytics.overview.totalMessages} messages</p>
                 </div>
 
-                <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6 hover:border-red-600 transition-all">
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-red-600 transition-all">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-neutral-400 text-sm font-medium">Reports</p>
+                    <p className="text-gray-500 text-sm font-medium">Reports</p>
                     <div className="w-10 h-10 bg-red-600/20 rounded-xl flex items-center justify-center">
                       <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     </div>
                   </div>
-                  <p className="text-3xl font-bold text-white">{analytics.overview.totalReports}</p>
-                  <p className="text-xs text-neutral-500 mt-2">Issues reported</p>
+                  <p className="text-3xl font-bold text-gray-900">{analytics.overview.totalReports}</p>
+                  <p className="text-xs text-gray-400 mt-2">Issues reported</p>
                 </div>
               </div>
 
               {/* Charts Row */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Subject Usage */}
-                <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Subject Usage</h3>
+                <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Subject Usage</h3>
                   <div className="space-y-3">
                     {Object.entries(analytics.subjectUsage)
                       .sort(([, a], [, b]) => b - a)
@@ -419,10 +419,10 @@ export default function AdminDashboard() {
                         return (
                           <div key={subject}>
                             <div className="flex justify-between text-sm mb-1">
-                              <span className="text-neutral-300 font-medium">{subject}</span>
-                              <span className="text-neutral-400">{count} chats ({percentage.toFixed(1)}%)</span>
+                              <span className="text-gray-700 font-medium">{subject}</span>
+                              <span className="text-gray-500">{count} chats ({percentage.toFixed(1)}%)</span>
                             </div>
-                            <div className="w-full bg-neutral-700 rounded-full h-2">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
                               <div
                                 className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-500"
                                 style={{ width: `${percentage}%` }}
@@ -435,8 +435,8 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Year Group Distribution */}
-                <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Year Group Distribution</h3>
+                <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Year Group Distribution</h3>
                   <div className="space-y-3">
                     {Object.entries(analytics.yearGroupDistribution)
                       .sort(([, a], [, b]) => b - a)
@@ -454,10 +454,10 @@ export default function AdminDashboard() {
                         return (
                           <div key={yearGroup}>
                             <div className="flex justify-between text-sm mb-1">
-                              <span className="text-neutral-300 font-medium">{yearLabels[yearGroup] || yearGroup}</span>
-                              <span className="text-neutral-400">{count} users ({percentage.toFixed(1)}%)</span>
+                              <span className="text-gray-700 font-medium">{yearLabels[yearGroup] || yearGroup}</span>
+                              <span className="text-gray-500">{count} users ({percentage.toFixed(1)}%)</span>
                             </div>
-                            <div className="w-full bg-neutral-700 rounded-full h-2">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
                               <div
                                 className="bg-gradient-to-r from-green-600 to-emerald-600 h-2 rounded-full transition-all duration-500"
                                 style={{ width: `${percentage}%` }}
@@ -471,16 +471,16 @@ export default function AdminDashboard() {
               </div>
 
               {/* Recent Activity */}
-              <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-white mb-4">Recent User Activity</h3>
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Recent User Activity</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-neutral-700">
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Email</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Year Group</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Chats</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Last Active</th>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Email</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Year Group</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Chats</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Last Active</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -488,11 +488,11 @@ export default function AdminDashboard() {
                         .sort((a, b) => new Date(b.lastLogin || 0) - new Date(a.lastLogin || 0))
                         .slice(0, 10)
                         .map((user, index) => (
-                          <tr key={index} className="border-b border-neutral-700/50 hover:bg-neutral-700/30 transition-colors">
-                            <td className="py-3 px-4 text-sm text-neutral-300">{user.email}</td>
-                            <td className="py-3 px-4 text-sm text-neutral-400">{user.yearGroup || 'Not set'}</td>
-                            <td className="py-3 px-4 text-sm text-neutral-400">{user.chatCount}</td>
-                            <td className="py-3 px-4 text-sm text-neutral-400">
+                          <tr key={index} className="border-b border-gray-200/50 hover:bg-gray-50 transition-colors">
+                            <td className="py-3 px-4 text-sm text-gray-700">{user.email}</td>
+                            <td className="py-3 px-4 text-sm text-gray-500">{user.yearGroup || 'Not set'}</td>
+                            <td className="py-3 px-4 text-sm text-gray-500">{user.chatCount}</td>
+                            <td className="py-3 px-4 text-sm text-gray-500">
                               {user.lastLogin
                                 ? new Date(user.lastLogin).toLocaleDateString()
                                 : 'Never'}
@@ -516,16 +516,16 @@ export default function AdminDashboard() {
                     placeholder="Search users by email..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 pl-11 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:border-blue-600 transition-all"
+                    className="w-full px-4 py-3 pl-11 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-600 transition-all"
                   />
-                  <svg className="w-5 h-5 text-neutral-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <select
                   value={filterYearGroup}
                   onChange={(e) => setFilterYearGroup(e.target.value)}
-                  className="w-full sm:w-auto px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white focus:outline-none focus:border-blue-600 transition-all"
+                  className="w-full sm:w-auto px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:border-blue-600 transition-all"
                 >
                   <option value="all">All Year Groups</option>
                   <option value="year7">Year 7</option>
@@ -539,18 +539,18 @@ export default function AdminDashboard() {
               </div>
 
               {/* Users Table */}
-              <div className="bg-neutral-800 border border-neutral-700 rounded-2xl overflow-hidden">
+              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-neutral-700/50">
+                    <thead className="bg-gray-50">
                       <tr>
-                        <th className="text-left py-4 px-6 text-sm font-semibold text-neutral-300">User</th>
-                        <th className="text-left py-4 px-6 text-sm font-semibold text-neutral-300">Year Group</th>
-                        <th className="text-left py-4 px-6 text-sm font-semibold text-neutral-300">Chats</th>
-                        <th className="text-left py-4 px-6 text-sm font-semibold text-neutral-300">Created</th>
-                        <th className="text-left py-4 px-6 text-sm font-semibold text-neutral-300">Last Active</th>
-                        <th className="text-left py-4 px-6 text-sm font-semibold text-neutral-300">Status</th>
-                        <th className="text-right py-4 px-6 text-sm font-semibold text-neutral-300">Actions</th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">User</th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Year Group</th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Chats</th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Created</th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Last Active</th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-gray-600">Status</th>
+                        <th className="text-right py-4 px-6 text-sm font-semibold text-gray-600">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -560,26 +560,26 @@ export default function AdminDashboard() {
                           : 0;
                         
                         return (
-                          <tr key={user.id} className="border-t border-neutral-700 hover:bg-neutral-700/30 transition-colors">
+                          <tr key={user.id} className="border-t border-gray-200 hover:bg-gray-50 transition-colors">
                             <td className="py-4 px-6">
                               <div>
-                                <p className="text-sm font-medium text-white">{user.email}</p>
-                                <p className="text-xs text-neutral-500">{user.id.substring(0, 8)}</p>
+                                <p className="text-sm font-medium text-gray-900">{user.email}</p>
+                                <p className="text-xs text-gray-400">{user.id.substring(0, 8)}</p>
                               </div>
                             </td>
                             <td className="py-4 px-6">
-                              <span className="text-sm text-neutral-300">{user.year_group || 'Not set'}</span>
+                              <span className="text-sm text-gray-700">{user.year_group || 'Not set'}</span>
                             </td>
                             <td className="py-4 px-6">
-                              <span className="text-sm text-neutral-300">{chatCount}</span>
+                              <span className="text-sm text-gray-700">{chatCount}</span>
                             </td>
                             <td className="py-4 px-6">
-                              <span className="text-sm text-neutral-400">
+                              <span className="text-sm text-gray-500">
                                 {new Date(user.created_at).toLocaleDateString()}
                               </span>
                             </td>
                             <td className="py-4 px-6">
-                              <span className="text-sm text-neutral-400">
+                              <span className="text-sm text-gray-500">
                                 {user.last_login
                                   ? new Date(user.last_login).toLocaleDateString()
                                   : 'Never'}
@@ -644,10 +644,10 @@ export default function AdminDashboard() {
           {currentTab === 'conversations' && (
             <div className="flex flex-col lg:flex-row h-full gap-4 lg:gap-6">
               {/* Accordion Sidebar */}
-              <div className="w-full lg:w-72 flex-shrink-0 bg-neutral-800 border border-neutral-700 rounded-2xl p-3 overflow-y-auto max-h-[70vh]">
+              <div className="w-full lg:w-72 flex-shrink-0 bg-white border border-gray-200 rounded-2xl p-3 overflow-y-auto max-h-[70vh]">
                 {/* Search */}
                 <div className="relative mb-3">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                   <input
@@ -655,7 +655,7 @@ export default function AdminDashboard() {
                     placeholder="Search users..."
                     value={convSearch}
                     onChange={(e) => setConvSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded-xl text-sm text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
@@ -683,7 +683,7 @@ export default function AdminDashboard() {
                             }
                           }}
                           className={`w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all ${
-                            isOpen ? 'bg-blue-600 text-white' : 'text-neutral-300 hover:bg-neutral-700'
+                            isOpen ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                           }`}
                         >
                           <svg className={`w-3 h-3 flex-shrink-0 transition-transform ${isOpen ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
@@ -714,7 +714,7 @@ export default function AdminDashboard() {
                                       }
                                     }}
                                     className={`w-full flex items-center gap-2 p-1.5 rounded-lg text-left transition-all ${
-                                      subOpen ? 'bg-blue-500/30 text-blue-300' : 'text-neutral-400 hover:bg-neutral-700/50'
+                                      subOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'
                                     }`}
                                   >
                                     <svg className={`w-2.5 h-2.5 flex-shrink-0 transition-transform ${subOpen ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
@@ -734,7 +734,7 @@ export default function AdminDashboard() {
                                           className={`w-full p-1.5 rounded-lg text-left transition-all ${
                                             selectedChat?.id === chat.id
                                               ? 'bg-blue-600 text-white'
-                                              : 'text-neutral-400 hover:bg-neutral-700/50'
+                                              : 'text-gray-500 hover:bg-gray-100'
                                           }`}
                                         >
                                           <p className="text-xs line-clamp-1">{chat.messages[0]?.content?.substring(0, 50)}...</p>
@@ -755,18 +755,18 @@ export default function AdminDashboard() {
               </div>
 
               {/* Chat Viewer */}
-              <div className="flex-1 bg-neutral-800 border border-neutral-700 rounded-2xl flex flex-col min-h-[400px] lg:min-h-0">
+              <div className="flex-1 bg-white border border-gray-200 rounded-2xl flex flex-col min-h-[400px] lg:min-h-0">
                 {selectedChat ? (
                   <>
-                    <div className="p-6 border-b border-neutral-700">
-                      <h3 className="text-lg font-bold text-white">
+                    <div className="p-6 border-b border-gray-200">
+                      <h3 className="text-lg font-bold text-gray-900">
                         {selectedUser.email} - {selectedSubject}
                       </h3>
-                      <p className="text-sm text-neutral-400">
+                      <p className="text-sm text-gray-500">
                         {selectedChat.messages.length} messages • {new Date(selectedChat.date).toLocaleString()}
                       </p>
-                      <div className="mt-3 bg-yellow-900/30 border border-yellow-600/30 rounded-lg p-3">
-                        <p className="text-xs text-yellow-400 font-medium">
+                      <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                        <p className="text-xs text-amber-700 font-medium">
                           ⚠️ Read-only mode: Viewing as admin
                         </p>
                       </div>
@@ -782,7 +782,7 @@ export default function AdminDashboard() {
   className={`max-w-[90%] rounded-2xl p-5 ${
                               message.role === 'user'
                                 ? 'bg-blue-600 text-white'
-                                : 'bg-neutral-700 text-neutral-100'
+                                : 'bg-gray-100 text-gray-800'
                             }`}
                           >
                             <div className="prose prose-invert prose-sm max-w-none">
@@ -800,8 +800,8 @@ export default function AdminDashboard() {
                   </>
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center text-neutral-500">
-                      <svg className="w-16 h-16 mx-auto mb-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="text-center text-gray-400">
+                      <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                       <p className="font-medium">Select a conversation</p>
@@ -816,16 +816,16 @@ export default function AdminDashboard() {
           {currentTab === 'reports' && (
             <div className="max-w-5xl mx-auto space-y-4">
               {reports.length === 0 ? (
-                <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-12 text-center">
-                  <svg className="w-16 h-16 mx-auto mb-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <h3 className="text-lg font-bold text-white mb-2">No Reports</h3>
-                  <p className="text-neutral-400">No issues have been reported by users yet.</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">No Reports</h3>
+                  <p className="text-gray-500">No issues have been reported by users yet.</p>
                 </div>
               ) : (
                 reports.map((report, index) => (
-                  <div key={index} className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6 hover:border-red-600/50 transition-all">
+                  <div key={index} className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-red-600/50 transition-all">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-red-600/20 rounded-xl flex items-center justify-center">
@@ -834,27 +834,27 @@ export default function AdminDashboard() {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-white">Report #{reports.length - index}</p>
-                          <p className="text-xs text-neutral-400">
+                          <p className="text-sm font-medium text-gray-900">Report #{reports.length - index}</p>
+                          <p className="text-xs text-gray-500">
                             {report.user_email} • {report.year_group}
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs text-neutral-500">
+                      <span className="text-xs text-gray-400">
                         {new Date(report.created_at).toLocaleString()}
                       </span>
                     </div>
                     
                     <div className="space-y-3">
-                      <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-4">
-                        <p className="text-xs font-semibold text-neutral-500 mb-2">Issue Description:</p>
-                        <p className="text-sm text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                      <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                        <p className="text-xs font-semibold text-gray-500 mb-2">Issue Description:</p>
+                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                           {report.issue}
                         </p>
                       </div>
 
                       {report.chat_context && (
-                        <div className="bg-neutral-900 border border-blue-700/50 rounded-xl p-4">
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                           <p className="text-xs font-semibold text-blue-400 mb-3 flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -863,7 +863,7 @@ export default function AdminDashboard() {
                           </p>
                           <div className="space-y-2 max-h-60 overflow-y-auto">
                             {JSON.parse(report.chat_context).messages.map((msg, i) => (
-                              <div key={i} className={`p-2 rounded text-xs ${msg.role === 'user' ? 'bg-blue-900/30 text-blue-200' : 'bg-neutral-800 text-neutral-400'}`}>
+                              <div key={i} className={`p-2 rounded text-xs ${msg.role === 'user' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>
                                 <span className="font-semibold">{msg.role === 'user' ? 'Student' : 'Newton'}:</span> {msg.content.substring(0, 200)}{msg.content.length > 200 ? '...' : ''}
                               </div>
                             ))}
@@ -872,7 +872,7 @@ export default function AdminDashboard() {
                       )}
 
                       {report.screenshot && (
-                        <div className="bg-neutral-900 border border-purple-700/50 rounded-xl p-4">
+                        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
                           <p className="text-xs font-semibold text-purple-400 mb-3 flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -882,7 +882,7 @@ export default function AdminDashboard() {
                           <img 
                             src={report.screenshot} 
                             alt="Issue screenshot" 
-                            className="w-full rounded-lg border border-neutral-700"
+                            className="w-full rounded-lg border border-gray-200"
                           />
                         </div>
                       )}
@@ -895,60 +895,60 @@ export default function AdminDashboard() {
 
           {currentTab === 'analytics' && analytics && (
             <div className="max-w-7xl mx-auto space-y-6">
-              <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-white mb-4">Detailed Statistics</h3>
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Detailed Statistics</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div>
-                    <p className="text-2xl font-bold text-white">{analytics.overview.totalUsers}</p>
-                    <p className="text-sm text-neutral-400">Total Users</p>
+                    <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalUsers}</p>
+                    <p className="text-sm text-gray-500">Total Users</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{analytics.overview.activeUsers}</p>
-                    <p className="text-sm text-neutral-400">Active Users (7d)</p>
+                    <p className="text-2xl font-bold text-gray-900">{analytics.overview.activeUsers}</p>
+                    <p className="text-sm text-gray-500">Active Users (7d)</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{analytics.overview.totalChats}</p>
-                    <p className="text-sm text-neutral-400">Total Chats</p>
+                    <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalChats}</p>
+                    <p className="text-sm text-gray-500">Total Chats</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{analytics.overview.totalMessages}</p>
-                    <p className="text-sm text-neutral-400">Total Messages</p>
+                    <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalMessages}</p>
+                    <p className="text-sm text-gray-500">Total Messages</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-gray-900">
                       {analytics.overview.totalMessages > 0
                         ? (analytics.overview.totalMessages / analytics.overview.totalChats).toFixed(1)
                         : '0'}
                     </p>
-                    <p className="text-sm text-neutral-400">Avg Messages/Chat</p>
+                    <p className="text-sm text-gray-500">Avg Messages/Chat</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-gray-900">
                       {analytics.overview.totalUsers > 0
                         ? (analytics.overview.totalChats / analytics.overview.totalUsers).toFixed(1)
                         : '0'}
                     </p>
-                    <p className="text-sm text-neutral-400">Avg Chats/User</p>
+                    <p className="text-sm text-gray-500">Avg Chats/User</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">{analytics.overview.totalReports}</p>
-                    <p className="text-sm text-neutral-400">Issues Reported</p>
+                    <p className="text-2xl font-bold text-gray-900">{analytics.overview.totalReports}</p>
+                    <p className="text-sm text-gray-500">Issues Reported</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-gray-900">
                       {analytics.overview.totalUsers > 0
                         ? ((analytics.overview.activeUsers / analytics.overview.totalUsers) * 100).toFixed(0)
                         : '0'}%
                     </p>
-                    <p className="text-sm text-neutral-400">Active Rate</p>
+                    <p className="text-sm text-gray-500">Active Rate</p>
                   </div>
                 </div>
               </div>
 
               {/* All users table for export */}
-              <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-white">All Users Data</h3>
+                  <h3 className="text-lg font-bold text-gray-900">All Users Data</h3>
                   <button
                     onClick={() => {
                       const csv = [
@@ -979,25 +979,25 @@ export default function AdminDashboard() {
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b border-neutral-700">
+                    <thead className="border-b border-gray-200">
                       <tr>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Email</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Year Group</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Chats</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Created</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-400">Last Active</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Email</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Year Group</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Chats</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Created</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Last Active</th>
                       </tr>
                     </thead>
                     <tbody>
                       {analytics.users.map((user, index) => (
-                        <tr key={index} className="border-b border-neutral-700/50 hover:bg-neutral-700/30 transition-colors">
-                          <td className="py-3 px-4 text-sm text-neutral-300">{user.email}</td>
-                          <td className="py-3 px-4 text-sm text-neutral-400">{user.yearGroup || 'Not set'}</td>
-                          <td className="py-3 px-4 text-sm text-neutral-400">{user.chatCount}</td>
-                          <td className="py-3 px-4 text-sm text-neutral-400">
+                        <tr key={index} className="border-b border-gray-200/50 hover:bg-gray-50 transition-colors">
+                          <td className="py-3 px-4 text-sm text-gray-700">{user.email}</td>
+                          <td className="py-3 px-4 text-sm text-gray-500">{user.yearGroup || 'Not set'}</td>
+                          <td className="py-3 px-4 text-sm text-gray-500">{user.chatCount}</td>
+                          <td className="py-3 px-4 text-sm text-gray-500">
                             {new Date(user.createdAt).toLocaleDateString()}
                           </td>
-                          <td className="py-3 px-4 text-sm text-neutral-400">
+                          <td className="py-3 px-4 text-sm text-gray-500">
                             {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
                           </td>
                         </tr>

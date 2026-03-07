@@ -29,10 +29,10 @@ export default function WelcomeCard({ subjectCount = 0, quizStats = {}, streak =
   return (
     <div className="p-5 lg:p-6 h-full flex flex-col">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-neutral-100 tracking-tight">
+        <h2 className="text-xl font-bold text-gray-900 tracking-tight">
           Welcome back
         </h2>
-        <p className="text-sm text-neutral-400 mt-1">
+        <p className="text-sm text-gray-500 mt-1">
           Pick up where you left off.
         </p>
       </div>
@@ -41,12 +41,12 @@ export default function WelcomeCard({ subjectCount = 0, quizStats = {}, streak =
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="bg-white/[0.04] border border-white/[0.06] rounded-xl p-3 flex flex-col justify-between min-w-[120px] snap-start shrink-0 sm:shrink sm:min-w-0"
+            className="bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col justify-between min-w-[120px] snap-start shrink-0 sm:shrink sm:min-w-0"
           >
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">
               {stat.label}
             </p>
-            <p className="text-2xl font-bold text-neutral-100 mt-1 tabular-nums">
+            <p className="text-2xl font-bold text-gray-900 mt-1 tabular-nums">
               <AnimatedNumber value={stat.value} />
               {stat.suffix}
             </p>

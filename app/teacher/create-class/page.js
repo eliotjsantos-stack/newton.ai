@@ -22,7 +22,7 @@ const DRAFT_KEY = 'newton-class-draft';
 function Tooltip({ text }) {
   return (
     <span className="group relative ml-1.5 inline-flex">
-      <svg className="w-3.5 h-3.5 text-white/30 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-3.5 h-3.5 text-gray-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
@@ -162,7 +162,7 @@ export default function CreateClassPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <div className="w-8 h-8 border-[3px] border-white/20 border-t-white/60 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-gray-200 border-t-gray-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -172,25 +172,25 @@ export default function CreateClassPage() {
   if (success) {
     return (
       <div className="max-w-lg mx-auto py-16 text-center">
-        <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+        <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
         </div>
-        <h1 className="text-2xl font-semibold text-white mb-1">Class Created</h1>
-        <p className="text-sm text-white/40 mb-8">Share this code with your students so they can join.</p>
+        <h1 className="text-2xl font-semibold text-gray-900 mb-1">Class Created</h1>
+        <p className="text-sm text-gray-500 mb-8">Share this code with your students so they can join.</p>
 
-        <div className="bg-white/[0.05] border border-white/[0.06] rounded-2xl p-8 mb-6">
-          <p className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-3">Class Code</p>
-          <div className="text-4xl font-mono font-bold text-white tracking-widest mb-5">{success.classCode}</div>
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-6 shadow-sm">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Class Code</p>
+          <div className="text-4xl font-mono font-bold text-gray-900 tracking-widest mb-5">{success.classCode}</div>
           <div className="flex gap-3 justify-center">
             <button
               onClick={copyCode}
-              className="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ED] text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
             >
               {copied ? 'Copied!' : 'Copy Code'}
             </button>
             <button
               onClick={printCode}
-              className="px-4 py-2 bg-white/[0.05] border border-white/[0.06] hover:bg-white/[0.08] text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
             >
               Print
             </button>
@@ -200,13 +200,13 @@ export default function CreateClassPage() {
         <div className="flex gap-3 justify-center">
           <Link
             href={`/teacher/class/${success.classId}`}
-            className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ED] text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
           >
             Go to Class
           </Link>
           <Link
             href="/teacher/classes"
-            className="px-5 py-2.5 bg-white/[0.05] border border-white/[0.06] hover:bg-white/[0.08] text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-5 py-2.5 bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
           >
             My Classes
           </Link>
@@ -215,55 +215,55 @@ export default function CreateClassPage() {
     );
   }
 
-  const inputCls = "w-full px-3 py-2 bg-white/[0.05] border border-white/[0.06] rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#0071e3] focus:border-transparent transition-all placeholder:text-white/20";
+  const inputCls = "w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all placeholder:text-gray-400";
 
   return (
     <div className="max-w-2xl">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-white/40 mb-6">
-        <Link href="/teacher/classes" className="hover:text-white transition-colors">My Classes</Link>
-        <svg className="w-4 h-4 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-        <span className="text-white font-medium">Create Class</span>
+      <nav className="flex items-center gap-1.5 text-sm text-gray-500 mb-6">
+        <Link href="/teacher/classes" className="hover:text-gray-900 transition-colors">My Classes</Link>
+        <svg className="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        <span className="text-gray-900 font-medium">Create Class</span>
       </nav>
 
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-white">Create a New Class</h1>
-        <p className="text-sm text-white/40 mt-1">Set up your class details and share the code with students.</p>
+        <h1 className="text-2xl font-semibold text-gray-900">Create a New Class</h1>
+        <p className="text-sm text-gray-500 mt-1">Set up your class details and share the code with students.</p>
       </div>
 
       {error && (
-        <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start gap-2">
-          <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+          <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* CLASS BASICS */}
-        <section className="bg-white/[0.05] border border-white/[0.06] rounded-2xl p-6">
+        <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-7 h-7 bg-blue-500/10 text-blue-400 rounded-md flex items-center justify-center text-xs font-semibold">1</div>
-            <h2 className="text-base font-semibold text-white">Class Basics</h2>
+            <div className="w-7 h-7 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center text-xs font-semibold">1</div>
+            <h2 className="text-base font-semibold text-gray-900">Class Basics</h2>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
-                Class Name <span className="text-red-400">*</span>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Class Name <span className="text-red-500">*</span>
                 <Tooltip text="A descriptive name students will see" />
               </label>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)}
                 placeholder='e.g. "Year 9 Set 1 - Mathematics"' className={inputCls} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
-                Subject <span className="text-red-400">*</span>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Subject <span className="text-red-500">*</span>
                 <Tooltip text="Type any subject — Maths, Drama, Latin, etc." />
               </label>
               <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)}
                 placeholder="e.g. Mathematics, Drama, Latin, RS..." className={inputCls} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">Year Group <span className="text-red-400">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Year Group <span className="text-red-500">*</span></label>
               <select value={yearGroup} onChange={(e) => setYearGroup(e.target.value)} className={inputCls}>
                 {YEAR_GROUPS.map(({ value, label }) => (
                   <option key={value} value={value}>{label}</option>
@@ -272,7 +272,7 @@ export default function CreateClassPage() {
             </div>
             {['year10', 'year11', 'year12', 'year13'].includes(yearGroup) && (
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Exam Board & Specification
                   <Tooltip text="Links this class to a specific syllabus for AI grounding" />
                 </label>
@@ -282,13 +282,13 @@ export default function CreateClassPage() {
                   levelFilter={['year10', 'year11'].includes(yearGroup) ? 2 : 3}
                   placeholder={['year10', 'year11'].includes(yearGroup) ? 'Search GCSE specifications...' : 'Search A-Level specifications...'}
                 />
-                <p className="text-xs text-white/40 mt-1.5">
+                <p className="text-xs text-gray-500 mt-1.5">
                   This ensures Newton teaches to the correct specification when students chat in this class.
                 </p>
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Description
                 <Tooltip text="Optional overview of what students will learn" />
               </label>
@@ -300,38 +300,38 @@ export default function CreateClassPage() {
         </section>
 
         {/* CUSTOMISATION */}
-        <section className="bg-white/[0.05] border border-white/[0.06] rounded-2xl p-6">
+        <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-7 h-7 bg-purple-500/10 text-purple-400 rounded-md flex items-center justify-center text-xs font-semibold">2</div>
-            <h2 className="text-base font-semibold text-white">Customisation</h2>
+            <div className="w-7 h-7 bg-purple-50 text-purple-600 rounded-md flex items-center justify-center text-xs font-semibold">2</div>
+            <h2 className="text-base font-semibold text-gray-900">Customisation</h2>
           </div>
           <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-2.5">
+              <label className="block text-sm font-medium text-gray-700 mb-2.5">
                 Class Colour
                 <Tooltip text="Used for visual distinction between classes" />
               </label>
               <div className="flex gap-2.5 flex-wrap">
                 {CLASS_COLORS.map(c => (
                   <button key={c} type="button" onClick={() => setColor(c)}
-                    className={`w-9 h-9 rounded-lg transition-all ${color === c ? 'ring-2 ring-[#0071e3] ring-offset-2 ring-offset-[#0B0B0C] scale-110' : 'hover:scale-105'}`}
+                    className={`w-9 h-9 rounded-lg transition-all ${color === c ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-white scale-110' : 'hover:scale-105'}`}
                     style={{ backgroundColor: c }} />
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-2.5">Class Icon</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2.5">Class Icon</label>
               <div className="flex gap-2 flex-wrap">
                 {CLASS_ICON_KEYS.map(key => (
                   <button key={key} type="button" onClick={() => setIcon(key)}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${icon === key ? 'bg-white/[0.08] ring-2 ring-[#0071e3] ring-offset-1 ring-offset-[#0B0B0C]' : 'bg-white/[0.03] hover:bg-white/[0.06]'}`}>
-                    <ClassIcon name={key} size={20} className="text-white/60" />
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${icon === key ? 'bg-blue-50 ring-2 ring-blue-500 ring-offset-1 ring-offset-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                    <ClassIcon name={key} size={20} className="text-gray-600" />
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Welcome Message
                 <Tooltip text="Shown to students when they first join" />
               </label>
@@ -343,38 +343,38 @@ export default function CreateClassPage() {
         </section>
 
         {/* SETTINGS */}
-        <section className="bg-white/[0.05] border border-white/[0.06] rounded-2xl p-6">
+        <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-7 h-7 bg-green-500/10 text-green-400 rounded-md flex items-center justify-center text-xs font-semibold">3</div>
-            <h2 className="text-base font-semibold text-white">Settings</h2>
+            <div className="w-7 h-7 bg-emerald-50 text-emerald-600 rounded-md flex items-center justify-center text-xs font-semibold">3</div>
+            <h2 className="text-base font-semibold text-gray-900">Settings</h2>
           </div>
           <div className="space-y-4">
             <div className="flex items-center justify-between py-1">
               <div>
-                <p className="text-sm font-medium text-white/70">Students can see classmates</p>
-                <p className="text-xs text-white/40 mt-0.5">Allow students to see who else is in the class</p>
+                <p className="text-sm font-medium text-gray-700">Students can see classmates</p>
+                <p className="text-xs text-gray-500 mt-0.5">Allow students to see who else is in the class</p>
               </div>
               <button type="button" onClick={() => setShowClassmates(!showClassmates)}
-                className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${showClassmates ? 'bg-[#0071e3]' : 'bg-white/[0.1]'}`}>
-                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${showClassmates ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
+                className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${showClassmates ? 'bg-blue-600' : 'bg-gray-200'}`}>
+                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${showClassmates ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
               </button>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Max Capacity <Tooltip text="Leave blank for unlimited" />
               </label>
               <input type="number" value={maxCapacity} onChange={(e) => setMaxCapacity(e.target.value)}
                 placeholder="e.g. 30" min="1" className={inputCls} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Class Schedule <Tooltip text="When does this class meet?" />
               </label>
               <input type="text" value={schedule} onChange={(e) => setSchedule(e.target.value)}
                 placeholder="e.g. Mon/Wed 9-10am" className={inputCls} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Archive Date <Tooltip text="Class will be archived after this date" />
               </label>
               <input type="date" value={archiveDate} onChange={(e) => setArchiveDate(e.target.value)} className={inputCls} />
@@ -383,30 +383,30 @@ export default function CreateClassPage() {
         </section>
 
         {/* PREVIEW & SUBMIT */}
-        <section className="bg-white/[0.05] border border-white/[0.06] rounded-2xl p-6">
+        <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-7 h-7 bg-amber-500/10 text-amber-400 rounded-md flex items-center justify-center text-xs font-semibold">4</div>
-            <h2 className="text-base font-semibold text-white">Review & Create</h2>
+            <div className="w-7 h-7 bg-amber-50 text-amber-600 rounded-md flex items-center justify-center text-xs font-semibold">4</div>
+            <h2 className="text-base font-semibold text-gray-900">Review & Create</h2>
           </div>
           {/* Preview card */}
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg p-5 mb-6">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-6">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + '15', color }}>
                 <ClassIcon name={icon} size={24} />
               </div>
               <div className="min-w-0">
-                <h3 className="font-semibold text-white truncate">{name || 'Class Name'}</h3>
-                <p className="text-sm text-white/40">{subject || 'Subject'} · {YEAR_GROUPS.find(y => y.value === yearGroup)?.label}</p>
-                {description && <p className="text-sm text-white/40 mt-1 line-clamp-2">{description}</p>}
+                <h3 className="font-semibold text-gray-900 truncate">{name || 'Class Name'}</h3>
+                <p className="text-sm text-gray-500">{subject || 'Subject'} · {YEAR_GROUPS.find(y => y.value === yearGroup)?.label}</p>
+                {description && <p className="text-sm text-gray-500 mt-1 line-clamp-2">{description}</p>}
               </div>
             </div>
           </div>
 
           <button type="submit" disabled={submitting || !name.trim() || !subject.trim()}
-            className="w-full py-2.5 bg-[#0071e3] hover:bg-[#0077ED] disabled:bg-white/[0.1] disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors">
+            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors">
             {submitting ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-blue-300 border-t-white rounded-full animate-spin" />
                 Creating Class...
               </span>
             ) : 'Create Class'}

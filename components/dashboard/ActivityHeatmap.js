@@ -63,8 +63,8 @@ export default function ActivityHeatmap({ activity = {}, streak = 0 }) {
     <div className="p-5 lg:p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-neutral-100">Study Activity</h3>
-          <p className="text-xs text-neutral-500 mt-0.5">Last 6 months</p>
+          <h3 className="text-sm font-semibold text-gray-900">Study Activity</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Last 6 months</p>
         </div>
         {streak > 0 && (
           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-violet-500/10 border border-violet-500/20 rounded-lg">
@@ -86,7 +86,7 @@ export default function ActivityHeatmap({ activity = {}, streak = 0 }) {
               key={i}
               x={LABEL_W + l.week * (CELL + GAP)}
               y={10}
-              className="fill-neutral-500"
+              className="fill-gray-400"
               fontSize="9"
               fontFamily="var(--font-geist-sans)"
             >
@@ -101,7 +101,7 @@ export default function ActivityHeatmap({ activity = {}, streak = 0 }) {
                 key={i}
                 x={0}
                 y={20 + i * (CELL + GAP) + CELL - 2}
-                className="fill-neutral-500"
+                className="fill-gray-400"
                 fontSize="9"
                 fontFamily="var(--font-geist-sans)"
               >
@@ -141,7 +141,7 @@ export default function ActivityHeatmap({ activity = {}, streak = 0 }) {
         {/* Tooltip */}
         {tooltip && (
           <div
-            className="absolute pointer-events-none z-10 px-2.5 py-1.5 bg-white/10 backdrop-blur-xl border border-white/10 text-neutral-100 text-[10px] font-medium rounded-lg shadow-xl whitespace-nowrap"
+            className="absolute pointer-events-none z-10 px-2.5 py-1.5 bg-gray-800 border border-gray-700 text-gray-100 text-[10px] font-medium rounded-lg shadow-xl whitespace-nowrap"
             style={{
               left: tooltip.x,
               top: tooltip.y,
@@ -149,14 +149,14 @@ export default function ActivityHeatmap({ activity = {}, streak = 0 }) {
             }}
           >
             <span className="font-semibold">{tooltip.count} {tooltip.count === 1 ? 'action' : 'actions'}</span>
-            <span className="text-neutral-400 ml-1.5">{tooltip.date}</span>
+            <span className="text-gray-300 ml-1.5">{tooltip.date}</span>
           </div>
         )}
       </div>
 
       {/* Legend */}
       <div className="flex items-center gap-1.5 mt-3 justify-end">
-        <span className="text-[10px] text-neutral-500">Less</span>
+        <span className="text-[10px] text-gray-500">Less</span>
         {[0, 2, 5, 10, 15].map((v) => (
           <div
             key={v}
@@ -164,7 +164,7 @@ export default function ActivityHeatmap({ activity = {}, streak = 0 }) {
             style={{ backgroundColor: getColor(v) }}
           />
         ))}
-        <span className="text-[10px] text-neutral-500">More</span>
+        <span className="text-[10px] text-gray-500">More</span>
       </div>
     </div>
   );

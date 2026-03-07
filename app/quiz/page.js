@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ClassIcon } from '@/components/ClassIcons';
 import NavigationDock from '@/components/NavigationDock';
 
-const cardBase = "bg-[#0d0d0d] border border-white/10 rounded-2xl transition-colors duration-200";
+const cardBase = "bg-white border border-gray-200 rounded-2xl transition-colors duration-200";
 
 export default function QuizHub() {
   const router = useRouter();
@@ -218,14 +218,14 @@ export default function QuizHub() {
   const recentSubjects = [...new Set(quizzes.slice(0, 5).map(q => q.subject).filter(Boolean))];
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[#F5F5F7]">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-black">
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white tracking-tight">Quizzes</h1>
+          <h1 className="text-xl font-bold text-gray-900 tracking-tight">Quizzes</h1>
           <button
             onClick={() => setShowNewQuiz(true)}
-            className="px-4 py-2 bg-[#0071e3] text-white text-sm font-semibold rounded-full hover:bg-[#0077ed] transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors"
           >
             + New
           </button>
@@ -238,13 +238,13 @@ export default function QuizHub() {
             <div className="grid grid-cols-2 gap-4">
               {[1, 2].map(i => (
                 <div key={i} className={`${cardBase} p-6 animate-pulse`}>
-                  <div className="h-8 w-12 bg-white/[0.06] rounded mb-2" />
-                  <div className="h-3 w-20 bg-white/[0.06] rounded" />
+                  <div className="h-8 w-12 bg-gray-200 rounded mb-2" />
+                  <div className="h-3 w-20 bg-gray-200 rounded" />
                 </div>
               ))}
             </div>
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-16 bg-white/[0.03] rounded-xl animate-pulse" />
+              <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
             ))}
           </div>
         ) : (
@@ -252,18 +252,18 @@ export default function QuizHub() {
             {/* ── Top Stats ── */}
             <div className="grid grid-cols-2 gap-4">
               <div className={`${cardBase} p-6`}>
-                <p className="text-3xl font-bold text-white tracking-tight">
+                <p className="text-3xl font-bold text-gray-900 tracking-tight">
                   {streak > 0 ? `${streak}` : '0'}
                 </p>
-                <p className="text-sm text-white/40 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   {streak > 0 ? `Active for ${streak} consecutive day${streak !== 1 ? 's' : ''}` : 'Day streak'}
                 </p>
               </div>
               <div className={`${cardBase} p-6`}>
-                <p className="text-3xl font-bold text-white tracking-tight">
+                <p className="text-3xl font-bold text-gray-900 tracking-tight">
                   {stats?.completed || 0}
                 </p>
-                <p className="text-sm text-white/40 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   Quizzes taken{stats?.averageScore != null ? ` \u00b7 ${Math.round(stats.averageScore)}% avg` : ''}
                 </p>
               </div>
@@ -276,16 +276,16 @@ export default function QuizHub() {
                 setNewQuizTopic('Full Paper Simulation');
                 setShowNewQuiz(true);
               }}
-              className="w-full rounded-2xl p-5 bg-white text-black border border-white/20 hover:bg-white/90 transition-colors text-left group"
+              className="w-full rounded-2xl p-5 bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 transition-colors text-left group"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.15em] text-black/40 mb-1">Exam Simulator</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.15em] text-gray-400 mb-1">Exam Simulator</p>
                   <p className="text-base font-bold tracking-tight">
                     Simulate {activeClasses[0]?.subject ? `${activeClasses[0].subject}` : 'Your'} 2026 Paper
                   </p>
                 </div>
-                <svg className="w-5 h-5 text-black/30 group-hover:text-black/60 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <svg className="w-5 h-5 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                 </svg>
               </div>
@@ -294,7 +294,7 @@ export default function QuizHub() {
             {/* ── Refresher Missions (Spaced Repetition) ── */}
             {refresherMissions.length > 0 && (
               <div>
-                <h2 className="text-sm font-semibold text-amber-400/60 uppercase tracking-wider mb-4">Retention Checks</h2>
+                <h2 className="text-sm font-semibold text-amber-600 uppercase tracking-wider mb-4">Retention Checks</h2>
                 <div className="space-y-2">
                   {refresherMissions.map((rm) => (
                     <button
@@ -311,7 +311,7 @@ export default function QuizHub() {
                           if (data.success) router.push(`/quiz/${data.quiz.id}`);
                         } catch {}
                       }}
-                      className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-amber-500/30 border-amber-500/20 text-left`}
+                      className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-amber-300 border-amber-200 text-left`}
                     >
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-amber-500/10">
                         <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -319,8 +319,8 @@ export default function QuizHub() {
                         </svg>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{rm.topic || 'Retention Check'}</p>
-                        <p className="text-xs text-amber-400/60 truncate">{rm.trigger_reason === 'decay_21_days' ? 'Knowledge fading — quick review' : 'Retention check due'}</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">{rm.topic || 'Retention Check'}</p>
+                        <p className="text-xs text-amber-600 truncate">{rm.trigger_reason === 'decay_21_days' ? 'Knowledge fading — quick review' : 'Retention check due'}</p>
                       </div>
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 shrink-0">
                         Review
@@ -334,16 +334,16 @@ export default function QuizHub() {
             {/* ── Topic Missions (AI-driven) ── */}
             {missions.length > 0 && (
               <div>
-                <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-4">Topic Missions</h2>
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Topic Missions</h2>
                 <div className="space-y-2">
                   {missions.map((mission, idx) => (
                     <button
                       key={idx}
                       onClick={() => startMissionQuiz(mission)}
-                      className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-white/25 text-left`}
+                      className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-gray-300 text-left`}
                     >
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        mission.type === 'blind_spot' ? 'bg-amber-500/10' : 'bg-[#0071e3]/10'
+                        mission.type === 'blind_spot' ? 'bg-amber-100' : 'bg-blue-50'
                       }`}>
                         {mission.type === 'blind_spot' ? (
                           <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -354,20 +354,20 @@ export default function QuizHub() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{mission.label}</p>
-                        <p className="text-xs text-white/40 truncate">{mission.reason}</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">{mission.label}</p>
+                        <p className="text-xs text-gray-500 truncate">{mission.reason}</p>
                       </div>
                       {mission.mastery != null && (
                         <div className="shrink-0 flex items-center gap-1">
-                          <div className="w-8 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <div className="w-8 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#0071e3] rounded-full"
+                              className="h-full bg-blue-600 rounded-full"
                               style={{ width: `${(mission.mastery / 5) * 100}%` }}
                             />
                           </div>
                         </div>
                       )}
-                      <svg className="w-4 h-4 text-white/20 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                       </svg>
                     </button>
@@ -379,22 +379,22 @@ export default function QuizHub() {
             {/* ── Fallback: Suggested for You (when no missions) ── */}
             {missions.length === 0 && !missionsLoading && recentSubjects.length > 0 && (
               <div>
-                <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-4">Suggested for You</h2>
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Suggested for You</h2>
                 <div className="space-y-2">
                   {recentSubjects.slice(0, 3).map(subject => (
                     <button
                       key={subject}
                       onClick={() => { setNewQuizSubject(subject); setShowNewQuiz(true); }}
-                      className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-white/25 text-left`}
+                      className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-gray-300 text-left`}
                     >
-                      <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
                         <ClassIcon subject={subject} size={20} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white">{subject}</p>
-                        <p className="text-xs text-white/40">Start a new quiz</p>
+                        <p className="text-sm font-semibold text-gray-900">{subject}</p>
+                        <p className="text-xs text-gray-500">Start a new quiz</p>
                       </div>
-                      <svg className="w-4 h-4 text-white/20 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                       </svg>
                     </button>
@@ -406,7 +406,7 @@ export default function QuizHub() {
             {/* ── Assigned by Teacher ── */}
             {assignedQuizzes.length > 0 && (
               <div>
-                <h2 className="text-sm font-semibold text-[#0071e3]/60 uppercase tracking-wider mb-4">Assigned by Teacher</h2>
+                <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wider mb-4">Assigned by Teacher</h2>
                 <div className="space-y-2">
                   {assignedQuizzes.map(aq => {
                     const isOverdue = aq.dueDate && new Date(aq.dueDate) < new Date() && !aq.completed;
@@ -415,10 +415,10 @@ export default function QuizHub() {
                         key={aq.id}
                         onClick={() => handleStartAssigned(aq)}
                         disabled={startingAssignment === aq.id}
-                        className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-white/25 text-left ${isOverdue ? 'border-red-500/20' : ''}`}
+                        className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-gray-300 text-left ${isOverdue ? 'border-red-300' : ''}`}
                       >
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          aq.completed ? 'bg-emerald-500/10' : 'bg-[#0071e3]/10'
+                          aq.completed ? 'bg-emerald-100' : 'bg-blue-50'
                         }`}>
                           {aq.completed ? (
                             <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -429,17 +429,17 @@ export default function QuizHub() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-white truncate">{aq.topicName}</p>
-                          <p className={`text-xs truncate ${isOverdue ? 'text-red-400' : 'text-white/40'}`}>
+                          <p className="text-sm font-semibold text-gray-900 truncate">{aq.topicName}</p>
+                          <p className={`text-xs truncate ${isOverdue ? 'text-red-500' : 'text-gray-500'}`}>
                             {aq.className}{aq.dueDate ? ` · Due ${new Date(aq.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : ''}
                           </p>
                         </div>
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${
                           aq.completed
-                            ? 'bg-emerald-500/15 text-emerald-400'
+                            ? 'bg-emerald-100 text-emerald-700'
                             : aq.started
-                              ? 'bg-amber-500/15 text-amber-400'
-                              : 'bg-[#0071e3]/15 text-[#0071e3]'
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-blue-100 text-blue-700'
                         }`}>
                           {startingAssignment === aq.id ? 'Starting...' : aq.completed ? 'Done' : aq.started ? 'Continue' : 'Start'}
                         </span>
@@ -453,11 +453,11 @@ export default function QuizHub() {
             {/* ── Past Quizzes ── */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider">History</h2>
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">History</h2>
               </div>
 
               {/* Filter tabs */}
-              <div className="flex gap-1 p-1 bg-white/5 rounded-lg mb-4">
+              <div className="flex gap-1 p-1 bg-gray-100 rounded-lg mb-4">
                 {[
                   { key: 'all', label: 'All' },
                   { key: 'in_progress', label: 'Active' },
@@ -467,7 +467,7 @@ export default function QuizHub() {
                     key={key}
                     onClick={() => setFilter(key)}
                     className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                      filter === key ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'
+                      filter === key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
                     {label}
@@ -492,22 +492,22 @@ export default function QuizHub() {
                       <Link
                         key={quiz.id}
                         href={isComplete ? `/quiz/${quiz.id}/results` : `/quiz/${quiz.id}`}
-                        className={`flex items-center justify-between py-4 hover:bg-white/[0.02] -mx-2 px-2 rounded-lg transition-colors ${
-                          i < filteredQuizzes.length - 1 ? 'border-b border-white/[0.05]' : ''
+                        className={`flex items-center justify-between py-4 hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors ${
+                          i < filteredQuizzes.length - 1 ? 'border-b border-gray-100' : ''
                         }`}
                       >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-white truncate">
+                            <p className="text-sm font-medium text-gray-900 truncate">
                               {quiz.topic_name || quiz.topicName || 'Untitled'}
                             </p>
                             {quiz.quiz_assignment_id ? (
-                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-[#0071e3]/15 text-[#0071e3] shrink-0">Set by Teacher</span>
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 shrink-0">Set by Teacher</span>
                             ) : (
-                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/5 text-white/30 shrink-0">Personal</span>
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-gray-100 text-gray-400 shrink-0">Personal</span>
                             )}
                           </div>
-                          <p className="text-xs text-white/30 mt-0.5">
+                          <p className="text-xs text-gray-400 mt-0.5">
                             {quiz.subject}{dateStr ? ` \u00b7 ${dateStr}` : ''}
                           </p>
                         </div>
@@ -519,7 +519,7 @@ export default function QuizHub() {
                               {score}%
                             </span>
                           ) : (
-                            <span className="text-xs font-semibold text-[#0071e3]">Continue</span>
+                            <span className="text-xs font-semibold text-blue-600">Continue</span>
                           )}
                         </div>
                       </Link>
@@ -528,10 +528,10 @@ export default function QuizHub() {
                 </div>
               ) : (
                 <div className="py-12 text-center">
-                  <p className="text-white/30 text-sm mb-4">No quizzes yet</p>
+                  <p className="text-gray-400 text-sm mb-4">No quizzes yet</p>
                   <button
                     onClick={() => setShowNewQuiz(true)}
-                    className="px-6 py-2.5 bg-[#0071e3] text-white text-sm font-semibold rounded-full hover:bg-[#0077ed] transition-colors"
+                    className="px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors"
                   >
                     Create Your First Quiz
                   </button>
@@ -541,21 +541,21 @@ export default function QuizHub() {
 
             {/* ── Class Rankings ── */}
             <div className={`${cardBase} p-6`}>
-              <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-4">Class Rankings</h2>
-              <div className="flex gap-1 p-1 bg-white/5 rounded-lg mb-4">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Class Rankings</h2>
+              <div className="flex gap-1 p-1 bg-gray-100 rounded-lg mb-4">
                 {['Quizzes', 'Score', 'Streaks'].map(tab => (
                   <button
                     key={tab}
                     onClick={() => setLeaderboardTab(tab)}
                     className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-                      leaderboardTab === tab ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'
+                      leaderboardTab === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
                     {tab}
                   </button>
                 ))}
               </div>
-              <p className="text-center text-white/30 text-sm py-8">Coming soon</p>
+              <p className="text-center text-gray-400 text-sm py-8">Coming soon</p>
             </div>
           </>
         )}
@@ -573,9 +573,9 @@ export default function QuizHub() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { if (!creatingQuiz) resetNewQuizModal(); }} />
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => { if (!creatingQuiz) resetNewQuizModal(); }} />
             <motion.div
-              className="relative bg-neutral-900/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl max-w-sm w-full p-6"
+              className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl max-w-sm w-full p-6"
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -595,24 +595,24 @@ export default function QuizHub() {
                   >
                     {/* Topic pill */}
                     <div className="flex items-center gap-2 mb-6">
-                      <div className="w-7 h-7 rounded-lg bg-[#0071e3]/15 flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                         <ClassIcon subject={newQuizSubject} size={14} />
                       </div>
                       <div>
-                        <p className="text-xs text-white/40">{newQuizSubject}</p>
-                        <p className="text-sm font-semibold text-white leading-tight">{newQuizTopic}</p>
+                        <p className="text-xs text-gray-500">{newQuizSubject}</p>
+                        <p className="text-sm font-semibold text-gray-900 leading-tight">{newQuizTopic}</p>
                       </div>
                     </div>
 
                     {/* Progress bar */}
                     <div className="mb-3">
                       <div className="flex justify-between items-center mb-2">
-                        <p className="text-xs font-medium text-white/50">{GEN_STEPS[genStep]}</p>
-                        <p className="text-xs font-bold text-[#0071e3] tabular-nums">{genProgress}%</p>
+                        <p className="text-xs font-medium text-gray-500">{GEN_STEPS[genStep]}</p>
+                        <p className="text-xs font-bold text-blue-600 tabular-nums">{genProgress}%</p>
                       </div>
-                      <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-[#0071e3]"
+                          className="h-full rounded-full bg-blue-600"
                           style={{ width: `${genProgress}%` }}
                           transition={{ duration: 0.3, ease: 'easeOut' }}
                         />
@@ -625,7 +625,7 @@ export default function QuizHub() {
                         <div
                           key={i}
                           className={`h-1 rounded-full transition-all duration-300 ${
-                            i <= genStep ? 'bg-[#0071e3] flex-1' : 'bg-white/10 flex-1'
+                            i <= genStep ? 'bg-blue-600 flex-1' : 'bg-gray-200 flex-1'
                           }`}
                         />
                       ))}
@@ -640,15 +640,15 @@ export default function QuizHub() {
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <h2 className="text-lg font-bold text-white mb-1">Create a Quiz</h2>
-                    <p className="text-sm text-white/60 mb-5">Choose a subject and topic to test yourself.</p>
+                    <h2 className="text-lg font-bold text-gray-900 mb-1">Create a Quiz</h2>
+                    <p className="text-sm text-gray-500 mb-5">Choose a subject and topic to test yourself.</p>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-semibold text-white/60 mb-1.5">Subject</label>
+                        <label className="block text-sm font-semibold text-gray-500 mb-1.5">Subject</label>
                         <select
                           value={newQuizSubject}
                           onChange={(e) => setNewQuizSubject(e.target.value)}
-                          className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                         >
                           <option value="">Select a subject</option>
                           {allSubjects.map(s => (
@@ -658,26 +658,26 @@ export default function QuizHub() {
                           ))}
                         </select>
                         {newQuizSubject && subjectSpecMap[newQuizSubject] && (
-                          <p className="mt-1.5 text-xs text-[#0071e3]/70 truncate">
+                          <p className="mt-1.5 text-xs text-blue-600 truncate">
                             {subjectSpecMap[newQuizSubject].board}: {subjectSpecMap[newQuizSubject].qualTitle}
                           </p>
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-white/60 mb-1.5">Topic</label>
+                        <label className="block text-sm font-semibold text-gray-500 mb-1.5">Topic</label>
                         <input
                           type="text"
                           value={newQuizTopic}
                           onChange={(e) => setNewQuizTopic(e.target.value)}
                           placeholder="e.g., Quadratic equations"
-                          className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 placeholder:text-white/30"
+                          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/50 placeholder:text-gray-400"
                           onKeyDown={(e) => e.key === 'Enter' && !creatingQuiz && newQuizSubject && handleCreateQuiz()}
                         />
                       </div>
 
                       {/* Mode selector */}
                       <div>
-                        <label className="block text-sm font-semibold text-white/60 mb-1.5">Mode</label>
+                        <label className="block text-sm font-semibold text-gray-500 mb-1.5">Mode</label>
                         <div className="grid grid-cols-2 gap-1.5">
                           {[
                             { id: 'mini_quiz', label: 'Mini Quiz', desc: 'Quick revision', marks: 15 },
@@ -691,8 +691,8 @@ export default function QuizHub() {
                               onClick={() => { setQuizMode(m.id); setQuizMarks(m.marks); }}
                               className={`px-3 py-2 rounded-lg text-left text-xs transition-colors border ${
                                 quizMode === m.id
-                                  ? 'bg-[#0071e3]/15 border-[#0071e3]/40 text-white'
-                                  : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20'
+                                  ? 'bg-blue-50 border-blue-300 text-blue-900'
+                                  : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300'
                               }`}
                             >
                               <p className="font-semibold">{m.label}</p>
@@ -704,20 +704,20 @@ export default function QuizHub() {
 
                       {/* Marks stepper */}
                       <div>
-                        <label className="block text-sm font-semibold text-white/60 mb-1.5">Total Marks</label>
+                        <label className="block text-sm font-semibold text-gray-500 mb-1.5">Total Marks</label>
                         <div className="flex items-center gap-3">
                           <button
                             type="button"
                             onClick={() => setQuizMarks(m => Math.max(5, m - 5))}
-                            className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 transition-colors text-lg font-bold"
+                            className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200 transition-colors text-lg font-bold"
                           >
                             -
                           </button>
-                          <span className="text-white font-bold text-lg tabular-nums w-10 text-center">{quizMarks}</span>
+                          <span className="text-gray-900 font-bold text-lg tabular-nums w-10 text-center">{quizMarks}</span>
                           <button
                             type="button"
                             onClick={() => setQuizMarks(m => Math.min(100, m + 5))}
-                            className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 transition-colors text-lg font-bold"
+                            className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200 transition-colors text-lg font-bold"
                           >
                             +
                           </button>
@@ -727,14 +727,14 @@ export default function QuizHub() {
                     <div className="flex gap-3 mt-5">
                       <button
                         onClick={() => resetNewQuizModal()}
-                        className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-white/60 font-semibold rounded-xl transition-colors"
+                        className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold rounded-xl transition-colors"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleCreateQuiz}
                         disabled={!newQuizTopic.trim() || !newQuizSubject}
-                        className="flex-1 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] disabled:bg-white/5 text-white disabled:text-white/30 font-semibold rounded-xl transition-colors duration-200"
+                        className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 text-white disabled:text-gray-400 font-semibold rounded-xl transition-colors duration-200"
                       >
                         Start Quiz
                       </button>

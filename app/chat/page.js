@@ -113,24 +113,24 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
   const linkCount = (linksContent.match(/\[.*?\]\(.*?\)/g) || []).length;
 
   return (
-    <div className="mt-4 border border-blue-500/20 bg-blue-500/[0.06] rounded-2xl overflow-hidden">
+    <div className="mt-4 border border-blue-200 bg-blue-50 rounded-2xl overflow-hidden">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-500/[0.08] transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-100/70 transition-colors"
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-blue-500/15 rounded-lg flex items-center justify-center">
-            <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
           </div>
           <div className="text-left">
-            <p className="text-sm font-semibold text-blue-300">Helpful Resources</p>
-            <p className="text-xs text-blue-400/70">{linkCount} link{linkCount !== 1 ? 's' : ''} to learn more</p>
+            <p className="text-sm font-semibold text-blue-700">Helpful Resources</p>
+            <p className="text-xs text-blue-500">{linkCount} link{linkCount !== 1 ? 's' : ''} to learn more</p>
           </div>
         </div>
         <svg
-          className={`w-5 h-5 text-blue-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-blue-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -140,8 +140,8 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
       </button>
 
       {isExpanded && (
-        <div className="px-4 pb-4 pt-1 border-t border-blue-500/20">
-          <div className="prose prose-sm prose-invert max-w-none">
+        <div className="px-4 pb-4 pt-1 border-t border-blue-200">
+          <div className="prose prose-sm max-w-none">
             <ReactMarkdown
               remarkPlugins={remarkPlugins}
               rehypePlugins={rehypePlugins}
@@ -152,14 +152,14 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
                     {...props}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 underline decoration-blue-500/40 hover:decoration-blue-400 font-medium transition-colors"
+                    className="text-blue-600 hover:text-blue-700 underline font-medium transition-colors"
                   />
                 ),
-                p: ({node, ...props}) => <p {...props} className="mb-2 last:mb-0 text-neutral-300" />,
+                p: ({node, ...props}) => <p {...props} className="mb-2 last:mb-0 text-gray-600" />,
                 ul: ({node, ...props}) => <ul {...props} className="list-none ml-0 space-y-2 mt-2" />,
                 li: ({node, ...props}) => (
-                  <li {...props} className="flex items-start gap-2 text-sm text-neutral-300">
-                    <span className="text-blue-400 mt-0.5">→</span>
+                  <li {...props} className="flex items-start gap-2 text-sm text-gray-600">
+                    <span className="text-blue-500 mt-0.5">→</span>
                     <span className="flex-1">{props.children}</span>
                   </li>
                 ),
@@ -198,7 +198,7 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
       )}
       <div
         className={`max-w-[75%] px-1 py-1 ${
-          isUser ? 'text-white/80' : 'text-neutral-200'
+          isUser ? 'text-gray-800' : 'text-gray-800'
         }`}
       >
         <ReactMarkdown
@@ -217,7 +217,7 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
         {message.files && message.files.length > 0 && (
           <div className="mt-3 space-y-2">
             {message.files.map((file, fileIndex) => (
-              <div key={fileIndex} className="bg-white/[0.04] border border-white/[0.06] rounded-xl p-3">
+              <div key={fileIndex} className="bg-gray-50 border border-gray-200 rounded-xl p-3">
                 {file.type === 'image' ? (
                   <div>
                     <img
@@ -225,14 +225,14 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
                       alt={file.name}
                       className="rounded-lg max-w-full h-auto max-h-64 object-contain"
                     />
-                    <p className="text-xs text-neutral-400 mt-2">{file.name}</p>
+                    <p className="text-xs text-gray-400 mt-2">{file.name}</p>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-sm font-semibold text-neutral-300">{file.name}</span>
+                    <span className="text-sm font-semibold text-gray-700">{file.name}</span>
                   </div>
                 )}
               </div>
@@ -241,8 +241,8 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
         )}
       </div>
       {isUser && (
-        <div className="w-9 h-9 bg-white/[0.08] backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
-          <span className="text-[10px] font-semibold text-white/60">You</span>
+        <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          <span className="text-[10px] font-semibold text-gray-500">You</span>
         </div>
       )}
     </div>
@@ -798,17 +798,17 @@ useChatStorage(chatsBySubject, ['General'], currentSubject, currentChatId);
         {...props}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-neutral-900 dark:text-neutral-100 underline hover:text-black dark:hover:text-white font-semibold transition-colors duration-200"
+        className="text-blue-600 underline hover:text-blue-700 font-semibold transition-colors duration-200"
       />
     ),
     p: ({node, ...props}) => <p {...props} className="mb-4 last:mb-0 leading-relaxed" />,
     ul: ({node, ...props}) => <ul {...props} className="list-disc ml-5 mb-4 space-y-2" />,
     ol: ({node, ...props}) => <ol {...props} className="list-decimal ml-5 mb-4 space-y-2" />,
     li: ({node, ...props}) => <li {...props} className="mb-1.5 leading-relaxed" />,
-    strong: ({node, ...props}) => <strong {...props} className="font-bold text-black dark:text-white" />,
-    h1: ({node, ...props}) => <h1 {...props} className="text-xl font-bold my-4 text-neutral-900 dark:text-neutral-100" />,
-    h2: ({node, ...props}) => <h2 {...props} className="text-lg font-bold my-3 text-neutral-900 dark:text-neutral-100" />,
-    h3: ({node, ...props}) => <h3 {...props} className="text-base font-semibold my-2 text-neutral-800 dark:text-neutral-200" />,
+    strong: ({node, ...props}) => <strong {...props} className="font-bold text-gray-900" />,
+    h1: ({node, ...props}) => <h1 {...props} className="text-xl font-bold my-4 text-gray-900" />,
+    h2: ({node, ...props}) => <h2 {...props} className="text-lg font-bold my-3 text-gray-900" />,
+    h3: ({node, ...props}) => <h3 {...props} className="text-base font-semibold my-2 text-gray-800" />,
     code: ({node, inline, children, className, ...props}) => {
       const match = /language-(\w+)/.exec(className || '');
       const language = match ? match[1] : '';
@@ -816,17 +816,16 @@ useChatStorage(chatsBySubject, ['General'], currentSubject, currentChatId);
       if (!inline && language === 'mermaid') {
         const code = String(children).replace(/\n$/, '');
 
-        // Detect xychart syntax which mermaid can't parse properly
         if (code.includes('xychart') || code.includes('x-axis') || code.includes('y-axis')) {
           return (
-            <div className="my-4 p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl">
+            <div className="my-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
               <div className="flex items-start gap-3">
                 <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div>
-                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Graph format not supported</p>
-                  <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                  <p className="text-sm font-medium text-amber-800">Graph format not supported</p>
+                  <p className="text-xs text-amber-700 mt-1">
                     Newton tried to create a graph using an unsupported format. Please ask Newton to &quot;draw the graph using chart format&quot; instead.
                   </p>
                 </div>
@@ -844,12 +843,12 @@ useChatStorage(chatsBySubject, ['General'], currentSubject, currentChatId);
       }
 
       return inline ? (
-        <code {...props} className="bg-neutral-100 dark:bg-neutral-700 text-pink-600 dark:text-pink-400 px-2 py-0.5 rounded font-mono text-sm">
+        <code {...props} className="bg-gray-100 text-pink-600 px-2 py-0.5 rounded font-mono text-sm">
           {children}
         </code>
       ) : (
-        <pre className="bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 p-4 rounded-xl my-3 overflow-x-auto">
-          <code {...props} className={`text-sm font-mono text-neutral-800 dark:text-neutral-200 block whitespace-pre-wrap leading-relaxed ${className || ''}`}>
+        <pre className="bg-gray-50 border border-gray-200 p-4 rounded-xl my-3 overflow-x-auto">
+          <code {...props} className={`text-sm font-mono text-gray-800 block whitespace-pre-wrap leading-relaxed ${className || ''}`}>
             {children}
           </code>
         </pre>
@@ -1831,12 +1830,12 @@ const sendMessage = async (e) => {
 
 if (isLoadingData) {
   return (
-    <div className="flex h-screen bg-black items-center justify-center">
+    <div className="flex h-screen bg-[#F5F5F7] items-center justify-center">
       <div className="text-center">
-        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 mx-auto animate-pulse">
-          <span className="text-2xl font-bold text-black">N</span>
+        <div className="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mb-4 mx-auto animate-pulse">
+          <span className="text-2xl font-bold text-white">N</span>
         </div>
-        <p className="text-neutral-400 font-medium">Loading your chats...</p>
+        <p className="text-gray-500 font-medium">Loading your chats...</p>
       </div>
     </div>
   );
@@ -1853,40 +1852,39 @@ if (isLoadingData) {
   ];
 
   return (
-   <div className="flex h-screen overflow-hidden" style={{ background: '#0B0B0C' }}>
+   <div className="flex h-screen overflow-hidden bg-[#F5F5F7]">
       {/* Sidebar */}
       <div
   className={`${
     sidebarOpen ? 'w-72' : 'w-0'
-  } flex flex-col transition-all duration-200 overflow-hidden md:relative fixed inset-y-0 left-0 z-50 border-r border-white/5 backdrop-blur-xl`}
-  style={{ background: 'rgba(11,11,12,0.92)' }}
+  } flex flex-col transition-all duration-200 overflow-hidden md:relative fixed inset-y-0 left-0 z-50 border-r border-gray-200 bg-white`}
 >
         {/* Sidebar Header */}
-        <div className="px-5 py-5 border-b border-white/5">
+        <div className="px-5 py-5 border-b border-gray-100">
           <Link
             href="/chat"
             className="flex items-center space-x-2.5 mb-5"
           >
-            <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-sm font-bold text-black">N</span>
+            <div className="w-8 h-8 bg-gray-900 rounded-xl flex items-center justify-center">
+              <span className="text-sm font-bold text-white">N</span>
             </div>
-            <span className="text-[15px] font-semibold text-white tracking-tight">Newton</span>
+            <span className="text-[15px] font-semibold text-gray-900 tracking-tight">Newton</span>
           </Link>
 
           {currentUserEmail && (
-            <p className="text-[11px] text-white/30 truncate mb-3">{currentUserEmail}</p>
+            <p className="text-[11px] text-gray-400 truncate mb-3">{currentUserEmail}</p>
           )}
 
           <button
             onClick={startNewChat}
-            className="w-full px-4 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-sm font-medium rounded-full transition-colors duration-200"
+            className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full transition-colors duration-200"
           >
             New conversation
           </button>
         </div>
 
         {/* Subject Sidebar */}
-        <div className="px-3 py-3 border-b border-white/5 overflow-y-auto max-h-48">
+        <div className="px-3 py-3 border-b border-gray-100 overflow-y-auto max-h-48">
           <SubjectSidebar
             subjects={userSubjects}
             activeSubjectId={activeSubjectId}
@@ -1920,7 +1918,7 @@ if (isLoadingData) {
 
             if (chatsWithMessages.length === 0) {
               return (
-                <div className="text-center py-8 text-neutral-500 text-sm">
+                <div className="text-center py-8 text-gray-400 text-sm">
                   No conversations yet
                 </div>
               );
@@ -1937,8 +1935,8 @@ if (isLoadingData) {
                   className={`
                     w-full px-3.5 py-2.5 text-left rounded-xl transition-colors duration-200
                     ${currentChatId === chat.id
-                      ? 'bg-white/[0.08] text-white'
-                      : 'hover:bg-white/[0.04] text-white/60'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'hover:bg-gray-50 text-gray-600'
                     }
                   `}
                 >
@@ -1948,11 +1946,11 @@ if (isLoadingData) {
                         <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5v6l1 1 1-1v-6h5v-2l-2-2z"/>
                       </svg>
                     )}
-                    <span className="text-sm font-medium text-neutral-100 truncate pr-6">
+                    <span className="text-sm font-medium text-gray-800 truncate pr-6">
                       {generateChatTitle(chat.messages, chat.title)}
                     </span>
                   </div>
-                  <div className="text-xs text-neutral-500 mt-1.5">
+                  <div className="text-xs text-gray-400 mt-1.5">
                     {new Date(chat.date).toLocaleDateString('en-GB', {
                       day: 'numeric',
                       month: 'short'
@@ -1966,9 +1964,9 @@ if (isLoadingData) {
                     e.stopPropagation();
                     setMenuOpen(menuOpen === `chat-${chat.id}` ? null : `chat-${chat.id}`);
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/[0.1] rounded-lg transition-all duration-250"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-250"
                 >
-                  <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                   </svg>
                 </button>
@@ -1976,12 +1974,11 @@ if (isLoadingData) {
                 {/* Chat Context Menu */}
                 {menuOpen === `chat-${chat.id}` && (
                   <div
-                    className="absolute right-2 top-full mt-1 bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-xl shadow-2xl z-50 min-w-[140px] overflow-hidden animate-scaleIn"
-                    style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}
+                    className="absolute right-2 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 min-w-[140px] overflow-hidden animate-scaleIn"
                   >
                     <button
                       onClick={(e) => pinChat(currentSubject, chat.id, e)}
-                      className="w-full text-left px-4 py-2.5 hover:bg-white/[0.06] text-neutral-300 text-sm font-medium transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors flex items-center gap-2"
                     >
                       <svg className="w-4 h-4 text-amber-500" fill={chat.pinned ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5v6l1 1 1-1v-6h5v-2l-2-2z"/>
@@ -1990,17 +1987,17 @@ if (isLoadingData) {
                     </button>
                     <button
                       onClick={(e) => archiveChat(currentSubject, chat.id, e)}
-                      className="w-full text-left px-4 py-2.5 hover:bg-white/[0.06] text-neutral-300 text-sm font-medium transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors flex items-center gap-2"
                     >
                       <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                       </svg>
                       Archive
                     </button>
-                    <div className="h-px bg-white/[0.06]"></div>
+                    <div className="h-px bg-gray-100"></div>
                     <button
                       onClick={(e) => deleteChat(currentSubject, chat.id, e)}
-                      className="w-full text-left px-4 py-2.5 hover:bg-red-500/10 text-red-400 text-sm font-medium transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 hover:bg-red-50 text-red-500 text-sm font-medium transition-colors flex items-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -2015,12 +2012,12 @@ if (isLoadingData) {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-white/[0.06] bg-white/[0.02] backdrop-blur-xl space-y-2">
+        <div className="p-4 border-t border-gray-100 bg-gray-50 space-y-2">
           {/* Navigation Links */}
           <div className="flex gap-2">
             <Link
               href="/dashboard"
-              className="flex-1 px-3 py-2.5 text-neutral-400 hover:text-white hover:bg-white/[0.06] rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-2"
+              className="flex-1 px-3 py-2.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
@@ -2029,7 +2026,7 @@ if (isLoadingData) {
             </Link>
             <Link
               href="/quiz"
-              className="flex-1 px-3 py-2.5 text-neutral-400 hover:text-white hover:bg-white/[0.06] rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-2"
+              className="flex-1 px-3 py-2.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
@@ -2041,21 +2038,21 @@ if (isLoadingData) {
           <div className="flex gap-2">
             <Link
               href="/chat/archive"
-              className="flex-1 px-4 py-3 bg-white/[0.05] backdrop-blur-sm border border-white/[0.08] text-neutral-300 rounded-2xl text-sm font-medium hover:bg-white/[0.08] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 bg-white border border-gray-200 text-gray-600 rounded-2xl text-sm font-medium hover:bg-gray-50 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
               </svg>
               <span>Archive</span>
               {Object.values(archivedChats).flat().length > 0 && (
-                <span className="bg-white/[0.1] text-neutral-400 text-xs px-1.5 py-0.5 rounded-full">
+                <span className="bg-gray-100 text-gray-500 text-xs px-1.5 py-0.5 rounded-full">
                   {Object.values(archivedChats).flat().length}
                 </span>
               )}
             </Link>
             <button
               onClick={() => setShowSettings(true)}
-              className="px-4 py-3 bg-white/[0.05] backdrop-blur-sm border border-white/[0.08] text-neutral-300 rounded-2xl text-sm font-medium hover:bg-white/[0.08] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              className="px-4 py-3 bg-white border border-gray-200 text-gray-600 rounded-2xl text-sm font-medium hover:bg-gray-50 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -2067,8 +2064,8 @@ if (isLoadingData) {
       </div>
 
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+        <div
+          className="fixed inset-0 bg-black/30 z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -2076,27 +2073,24 @@ if (isLoadingData) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div
-          className="h-12 border-b border-white/5 flex items-center justify-between px-4 sm:px-6 backdrop-blur-md"
-          style={{ background: 'rgba(11,11,12,0.85)' }}
-        >
+        <div className="h-12 border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 bg-white">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-white/[0.06] rounded-xl transition-colors duration-200"
+              className="p-2 hover:bg-gray-100 rounded-xl transition-colors duration-200"
             >
-              <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <div>
-              <h1 className="text-sm font-medium text-white/80">{currentSubject}</h1>
+              <h1 className="text-sm font-semibold text-gray-800">{currentSubject}</h1>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
   {yearGroup && (
-    <div className="hidden sm:block px-2.5 py-1 text-[10px] text-white/40 border border-white/5 rounded-full">
+    <div className="hidden sm:block px-2.5 py-1 text-[10px] text-gray-500 border border-gray-200 rounded-full bg-gray-50">
       {yearOptions.find(y => y.value === yearGroup)?.label || 'Year 9'}
     </div>
   )}
@@ -2131,7 +2125,7 @@ if (isLoadingData) {
         setShowReportIssue(true);
       }
     }}
-    className={`px-3 py-1.5 border border-white/5 text-white/40 hover:text-red-400 hover:border-red-500/20 rounded-full text-[10px] transition-colors flex items-center gap-1.5 ${showTutorial && tutorialStep === 4 ? 'relative z-[102]' : ''}`}
+    className={`px-3 py-1.5 border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 rounded-full text-[10px] transition-colors flex items-center gap-1.5 ${showTutorial && tutorialStep === 4 ? 'relative z-[102]' : ''}`}
   >
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -2140,7 +2134,7 @@ if (isLoadingData) {
   </button>
   <Link
     href="/chat"
-    className="hidden sm:block text-sm font-bold text-neutral-100 hover:text-white transition-colors duration-250"
+    className="hidden sm:block text-sm font-bold text-gray-900 hover:text-gray-700 transition-colors duration-250"
   >
     Newton
   </Link>
@@ -2193,10 +2187,10 @@ if (isLoadingData) {
                 </div>
               </div>
 
-              <h2 className="text-3xl font-semibold text-white tracking-tight mt-4 mb-2">
+              <h2 className="text-3xl font-semibold text-gray-900 tracking-tight mt-4 mb-2">
                 {!hasSeenWelcome ? 'Welcome to Newton' : 'New conversation'}
               </h2>
-              <p className="text-base text-neutral-500 max-w-md px-4">
+              <p className="text-base text-gray-500 max-w-md px-4">
                 {!hasSeenWelcome
                   ? "I\u2019ll guide you to understand it yourself."
                   : `Ask me anything about ${currentSubject.toLowerCase()}`
@@ -2242,14 +2236,11 @@ if (isLoadingData) {
               {isTyping && (
                 <div ref={typingIndicatorRef} className="flex gap-4 justify-start animate-fadeIn">
                   <div className="w-[52px] h-[52px] flex-shrink-0" />
-                  <div
-                    className="bg-white/[0.05] backdrop-blur-sm border border-white/[0.08] rounded-2xl px-5 py-4"
-                    style={{ boxShadow: '0 2px 12px rgba(0, 0, 0, 0.2)' }}
-                  >
+                  <div className="bg-white border border-gray-200 rounded-2xl px-5 py-4 shadow-sm">
                     <div className="flex gap-1.5">
-                      <div className="w-2 h-2 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1.4s' }} />
-                      <div className="w-2 h-2 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1.4s' }} />
-                      <div className="w-2 h-2 bg-white/30 rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1.4s' }} />
+                      <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1.4s' }} />
+                      <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1.4s' }} />
+                      <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1.4s' }} />
                     </div>
                   </div>
                 </div>
@@ -2263,7 +2254,7 @@ if (isLoadingData) {
       </div>
 
       {/* ── Input Area (fixed bottom, centered) ── */}
-      <div className={`fixed bottom-0 ${sidebarOpen ? 'md:left-72' : 'left-0'} right-0 ${sidebarOpen ? 'z-[30] md:z-[100]' : 'z-[100]'} flex flex-col items-center pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 pointer-events-none`} style={{ background: 'linear-gradient(to top, #0B0B0C 50%, transparent)' }}>
+      <div className={`fixed bottom-0 ${sidebarOpen ? 'md:left-72' : 'left-0'} right-0 ${sidebarOpen ? 'z-[30] md:z-[100]' : 'z-[100]'} flex flex-col items-center pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 pointer-events-none`} style={{ background: 'linear-gradient(to top, #F5F5F7 50%, transparent)' }}>
         <div className="w-full max-w-3xl px-4 pointer-events-auto">
           <form onSubmit={sendMessage}>
             {/* File Upload Preview */}
@@ -2294,8 +2285,7 @@ if (isLoadingData) {
             )}
 
             <div
-              className="relative flex flex-col rounded-2xl border border-white/10 focus-within:border-white/20 transition-colors duration-200 shadow-lg shadow-black/40"
-              style={{ background: 'rgba(18,18,20,0.95)', backdropFilter: 'blur(20px)' }}
+              className="relative flex flex-col rounded-2xl border border-gray-300 focus-within:border-blue-400 transition-colors duration-200 shadow-sm bg-white"
               onDragOver={handleFileDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -2325,7 +2315,7 @@ if (isLoadingData) {
                     }
                   }}
                   placeholder={`Ask about ${currentSubject.toLowerCase()}...`}
-                  className="w-full px-4 pt-3 pb-2 bg-transparent resize-none focus:outline-none text-white/90 placeholder-white/30 overflow-y-auto"
+                  className="w-full px-4 pt-3 pb-2 bg-transparent resize-none focus:outline-none text-gray-900 placeholder-gray-400 overflow-y-auto"
                   rows={1}
                   style={{
                     minHeight: '44px',
@@ -2337,7 +2327,7 @@ if (isLoadingData) {
               {/* Bottom row: attach + mic + send */}
               <div className="px-2 pb-2 flex items-center justify-between">
                 <div className="flex items-center gap-1">
-                  <label className="cursor-pointer p-2 hover:bg-white/[0.06] rounded-full transition-colors">
+                  <label className="cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <input
                       type="file"
                       multiple
@@ -2345,7 +2335,7 @@ if (isLoadingData) {
                       onChange={(e) => handleFileUpload(e.target.files)}
                       className="hidden"
                     />
-                    <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                     </svg>
                   </label>
@@ -2354,8 +2344,8 @@ if (isLoadingData) {
                     onClick={toggleSpeechToText}
                     className={`p-2 rounded-full transition-all duration-200 ${
                       isListening
-                        ? 'bg-red-500/15 text-red-400 animate-pulse'
-                        : 'hover:bg-white/[0.06] text-white/40'
+                        ? 'bg-red-50 text-red-500 animate-pulse'
+                        : 'hover:bg-gray-100 text-gray-400'
                     }`}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2378,7 +2368,7 @@ if (isLoadingData) {
                   <button
                     type="submit"
                     disabled={!input.trim()}
-                    className="p-2 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
+                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -2394,34 +2384,23 @@ if (isLoadingData) {
 
       {/* Premium Year Group Modal */}
       {showYearModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[150] p-6 animate-fadeIn">
-          <div
-            className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
-            style={{
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3)'
-            }}
-          >
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[150] p-6 animate-fadeIn">
+          <div className="bg-white border border-gray-200 rounded-3xl shadow-xl max-w-lg w-full overflow-hidden animate-scaleIn">
             <div className="p-10 text-center">
-              <div
-                className="w-20 h-20 mx-auto bg-white rounded-3xl flex items-center justify-center mb-8"
-              >
-                <span className="text-3xl font-bold text-black">N</span>
+              <div className="w-20 h-20 mx-auto bg-gray-900 rounded-3xl flex items-center justify-center mb-8">
+                <span className="text-3xl font-bold text-white">N</span>
               </div>
-              <h2 className="text-3xl font-extrabold text-neutral-100 mb-4 tracking-tight">Welcome to Newton!</h2>
-              <p className="text-neutral-400 mb-8 text-lg leading-relaxed">
+              <h2 className="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">Welcome to Newton!</h2>
+              <p className="text-gray-500 mb-8 text-lg leading-relaxed">
                 What year group are you in? This helps me adjust my teaching style for you.
               </p>
-              
               <div className="grid grid-cols-2 gap-3">
                 {yearOptions.map((option, i) => (
                   <button
                     key={option.value}
                     onClick={() => saveYearGroup(option.value)}
-                    className="px-6 py-4 bg-white/[0.05] backdrop-blur-sm hover:bg-white/[0.1] border border-white/[0.08] rounded-2xl text-left text-neutral-100 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animate-slideUp"
-                    style={{
-                      animationDelay: `${i * 50}ms`,
-                      animationFillMode: 'both'
-                    }}
+                    className="px-6 py-4 bg-gray-50 hover:bg-blue-50 hover:border-blue-300 border border-gray-200 rounded-2xl text-left text-gray-800 font-semibold transition-all duration-200 hover:scale-105 active:scale-95 animate-slideUp"
+                    style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'both' }}
                   >
                     {option.label}
                   </button>
@@ -2434,23 +2413,16 @@ if (isLoadingData) {
 
       {/* Course Selection Modal (onboarding step 2) */}
       {showCourseModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[150] p-6 animate-fadeIn">
-          <div
-            className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-scaleIn"
-            style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3)' }}
-          >
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[150] p-6 animate-fadeIn">
+          <div className="bg-white border border-gray-200 rounded-3xl shadow-xl max-w-lg w-full overflow-hidden animate-scaleIn">
             <div className="p-10 text-center">
-              <div
-                className="w-20 h-20 mx-auto bg-white rounded-3xl flex items-center justify-center mb-8"
-              >
-                <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 mx-auto bg-gray-900 rounded-3xl flex items-center justify-center mb-8">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
-              <h2 className="text-3xl font-extrabold text-neutral-100 mb-4 tracking-tight">
-                What are you studying?
-              </h2>
-              <p className="text-neutral-400 mb-8 text-lg leading-relaxed">
+              <h2 className="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">What are you studying?</h2>
+              <p className="text-gray-500 mb-8 text-lg leading-relaxed">
                 Pick your course so I can tailor my help to your exact syllabus.
               </p>
               <div className="text-left">
@@ -2463,9 +2435,9 @@ if (isLoadingData) {
               </div>
               <button
                 onClick={() => setShowCourseModal(false)}
-                className="mt-6 text-sm font-medium text-neutral-500 hover:text-neutral-300 transition-colors"
+                className="mt-6 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
               >
-                I'll set this later
+                I&apos;ll set this later
               </button>
             </div>
           </div>
@@ -2475,36 +2447,35 @@ if (isLoadingData) {
 {/* Settings Modal */}
       {showSettings && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[200] p-4 animate-fadeIn"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-fadeIn"
           onClick={() => { setShowSettings(false); setShowDeleteConfirm(false); }}
         >
           <div
-            className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl w-full max-w-[95vw] md:max-w-2xl overflow-hidden animate-scaleIn"
+            className="bg-white border border-gray-200 rounded-3xl shadow-xl w-full max-w-[95vw] md:max-w-2xl overflow-hidden animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
-            style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3)' }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-              <h2 className="text-xl font-bold text-neutral-100 tracking-tight">Settings</h2>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Settings</h2>
               <button
                 onClick={() => { setShowSettings(false); setShowDeleteConfirm(false); }}
-                className="p-2 hover:bg-white/[0.06] rounded-xl transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
               >
-                <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Two-column body on desktop, single column on mobile */}
-            <div className="md:grid md:grid-cols-2 md:divide-x md:divide-white/[0.06]">
+            <div className="md:grid md:grid-cols-2 md:divide-x md:divide-gray-100">
               {/* Left: Account Settings */}
               <div className="p-6 flex flex-col gap-5">
                 <div>
-                  <label className="text-xs font-bold text-white/40 uppercase tracking-wider block mb-3">Account Settings</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">Account Settings</label>
 
                   {/* Year Group */}
-                  <p className="text-xs text-neutral-500 mb-2">Year Group</p>
+                  <p className="text-xs text-gray-500 mb-2">Year Group</p>
                   <div className="grid grid-cols-2 gap-2">
                     {yearOptions.map((option) => (
                       <button
@@ -2515,15 +2486,15 @@ if (isLoadingData) {
                         }}
                         className={`px-3 py-3 rounded-xl text-left text-sm font-semibold transition-all active:scale-95 ${
                           yearGroup === option.value
-                            ? 'bg-[#0071e3] text-white'
-                            : 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.08] border border-white/[0.06]'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
                         }`}
                       >
                         {option.label}
                       </button>
                     ))}
                   </div>
-                  <p className="text-xs text-neutral-500 mt-2">
+                  <p className="text-xs text-gray-400 mt-2">
                     Current: {yearOptions.find(y => y.value === yearGroup)?.label || 'Not set'}
                   </p>
                 </div>
@@ -2534,7 +2505,7 @@ if (isLoadingData) {
                     {!showDeleteConfirm ? (
                       <button
                         onClick={() => setShowDeleteConfirm(true)}
-                        className="w-full px-4 py-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                        className="w-full px-4 py-3 bg-red-50 border border-red-200 hover:bg-red-100 text-red-500 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -2542,14 +2513,14 @@ if (isLoadingData) {
                         Delete Account
                       </button>
                     ) : (
-                      <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl space-y-3">
-                        <p className="text-sm font-semibold text-red-400">Delete your account?</p>
-                        <p className="text-xs text-red-400/80">This will permanently erase all your chats, quiz history, mastery data, and account. This cannot be undone.</p>
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-xl space-y-3">
+                        <p className="text-sm font-semibold text-red-600">Delete your account?</p>
+                        <p className="text-xs text-red-500/80">This will permanently erase all your chats, quiz history, mastery data, and account. This cannot be undone.</p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => setShowDeleteConfirm(false)}
                             disabled={deletingAccount}
-                            className="flex-1 px-3 py-2 bg-white/[0.06] hover:bg-white/[0.1] text-neutral-300 rounded-lg text-sm font-semibold transition-colors"
+                            className="flex-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
                           >
                             Cancel
                           </button>
@@ -2576,18 +2547,18 @@ if (isLoadingData) {
               </div>
 
               {/* Right: Preferences + Actions */}
-              <div className="p-6 flex flex-col gap-4 border-t border-white/[0.06] md:border-t-0">
+              <div className="p-6 flex flex-col gap-4 border-t border-gray-100 md:border-t-0">
                 <div>
-                  <label className="text-xs font-bold text-white/40 uppercase tracking-wider block mb-3">Preferences</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">Preferences</label>
                   <div
-                    className="flex items-center justify-between p-3 bg-white/[0.04] border border-white/[0.06] rounded-xl cursor-pointer hover:bg-white/[0.06] transition-colors"
+                    className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
                     onClick={() => setShowLinkRecommendations(!showLinkRecommendations)}
                   >
                     <div>
-                      <p className="text-sm font-semibold text-neutral-100">Link Recommendations</p>
-                      <p className="text-xs text-neutral-500">Show resources after each response</p>
+                      <p className="text-sm font-semibold text-gray-900">Link Recommendations</p>
+                      <p className="text-xs text-gray-500">Show resources after each response</p>
                     </div>
-                    <div className={`w-10 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-3 ${showLinkRecommendations ? 'bg-blue-500' : 'bg-white/[0.1]'}`}>
+                    <div className={`w-10 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-3 ${showLinkRecommendations ? 'bg-blue-600' : 'bg-gray-300'}`}>
                       <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${showLinkRecommendations ? 'translate-x-5' : 'translate-x-1'}`} />
                     </div>
                   </div>
@@ -2599,7 +2570,7 @@ if (isLoadingData) {
                       setShowSettings(false);
                       startTutorial();
                     }}
-                    className="w-full px-4 py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -2614,7 +2585,7 @@ if (isLoadingData) {
                         setCurrentUserEmail(null);
                         window.location.href = '/';
                       }}
-                      className="w-full px-4 py-3 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                      className="w-full px-4 py-3 bg-red-50 border border-red-200 hover:bg-red-100 text-red-500 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -2712,24 +2683,24 @@ if (isLoadingData) {
           {/* Tutorial content cards */}
           {tutorialStep === 0 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-12 text-center animate-scaleIn">
-                <div className="w-24 h-24 mx-auto bg-white rounded-3xl flex items-center justify-center mb-8">
-                  <span className="text-4xl font-bold text-black">N</span>
+              <div className="bg-white border border-gray-200 rounded-3xl shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-12 text-center animate-scaleIn">
+                <div className="w-24 h-24 mx-auto bg-gray-900 rounded-3xl flex items-center justify-center mb-8">
+                  <span className="text-4xl font-bold text-white">N</span>
                 </div>
-                <h2 className="text-2xl sm:text-4xl font-extrabold text-neutral-100 mb-4">Welcome to Newton!</h2>
-                <p className="text-lg sm:text-xl text-neutral-300 mb-8 leading-relaxed">
+                <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-4">Welcome to Newton!</h2>
+                <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed">
                   Let's take a quick tour. This will only take a minute!
                 </p>
                 <div className="flex gap-4 justify-center">
                   <button
                     onClick={skipTutorial}
-                    className="px-6 py-3 bg-white/[0.06] text-neutral-300 rounded-xl font-semibold hover:bg-white/[0.1] transition-all"
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all"
                   >
                     Skip Tour
                   </button>
                   <button
                     onClick={nextTutorialStep}
-                    className="px-8 py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl font-semibold transition-colors duration-200"
+                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors duration-200"
                   >
                     Start Tour →
                   </button>
@@ -2740,27 +2711,27 @@ if (isLoadingData) {
 
           {tutorialStep === 1 && (
   <div
-    className="absolute bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+    className="absolute bg-white border border-gray-200 rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '285px',
       left: sidebarOpen ? '300px' : '50px',
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 1
               </div>
-              <h3 className="text-xl font-bold text-neutral-100 mb-2">New Conversations</h3>
-              <p className="text-neutral-300 mb-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">New Conversations</h3>
+              <p className="text-gray-600 mb-4">
                 Click "New conversation" to start a fresh chat. Each is automatically saved by subject!
               </p>
               <div className="flex gap-3 justify-end">
-                <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
+                <button onClick={skipTutorial} className="text-sm text-gray-400 hover:text-gray-700">
                   Skip
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Next →
                 </button>
@@ -2770,27 +2741,27 @@ if (isLoadingData) {
 
           {tutorialStep === 2 && (
   <div
-    className="absolute bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+    className="absolute bg-white border border-gray-200 rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '315px',
       left: sidebarOpen ? '265px' : '50px',
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 2
               </div>
-              <h3 className="text-xl font-bold text-neutral-100 mb-2">Organize by Subject</h3>
-              <p className="text-neutral-300 mb-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Organize by Subject</h3>
+              <p className="text-gray-600 mb-4">
                 Your chats are organized by subject. Switch between subjects to see all conversations about each topic!
               </p>
               <div className="flex gap-3 justify-end">
-                <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
+                <button onClick={skipTutorial} className="text-sm text-gray-400 hover:text-gray-700">
                   Skip
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Next →
                 </button>
@@ -2800,56 +2771,56 @@ if (isLoadingData) {
 
           {tutorialStep === 3 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-3xl w-full p-5 sm:p-10 animate-scaleIn">
-                <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="bg-white border border-gray-200 rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-3xl w-full p-5 sm:p-10 animate-scaleIn">
+                <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                   3
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-neutral-100 mb-6">How Newton Helps You Learn</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">How Newton Helps You Learn</h3>
 
-                <div className="bg-white/[0.04] rounded-2xl p-6 mb-6">
+                <div className="bg-gray-50 rounded-2xl p-6 mb-6">
                   <div className="flex gap-4 mb-4">
-                    <div className="w-10 h-10 bg-neutral-400 rounded-xl flex items-center justify-center flex-shrink-0">
-      <span className="text-xs font-bold text-white">You</span>
+                    <div className="w-10 h-10 bg-gray-300 rounded-xl flex items-center justify-center flex-shrink-0">
+      <span className="text-xs font-bold text-gray-700">You</span>
     </div>
-                    <div className="flex-1 bg-white/[0.06] rounded-xl p-4 shadow-sm">
-                      <p className="text-neutral-100">What's the answer to 2x + 5 = 15?</p>
+                    <div className="flex-1 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                      <p className="text-gray-800">What's the answer to 2x + 5 = 15?</p>
                     </div>
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-[#0071e3] rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">N</span>
                     </div>
-                    <div className="flex-1 bg-blue-500/10 rounded-xl p-4 border-2 border-blue-500/20">
-                      <p className="text-neutral-100 mb-3">Great question! Let's work through this together. First, what do you think we should do to get x by itself?</p>
-                      <p className="text-sm text-blue-400 font-semibold">Newton guides you to discover answers yourself!</p>
+                    <div className="flex-1 bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                      <p className="text-gray-800 mb-3">Great question! Let's work through this together. First, what do you think we should do to get x by itself?</p>
+                      <p className="text-sm text-blue-600 font-semibold">Newton guides you to discover answers yourself!</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
-  <div className="bg-emerald-500/10 border-2 border-emerald-500/20 rounded-xl p-4">
-    <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center mb-3">
+  <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4">
+    <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center mb-3">
       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
       </svg>
     </div>
-    <p className="font-semibold text-neutral-100 mb-1">Newton Will:</p>
-    <ul className="text-sm text-neutral-300 space-y-1">
+    <p className="font-semibold text-gray-900 mb-1">Newton Will:</p>
+    <ul className="text-sm text-gray-600 space-y-1">
       <li>• Ask guiding questions</li>
       <li>• Explain step-by-step</li>
       <li>• Help you understand deeply</li>
     </ul>
   </div>
 
-  <div className="bg-red-500/10 border-2 border-red-500/20 rounded-xl p-4">
+  <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
     <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center mb-3">
       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
       </svg>
     </div>
-    <p className="font-semibold text-neutral-100 mb-1">Newton Won't:</p>
-    <ul className="text-sm text-neutral-300 space-y-1">
+    <p className="font-semibold text-gray-900 mb-1">Newton Won't:</p>
+    <ul className="text-sm text-gray-600 space-y-1">
       <li>• Do your homework</li>
       <li>• Give direct answers</li>
       <li>• Write your essays</li>
@@ -2858,12 +2829,12 @@ if (isLoadingData) {
 </div>
 
                 <div className="flex gap-3 justify-end">
-                  <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
+                  <button onClick={skipTutorial} className="text-sm text-gray-400 hover:text-gray-700">
                     Skip
                   </button>
                   <button
                     onClick={nextTutorialStep}
-                    className="px-6 py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl font-semibold transition-colors duration-200"
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors duration-200"
                   >
                     Next →
                   </button>
@@ -2874,7 +2845,7 @@ if (isLoadingData) {
 
           {tutorialStep === 4 && (
             <div
-              className="absolute bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl p-6 shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-sm animate-slideIn pointer-events-auto left-1/2 -translate-x-1/2 bottom-24 sm:bottom-auto sm:left-auto sm:translate-x-0 sm:top-[80px] sm:right-[50px]"
+              className="absolute bg-white border border-gray-200 rounded-2xl p-6 shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-sm animate-slideIn pointer-events-auto left-1/2 -translate-x-1/2 bottom-24 sm:bottom-auto sm:left-auto sm:translate-x-0 sm:top-[80px] sm:right-[50px]"
               style={{
                 zIndex: 102
               }}
@@ -2882,17 +2853,17 @@ if (isLoadingData) {
               <div className="absolute -top-3 -left-3 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 4
               </div>
-              <h3 className="text-xl font-bold text-neutral-100 mb-2">Report Issues</h3>
-              <p className="text-neutral-300 mb-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Report Issues</h3>
+              <p className="text-gray-600 mb-4">
                 Encounter a bug? Click "Report Issue" to let us know and we'll fix it right away!
               </p>
               <div className="flex gap-3 justify-end">
-                <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
+                <button onClick={skipTutorial} className="text-sm text-gray-400 hover:text-gray-700">
                   Skip
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   {currentUserEmail ? 'Next →' : 'Finish! 🚀'}
                 </button>
@@ -2902,29 +2873,29 @@ if (isLoadingData) {
 
           {tutorialStep === 5 && currentUserEmail && (
   <div
-    className="absolute bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl p-6 shadow-2xl max-w-sm animate-slideIn pointer-events-auto"
+    className="absolute bg-white border border-gray-200 rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '230px',
       left: sidebarOpen ? '300px' : '50px',
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 5
               </div>
-              <h3 className="text-xl font-bold text-neutral-100 mb-2">Your Dashboard</h3>
-              <p className="text-neutral-300 mb-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Your Dashboard</h3>
+              <p className="text-gray-600 mb-4">
                 Visit your Dashboard to see learning progress and analytics. Let's check it out!
               </p>
               <div className="flex gap-3 justify-end">
-                <button onClick={skipTutorial} className="text-sm text-neutral-400 hover:text-white">
+                <button onClick={skipTutorial} className="text-sm text-gray-400 hover:text-gray-700">
                   Skip
                 </button>
                 <button
                   onClick={() => {
                     window.location.href = '/dashboard?tutorial=true';
                   }}
-                  className="px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Visit Dashboard →
                 </button>
@@ -2934,14 +2905,14 @@ if (isLoadingData) {
 
           {tutorialStep === 6 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-neutral-900/95 backdrop-blur-xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-10 text-center animate-scaleIn">
+              <div className="bg-white border border-gray-200 rounded-3xl shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-10 text-center animate-scaleIn">
                 <div className="w-20 h-20 mx-auto bg-emerald-500 rounded-3xl flex items-center justify-center mb-6">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-bold text-neutral-100 mb-4">You're All Set!</h3>
-                <p className="text-lg sm:text-xl text-neutral-300 mb-8">
+                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">You're All Set!</h3>
+                <p className="text-lg sm:text-xl text-gray-600 mb-8">
                   Ready to start learning? Ask Newton your first question!
                 </p>
                 <button
@@ -2959,35 +2930,32 @@ if (isLoadingData) {
       {/* Report Issue Modal */}
       {showReportIssue && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[150] p-6 animate-fadeIn"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[150] p-6 animate-fadeIn"
           onClick={() => setShowReportIssue(false)}
         >
           <div
-            className="bg-neutral-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-scaleIn"
+            className="bg-white border border-gray-200 rounded-3xl shadow-xl max-w-2xl w-full overflow-hidden animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
-            style={{
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.3)'
-            }}
           >
             <div className="p-10">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-extrabold text-neutral-100 tracking-tight">Report Issue</h2>
+                <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Report Issue</h2>
                 <button
                   onClick={() => {
                     setShowReportIssue(false);
                     setScreenshot(null);
                   }}
-                  className="p-3 hover:bg-white/[0.06] rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
+                  className="p-3 hover:bg-gray-100 rounded-2xl transition-all duration-250 hover:scale-105 active:scale-95"
                 >
-                  <svg className="w-6 h-6 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-              
+
               <div className="space-y-6">
                 <div>
-                  <label className="text-sm font-bold text-neutral-100 block mb-4">
+                  <label className="text-sm font-bold text-gray-900 block mb-4">
                     Describe the issue you encountered
                   </label>
                   <textarea
@@ -2995,11 +2963,11 @@ if (isLoadingData) {
                     onChange={(e) => setReportIssueText(e.target.value)}
                     placeholder="Please describe what happened, what you expected, and any steps to reproduce the issue..."
                     rows={6}
-                    className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all text-neutral-100 placeholder:text-neutral-500"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-gray-900 placeholder:text-gray-400"
                   />
                 </div>
 
-                <div className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                   <input
                     type="checkbox"
                     id="includeChat"
@@ -3007,21 +2975,21 @@ if (isLoadingData) {
                     onChange={(e) => setIncludeChat(e.target.checked)}
                     className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
-                  <label htmlFor="includeChat" className="text-sm font-semibold text-neutral-100 cursor-pointer flex-1">
+                  <label htmlFor="includeChat" className="text-sm font-semibold text-gray-800 cursor-pointer flex-1">
                     Include current chat conversation (helps us debug faster)
                   </label>
                 </div>
 
                 {screenshot && (
-                  <div className="relative p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                  <div className="relative p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-sm font-semibold text-emerald-300">Screenshot attached</span>
+                      <span className="text-sm font-semibold text-emerald-700">Screenshot attached</span>
                       <button
                         onClick={() => setScreenshot(null)}
-                        className="ml-auto text-xs text-white/30 hover:text-red-400 font-semibold transition-colors"
+                        className="ml-auto text-xs text-gray-400 hover:text-red-500 font-semibold transition-colors"
                       >
                         Remove
                       </button>
@@ -3035,14 +3003,14 @@ if (isLoadingData) {
                       setShowReportIssue(false);
                       setScreenshot(null);
                     }}
-                    className="flex-1 px-6 py-3 bg-white/[0.06] text-neutral-300 rounded-xl font-semibold hover:bg-white/[0.1] transition-all duration-250"
+                    className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-250"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleReportIssue}
                     disabled={reportIssueSubmitting || !reportIssueText.trim()}
-                    className="flex-1 px-6 py-3 bg-red-500/20 border border-red-500/30 text-red-400 rounded-xl font-semibold hover:bg-red-500/30 hover:shadow-lg transition-all duration-250 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 shadow-sm hover:shadow-md transition-all duration-250 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {reportIssueSubmitting ? 'Submitting...' : 'Submit Report'}
                   </button>
@@ -3215,10 +3183,10 @@ if (isLoadingData) {
 export default function Newton() {
   return (
     <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-[#F5F5F7]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-neutral-200 border-t-neutral-800 rounded-full animate-spin"></div>
-          <p className="text-neutral-500 text-sm">Loading Newton...</p>
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-700 rounded-full animate-spin"></div>
+          <p className="text-gray-500 text-sm">Loading Newton...</p>
         </div>
       </div>
     }>

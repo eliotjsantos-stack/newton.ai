@@ -78,8 +78,8 @@ export default function QuizResultsPage({ params }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="flex items-center gap-3 text-neutral-500">
+      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-gray-500">
           <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -92,9 +92,9 @@ export default function QuizResultsPage({ params }) {
 
   if (!quiz) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-neutral-600 mb-4">Quiz not found</p>
+          <p className="text-gray-600 mb-4">Quiz not found</p>
           <Link href="/quiz" className="text-blue-600 hover:underline">
             Back to quizzes
           </Link>
@@ -152,53 +152,53 @@ export default function QuizResultsPage({ params }) {
 
     return (
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-neutral-600 w-16 capitalize">{level}</span>
+        <span className="text-sm font-medium text-gray-600 w-16 capitalize">{level}</span>
         <div className={`flex-1 h-3 ${colors[level].light} rounded-full overflow-hidden`}>
           <div
             className={`h-full ${colors[level].bg} transition-all duration-500`}
             style={{ width: `${pct}%` }}
           />
         </div>
-        <span className="text-sm font-bold text-neutral-700 w-16 text-right">{displayEarned}/{displayTotal}</span>
+        <span className="text-sm font-bold text-gray-700 w-16 text-right">{displayEarned}/{displayTotal}</span>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-[#F5F5F7]">
       {/* Header */}
-      <header className="bg-white border-b border-neutral-200">
+      <header className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/quiz" className="p-2 -ml-2 hover:bg-neutral-100 rounded-lg transition-colors">
-            <svg className="w-5 h-5 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <Link href="/quiz" className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
           </Link>
-          <h1 className="font-semibold text-neutral-900">Quiz Results</h1>
+          <h1 className="font-semibold text-gray-900">Quiz Results</h1>
           <div className="w-9" />
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Score Card */}
-        <div className="bg-white rounded-2xl border border-neutral-200 p-8 text-center mb-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center mb-6">
           <div className={`w-24 h-24 ${gradeInfo.bg} rounded-full flex items-center justify-center mx-auto mb-4`}>
             <span className={`text-4xl font-bold ${gradeInfo.color}`}>{gradeInfo.grade}</span>
           </div>
-          <h2 className="text-2xl font-bold text-neutral-900 mb-1">{marksEarned} / {quizTotalMarks} marks</h2>
-          <p className="text-lg text-neutral-500 mb-4">{percentage}%</p>
-          <p className="text-neutral-600">{getMessage()}</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">{marksEarned} / {quizTotalMarks} marks</h2>
+          <p className="text-lg text-gray-500 mb-4">{percentage}%</p>
+          <p className="text-gray-600">{getMessage()}</p>
         </div>
 
         {/* Topic Info */}
-        <div className="bg-white rounded-xl border border-neutral-200 p-4 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-neutral-900">{quiz.topicName}</h3>
-              <p className="text-sm text-neutral-500">{quiz.subject}</p>
+              <h3 className="font-semibold text-gray-900">{quiz.topicName}</h3>
+              <p className="text-sm text-gray-500">{quiz.subject}</p>
             </div>
             {quiz.completedAt && (
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-gray-400">
                 Completed {new Date(quiz.completedAt).toLocaleDateString()}
               </p>
             )}
@@ -206,8 +206,8 @@ export default function QuizResultsPage({ params }) {
         </div>
 
         {/* Level Breakdown */}
-        <div className="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
-          <h3 className="font-semibold text-neutral-900 mb-4">Score Breakdown</h3>
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h3 className="font-semibold text-gray-900 mb-4">Score Breakdown</h3>
           <div className="space-y-4">
             {getLevelBar(quiz.easyScore, 'easy')}
             {getLevelBar(quiz.mediumScore, 'medium')}
@@ -236,17 +236,17 @@ export default function QuizResultsPage({ params }) {
 
         {/* Flagged Questions */}
         {flaggedQuestions.length > 0 && (
-          <div className="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
             <div className="flex items-center gap-2 mb-4">
               <svg className="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5" />
               </svg>
-              <h3 className="font-semibold text-neutral-900">Flagged for Review</h3>
-              <span className="ml-auto text-sm text-neutral-500">{flaggedQuestions.length} question{flaggedQuestions.length !== 1 ? 's' : ''}</span>
+              <h3 className="font-semibold text-gray-900">Flagged for Review</h3>
+              <span className="ml-auto text-sm text-gray-500">{flaggedQuestions.length} question{flaggedQuestions.length !== 1 ? 's' : ''}</span>
             </div>
             <div className="space-y-2 mb-4">
               {flaggedQuestions.map((q, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-3 bg-neutral-50 rounded-lg">
+                <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded capitalize flex-shrink-0 ${
                     q.level === 'easy' ? 'bg-green-100 text-green-700' :
                     q.level === 'medium' ? 'bg-amber-100 text-amber-700' :
@@ -254,7 +254,7 @@ export default function QuizResultsPage({ params }) {
                   }`}>
                     {q.level}
                   </span>
-                  <p className="text-sm text-neutral-700 flex-1"><MathText>{q.questionText}</MathText></p>
+                  <p className="text-sm text-gray-700 flex-1"><MathText>{q.questionText}</MathText></p>
                 </div>
               ))}
             </div>
@@ -274,7 +274,7 @@ export default function QuizResultsPage({ params }) {
         <div className="space-y-3 mb-8">
           <button
             onClick={() => setShowReview(!showReview)}
-            className="flex items-center justify-center gap-2 w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-medium rounded-xl transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-colors"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
@@ -292,7 +292,7 @@ export default function QuizResultsPage({ params }) {
           </Link>
           <Link
             href="/quiz"
-            className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-700 font-medium rounded-xl transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-colors"
           >
             Back to Quizzes
           </Link>
@@ -300,9 +300,9 @@ export default function QuizResultsPage({ params }) {
 
         {/* Review Answers Section */}
         {showReview && (
-          <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
-            <div className="p-4 border-b border-neutral-200 bg-neutral-50">
-              <h3 className="font-semibold text-neutral-900 mb-3">Review Your Answers</h3>
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 bg-gray-50">
+              <h3 className="font-semibold text-gray-900 mb-3">Review Your Answers</h3>
               <div className="flex flex-wrap gap-2">
                 {[
                   { id: 'all', label: 'All', count: reviewData.length },
@@ -315,8 +315,8 @@ export default function QuizResultsPage({ params }) {
                     onClick={() => setReviewFilter(filter.id)}
                     className={`px-3 py-1.5 text-sm font-medium rounded-lg transition ${
                       reviewFilter === filter.id
-                        ? 'bg-neutral-900 text-white'
-                        : 'bg-white border border-neutral-200 text-neutral-600 hover:border-neutral-300'
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                   >
                     {filter.label} ({filter.count})
@@ -325,9 +325,9 @@ export default function QuizResultsPage({ params }) {
               </div>
             </div>
 
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-gray-100">
               {filteredReviewData.length === 0 ? (
-                <div className="p-8 text-center text-neutral-500">
+                <div className="p-8 text-center text-gray-500">
                   No questions match this filter
                 </div>
               ) : (
@@ -338,7 +338,7 @@ export default function QuizResultsPage({ params }) {
                         question.isCorrect
                           ? 'bg-emerald-100 text-emerald-700'
                           : question.skipped
-                            ? 'bg-neutral-100 text-neutral-500'
+                            ? 'bg-gray-100 text-gray-500'
                             : 'bg-red-100 text-red-700'
                       }`}>
                         {question.isCorrect ? '✓' : question.skipped ? '−' : '✗'}
@@ -352,16 +352,16 @@ export default function QuizResultsPage({ params }) {
                           }`}>
                             {question.level}
                           </span>
-                          <span className="text-xs text-neutral-400 capitalize">
+                          <span className="text-xs text-gray-400 capitalize">
                             {question.questionType.replace('_', ' ')}
                           </span>
                           {question.marks > 0 && (
-                            <span className="text-xs font-mono text-neutral-400">
+                            <span className="text-xs font-mono text-gray-400">
                               {question.marksAwarded}/{question.marks} marks
                             </span>
                           )}
                         </div>
-                        <p className="text-neutral-900 font-medium mb-3">
+                        <p className="text-gray-900 font-medium mb-3">
                           <MathText>{question.questionText}</MathText>
                         </p>
 
@@ -381,7 +381,7 @@ export default function QuizResultsPage({ params }) {
                                       ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
                                       : isStudentAnswer && !question.isCorrect
                                         ? 'bg-red-50 border border-red-200 text-red-800'
-                                        : 'bg-neutral-50 text-neutral-600'
+                                        : 'bg-gray-50 text-gray-600'
                                   }`}
                                 >
                                   <MathText>{option}</MathText>
@@ -407,7 +407,7 @@ export default function QuizResultsPage({ params }) {
                               </div>
                             )}
                             {question.skipped && (
-                              <div className="px-3 py-2 rounded-lg text-sm bg-neutral-100 text-neutral-600">
+                              <div className="px-3 py-2 rounded-lg text-sm bg-gray-100 text-gray-600">
                                 <span className="font-medium">Skipped</span>
                               </div>
                             )}

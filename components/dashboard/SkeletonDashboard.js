@@ -2,11 +2,11 @@
 
 function Shimmer({ className = '' }) {
   return (
-    <div className={`rounded-lg bg-white/[0.06] animate-pulse ${className}`} />
+    <div className={`rounded-lg bg-gray-100 animate-pulse ${className}`} />
   );
 }
 
-const cardBase = "bg-[#0d0d0d] border border-white/10 rounded-2xl";
+const cardBase = "bg-white border border-gray-200 rounded-2xl shadow-sm";
 
 export default function SkeletonDashboard() {
   return (

@@ -111,7 +111,7 @@ export default function QuizQuestion({
                 className={`w-full p-4 text-left rounded-xl border-2 transition-all ${
                   selectedOption === option
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
                 } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <span className="font-medium"><MathText>{option}</MathText></span>
@@ -133,7 +133,7 @@ export default function QuizQuestion({
                     ? option === 'True'
                       ? 'border-green-500 bg-green-50 text-green-700'
                       : 'border-red-500 bg-red-50 text-red-700'
-                    : 'border-neutral-200 hover:border-neutral-300 bg-white text-neutral-700'
+                    : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
                 } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 {option}
@@ -151,7 +151,7 @@ export default function QuizQuestion({
             onPaste={(e) => { e.preventDefault(); onPasteBlocked?.(); }}
             disabled={disabled}
             placeholder="Type your answer..."
-            className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
           />
         );
 
@@ -164,7 +164,7 @@ export default function QuizQuestion({
             disabled={disabled}
             placeholder="Explain your reasoning..."
             rows={4}
-            className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:opacity-50"
+            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:opacity-50"
           />
         );
 
@@ -181,23 +181,23 @@ export default function QuizQuestion({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       {/* Question Header */}
-      <div className="px-6 py-4 border-b border-neutral-100 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-neutral-500">
+          <span className="text-sm font-medium text-gray-500">
             Question {questionNumber} of {totalQuestions}
           </span>
           {getLevelBadge()}
         </div>
-        <span className="text-xs text-neutral-400 uppercase tracking-wide">
+        <span className="text-xs text-gray-400 uppercase tracking-wide">
           {question.questionType.replace('_', ' ')}
         </span>
       </div>
 
       {/* Question Content */}
       <div className="p-6">
-        <h2 className="text-lg font-semibold text-neutral-900 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">
           <MathText>{question.questionText}</MathText>
         </h2>
 
@@ -205,9 +205,9 @@ export default function QuizQuestion({
 
         {/* Confidence Slider */}
         {isAnswerValid() && (
-          <div className="mt-4 p-4 bg-neutral-50 rounded-xl">
+          <div className="mt-4 p-4 bg-gray-50 rounded-xl">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-neutral-700">How confident are you?</span>
+              <span className="text-sm font-medium text-gray-700">How confident are you?</span>
               <span className="text-sm font-semibold text-blue-600">{confidence}/5</span>
             </div>
             <input
@@ -217,11 +217,11 @@ export default function QuizQuestion({
               step="1"
               value={confidence}
               onChange={(e) => setConfidence(parseInt(e.target.value))}
-              className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
             <div className="flex justify-between mt-1">
-              <span className="text-xs text-neutral-400">Guessing</span>
-              <span className="text-xs text-neutral-400">Very sure</span>
+              <span className="text-xs text-gray-400">Guessing</span>
+              <span className="text-xs text-gray-400">Very sure</span>
             </div>
           </div>
         )}
@@ -231,7 +231,7 @@ export default function QuizQuestion({
           <button
             onClick={handleSubmit}
             disabled={!isAnswerValid() || disabled || submitting}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-200 disabled:text-neutral-400 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
           >
             {submitting ? (
               <>

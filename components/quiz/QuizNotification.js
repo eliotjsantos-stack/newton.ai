@@ -50,7 +50,7 @@ export default function QuizNotification({
 
   return (
     <div className="fixed bottom-4 right-4 z-50 animate-slideUp">
-      <div className="bg-white rounded-2xl shadow-2xl border border-neutral-200 p-5 w-80">
+      <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-5 w-80">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
@@ -60,22 +60,22 @@ export default function QuizNotification({
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-900">Ready to test yourself?</h3>
-              <p className="text-xs text-neutral-500">On: {topicName}</p>
+              <h3 className="font-semibold text-gray-900">Ready to test yourself?</h3>
+              <p className="text-xs text-gray-500">On: {topicName}</p>
             </div>
           </div>
           <button
             onClick={onDismiss}
-            className="p-1 hover:bg-neutral-100 rounded-lg transition-colors"
+            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-neutral-600 mb-4">
+        <p className="text-sm text-gray-600 mb-4">
           You've been discussing this topic for a while. Take a quick quiz to check your understanding!
         </p>
 
@@ -89,7 +89,7 @@ export default function QuizNotification({
           <button
             onClick={onDismiss}
             disabled={generating}
-            className="flex-1 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded-xl transition-colors"
+            className="flex-1 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
           >
             Maybe Later
           </button>
@@ -118,7 +118,7 @@ export default function QuizNotification({
         </div>
 
         {/* Quiz Info */}
-        <p className="text-xs text-neutral-400 text-center mt-3">
+        <p className="text-xs text-gray-400 text-center mt-3">
           15 questions • 3 difficulty levels
         </p>
       </div>

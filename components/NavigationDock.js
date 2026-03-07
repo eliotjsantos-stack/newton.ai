@@ -38,15 +38,6 @@ const items = [
   },
 ];
 
-/**
- * NavigationDock — unified navigation for mobile + desktop.
- *
- * Props:
- *   dimmed   — fade dock to 20% opacity (e.g. when the chat input is focused)
- *   hidden   — slide the dock off-screen (e.g. when user is scrolling)
- *   inline   — render without fixed positioning (for embedding in a parent container)
- *   focused  — when inline, scale down to 0.9 and fade to 20% opacity
- */
 export default function NavigationDock({ dimmed = false, hidden = false, inline = false, focused = false }) {
   const pathname = usePathname();
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -57,7 +48,6 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
     return pathname === href;
   };
 
-  /* ── Inline mode: no fixed positioning, lives inside a parent container ── */
   if (inline) {
     return (
       <>
@@ -74,7 +64,7 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                 key={item.href}
                 href={item.href}
                 className={`relative flex flex-col items-center gap-0.5 py-1.5 px-3 transition-colors ${
-                  active ? 'text-[#0071e3]' : 'text-white/40'
+                  active ? 'text-blue-600' : 'text-gray-400'
                 }`}
               >
                 {item.icon}
@@ -86,7 +76,7 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
 
         {/* Desktop inline dock */}
         <motion.nav
-          className="hidden md:flex items-center gap-1 px-2 py-2 rounded-full bg-black/80 backdrop-blur-xl border border-white/20 w-fit mx-auto shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+          className="hidden md:flex items-center gap-1 px-2 py-2 rounded-full bg-white border border-gray-200 shadow-sm w-fit mx-auto"
           animate={{ opacity: focused ? 0.2 : 1, scale: focused ? 0.9 : 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
@@ -103,18 +93,17 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                 {active && (
                   <motion.div
                     layoutId="active-pill-inline"
-                    className="absolute inset-0 rounded-full bg-white/10"
+                    className="absolute inset-0 rounded-full bg-gray-100"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
-
                 <span className={`relative z-10 transition-colors duration-150 ${
-                  active ? 'text-white' : 'text-white/40 group-hover:text-white/70'
+                  active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
                 }`}>
                   {item.icon}
                 </span>
                 <span className={`relative z-10 text-[10px] font-semibold mt-0.5 transition-colors duration-150 ${
-                  active ? 'text-white' : 'text-white/40 group-hover:text-white/70'
+                  active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
                 }`}>
                   {item.label}
                 </span>
@@ -126,9 +115,9 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 4 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/10 whitespace-nowrap pointer-events-none"
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md bg-gray-800 whitespace-nowrap pointer-events-none"
                     >
-                      <span className="text-[10px] font-semibold text-white/70">{item.tooltip}</span>
+                      <span className="text-[10px] font-semibold text-white">{item.tooltip}</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -140,15 +129,14 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
     );
   }
 
-  /* ── Standard mode: fixed positioning for standalone pages ── */
   const resolvedOpacity = hidden ? 0 : dimmed ? 0.2 : 1;
   const resolvedY = hidden ? 80 : 0;
 
   return (
     <>
-      {/* ── Mobile: Full-width bottom bar ── */}
+      {/* Mobile: Full-width bottom bar */}
       <motion.nav
-        className="fixed bottom-0 left-0 right-0 z-[100] md:hidden border-t border-white/10 bg-black/90 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
+        className="fixed bottom-0 left-0 right-0 z-[100] md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
         animate={{ opacity: resolvedOpacity, y: resolvedY }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         style={{ pointerEvents: hidden ? 'none' : 'auto' }}
@@ -161,7 +149,7 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                 key={item.href}
                 href={item.href}
                 className={`relative flex flex-col items-center gap-0.5 py-1.5 px-3 transition-colors ${
-                  active ? 'text-[#0071e3]' : 'text-white/40'
+                  active ? 'text-blue-600' : 'text-gray-400'
                 }`}
               >
                 {item.icon}
@@ -172,9 +160,9 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
         </div>
       </motion.nav>
 
-      {/* ── Desktop: Floating macOS-style dock ── */}
+      {/* Desktop: Floating dock */}
       <motion.nav
-        className="fixed bottom-6 left-1/2 z-[100] hidden md:flex items-center gap-1 px-2 py-2 rounded-full bg-black/80 backdrop-blur-xl border border-white/20 w-fit shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+        className="fixed bottom-6 left-1/2 z-[100] hidden md:flex items-center gap-1 px-2 py-2 rounded-full bg-white border border-gray-200 shadow-lg w-fit"
         style={{ x: '-50%', pointerEvents: hidden ? 'none' : 'auto' }}
         animate={{ opacity: resolvedOpacity, y: resolvedY }}
         whileHover={{ scale: 1.05 }}
@@ -193,18 +181,17 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
               {active && (
                 <motion.div
                   layoutId="active-pill"
-                  className="absolute inset-0 rounded-full bg-white/10"
+                  className="absolute inset-0 rounded-full bg-gray-100"
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
-
               <span className={`relative z-10 transition-colors duration-150 ${
-                active ? 'text-white' : 'text-white/40 group-hover:text-white/70'
+                active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
               }`}>
                 {item.icon}
               </span>
               <span className={`relative z-10 text-[10px] font-semibold mt-0.5 transition-colors duration-150 ${
-                active ? 'text-white' : 'text-white/40 group-hover:text-white/70'
+                active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
               }`}>
                 {item.label}
               </span>
@@ -216,9 +203,9 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 4 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/10 whitespace-nowrap pointer-events-none"
+                    className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md bg-gray-800 whitespace-nowrap pointer-events-none"
                   >
-                    <span className="text-[10px] font-semibold text-white/70">{item.tooltip}</span>
+                    <span className="text-[10px] font-semibold text-white">{item.tooltip}</span>
                   </motion.div>
                 )}
               </AnimatePresence>

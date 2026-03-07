@@ -74,8 +74,8 @@ export default function UnderstandingRatingModal({
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-neutral-900 mb-2">Thanks for your feedback!</h3>
-          <p className="text-sm text-neutral-500">This helps us understand how you're learning.</p>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Thanks for your feedback!</h3>
+          <p className="text-sm text-gray-500">This helps us understand how you're learning.</p>
         </div>
 
         <style jsx>{`
@@ -98,14 +98,14 @@ export default function UnderstandingRatingModal({
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h2 className="text-lg font-bold text-neutral-900">How well do you understand</h2>
+            <h2 className="text-lg font-bold text-gray-900">How well do you understand</h2>
             <p className="text-lg font-bold text-blue-600">{topicName}?</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -126,7 +126,7 @@ export default function UnderstandingRatingModal({
                   className={`w-10 h-10 transition-colors ${
                     star <= (hoveredRating || rating)
                       ? 'text-amber-400 fill-amber-400'
-                      : 'text-neutral-300 fill-neutral-200'
+                      : 'text-gray-300 fill-gray-200'
                   }`}
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -141,7 +141,7 @@ export default function UnderstandingRatingModal({
               </button>
             ))}
           </div>
-          <p className="text-center text-sm font-medium text-neutral-600 h-5">
+          <p className="text-center text-sm font-medium text-gray-600 h-5">
             {rating > 0 && (
               <span className="flex items-center justify-center gap-2">
                 <span>{ratingEmojis[rating]}</span>
@@ -154,14 +154,14 @@ export default function UnderstandingRatingModal({
         {/* Feedback Input (shown after rating) */}
         {rating > 0 && rating < 4 && (
           <div className="mb-6 animate-fadeIn">
-            <label className="block text-sm font-medium text-neutral-700 mb-2">
-              What's still unclear? <span className="text-neutral-400">(optional)</span>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              What's still unclear? <span className="text-gray-400">(optional)</span>
             </label>
             <textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               placeholder="Let Newton know what confused you..."
-              className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               rows={3}
             />
           </div>
@@ -171,14 +171,14 @@ export default function UnderstandingRatingModal({
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-700 text-sm font-medium rounded-xl transition-colors"
+            className="flex-1 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-xl transition-colors"
           >
             Skip
           </button>
           <button
             onClick={handleSubmit}
             disabled={rating === 0 || submitting}
-            className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-200 disabled:text-neutral-400 text-white text-sm font-medium rounded-xl transition-colors"
+            className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl transition-colors"
           >
             {submitting ? 'Submitting...' : 'Submit'}
           </button>
