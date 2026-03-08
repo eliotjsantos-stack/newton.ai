@@ -8,7 +8,7 @@ const variants = {
   success: 'bg-[var(--c-success-muted)] text-[var(--c-success-text)] border-[var(--c-success)]/20',
   error:   'bg-[var(--c-error-muted)] text-[var(--c-error-text)] border-[var(--c-error)]/20',
   warning: 'bg-[var(--c-warning-muted)] text-[var(--c-warning-text)] border-[var(--c-warning)]/20',
-  blue:    'bg-blue-50 text-blue-700 border-blue-200/60',
+  blue:    'bg-amber-50 text-amber-600 border-amber-200/60',
   purple:  'bg-purple-50 text-purple-700 border-purple-200/60',
 };
 
@@ -36,7 +36,7 @@ function Badge({ variant = 'default', size = 'md', dot = false, className, child
           variant === 'success' && 'bg-[var(--c-success)]',
           variant === 'error'   && 'bg-[var(--c-error)]',
           variant === 'warning' && 'bg-[var(--c-warning)]',
-          variant === 'blue'    && 'bg-blue-500',
+          variant === 'blue'    && 'bg-amber-500',
           variant === 'default' && 'bg-[var(--c-text-faint)]',
         )} />
       )}

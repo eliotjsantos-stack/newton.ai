@@ -588,8 +588,8 @@ function QuizPageContent({ params }) {
                         onClick={() => setSelectedAnswer(option)}
                         className={`w-full p-4 text-left rounded-lg border transition ${
                           selectedAnswer === option
-                            ? 'border-blue-500 bg-blue-50 text-blue-900'
-                            : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
+                            ? 'border-amber-500 bg-amber-50 text-amber-900'
+                            : 'border-[var(--c-border)] hover:border-[var(--c-border-strong)] bg-white text-[var(--c-text)]'
                         }`}
                       >
                         <MathText>{option}</MathText>
@@ -606,8 +606,8 @@ function QuizPageContent({ params }) {
                         onClick={() => setSelectedAnswer(option)}
                         className={`py-4 font-medium rounded-lg border transition ${
                           selectedAnswer === option
-                            ? 'border-blue-500 bg-blue-50 text-blue-900'
-                            : 'border-gray-200 hover:border-gray-300 bg-white text-gray-800'
+                            ? 'border-amber-500 bg-amber-50 text-amber-900'
+                            : 'border-[var(--c-border)] hover:border-[var(--c-border-strong)] bg-white text-[var(--c-text)]'
                         }`}
                       >
                         {option}
@@ -622,7 +622,7 @@ function QuizPageContent({ params }) {
                     value={textAnswer}
                     onChange={(e) => setTextAnswer(e.target.value)}
                     placeholder="Type your answer..."
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-amber-500/25 focus:border-amber-500"
                     onKeyDown={(e) => e.key === 'Enter' && handleAnswer()}
                   />
                 )}
@@ -633,7 +633,7 @@ function QuizPageContent({ params }) {
                     onChange={(e) => setTextAnswer(e.target.value)}
                     placeholder={currentQuestion.questionType === 'structured' ? "Write your answer here..." : "Explain your reasoning..."}
                     rows={currentQuestion.questionType === 'structured' ? 6 : 4}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-amber-500/25 focus:border-amber-500 resize-none"
                   />
                 )}
               </div>
@@ -651,7 +651,7 @@ function QuizPageContent({ params }) {
                   step="1"
                   value={confidence}
                   onChange={(e) => setConfidence(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
                 />
                 <div className="flex justify-between mt-1">
                   <span className="text-xs text-gray-400">Guessing</span>
@@ -682,7 +682,7 @@ function QuizPageContent({ params }) {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-6 bg-blue-100">
+              <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-6 bg-amber-100">
                 <svg className="w-8 h-8 text-[var(--c-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>

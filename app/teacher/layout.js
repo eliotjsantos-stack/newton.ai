@@ -81,29 +81,29 @@ export default function TeacherLayout({ children }) {
   const sidebar = (
     <div className="flex flex-col h-full">
       {/* Branding */}
-      <div className="px-5 py-5 border-b border-gray-200">
+      <div className="px-5 py-5 border-b border-neutral-100">
         <Link href="/teacher/classes" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm font-bold">N</span>
+          <div className="w-7 h-7 rounded-md bg-amber-500 flex items-center justify-center">
+            <span className="text-white font-semibold text-sm">N</span>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900 leading-none">Newton</p>
-            <p className="text-xs text-gray-500 mt-0.5">Teacher Dashboard</p>
+            <p className="text-sm font-semibold text-neutral-900 leading-none">Newton</p>
+            <p className="text-xs text-neutral-400 mt-0.5">Teacher Dashboard</p>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
         {navItems.map(item => (
           <Link
             key={item.href}
             href={item.href}
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150 ${
               isActive(item.href)
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                ? 'bg-amber-50 text-amber-700 font-medium'
+                : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
             }`}
           >
             {item.icon}
@@ -113,13 +113,13 @@ export default function TeacherLayout({ children }) {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-4 border-t border-gray-200 space-y-2">
+      <div className="px-3 py-4 border-t border-neutral-100 space-y-2">
         {teacherName && (
-          <p className="px-3 text-xs text-gray-400 truncate">{teacherName}</p>
+          <p className="px-3 text-xs text-neutral-400 truncate">{teacherName}</p>
         )}
         <Link
           href="/"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
@@ -131,7 +131,7 @@ export default function TeacherLayout({ children }) {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#F5F5F7]">
+    <div className="flex min-h-screen bg-[var(--c-canvas)]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setSidebarOpen(false)}>
@@ -140,19 +140,19 @@ export default function TeacherLayout({ children }) {
       )}
 
       {/* Sidebar — desktop */}
-      <aside className="hidden md:flex md:w-60 md:flex-col md:fixed md:inset-y-0 bg-white border-r border-gray-200 z-30">
+      <aside className="hidden md:flex md:w-60 md:flex-col md:fixed md:inset-y-0 bg-white border-r border-neutral-100 z-30">
         {sidebar}
       </aside>
 
       {/* Sidebar — mobile */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-60 bg-white border-r border-gray-200 transform transition-transform md:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-60 bg-white border-r border-neutral-100 transform transition-transform md:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {sidebar}
       </aside>
 
       {/* Main content */}
       <div className="flex-1 md:ml-60">
         {/* Mobile header */}
-        <div className="sticky top-0 z-20 md:hidden bg-white/90 backdrop-blur-xl border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+        <div className="sticky top-0 z-20 md:hidden bg-white/90 backdrop-blur-xl border-b border-neutral-100 px-4 py-3 flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100 transition-colors"

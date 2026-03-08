@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 
 const BOARD_COLORS = {
   AQA: 'bg-purple-100 text-purple-700',
-  OCR: 'bg-blue-100 text-blue-700',
+  OCR: 'bg-amber-100 text-amber-600',
   Pearson: 'bg-emerald-100 text-emerald-700',
 };
 

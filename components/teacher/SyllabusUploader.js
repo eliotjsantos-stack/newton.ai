@@ -109,7 +109,7 @@ export default function SyllabusUploader({ classId, qanCode }) {
         onClick={() => fileInputRef.current?.click()}
         className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
           dragging
-            ? 'border-blue-400 bg-blue-50'
+            ? 'border-amber-200 bg-amber-50'
             : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
         }`}
       >
@@ -182,7 +182,7 @@ export default function SyllabusUploader({ classId, qanCode }) {
           <button
             onClick={confirmSyllabus}
             disabled={saving}
-            className="w-full py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+            className="w-full py-2.5 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-700 disabled:opacity-50 transition"
           >
             {saving ? 'Saving...' : 'Confirm & Save to Class'}
           </button>

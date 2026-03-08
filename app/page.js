@@ -143,7 +143,7 @@ function GlassPane() {
         <div className="relative z-10 px-4 pb-3">
           <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50">
             <span className="text-[13px] text-gray-400">Ask about Mitosis...</span>
-            <div className="ml-auto w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center">
+            <div className="ml-auto w-7 h-7 rounded-full bg-amber-600 flex items-center justify-center">
               <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18" />
               </svg>
@@ -215,8 +215,8 @@ function ExamBoardScroll() {
                     <span className="text-xs text-gray-400 font-semibold tracking-widest uppercase">
                       2026 Specification
                     </span>
-                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                      <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+                      <svg className="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -236,8 +236,8 @@ function ExamBoardScroll() {
           transition={{ ...spring, delay: 0.35 }}
         >
           <div className="rounded-xl p-6 flex items-start gap-4 bg-white border border-gray-200 card-shadow">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </div>
@@ -249,14 +249,14 @@ function ExamBoardScroll() {
               <div className="mt-3 flex items-center gap-2">
                 <div className="h-1 flex-1 rounded-full bg-gray-200 overflow-hidden">
                   <motion.div
-                    className="h-full bg-blue-600 rounded-full"
+                    className="h-full bg-amber-600 rounded-full"
                     initial={{ width: '0%' }}
                     whileInView={{ width: '100%' }}
                     viewport={{ once: true, margin: '-60px' }}
                     transition={{ duration: 1, delay: 0.55, ease: 'easeOut' }}
                   />
                 </div>
-                <span className="text-[11px] text-blue-600 font-semibold">Loaded</span>
+                <span className="text-[11px] text-amber-600 font-semibold">Loaded</span>
               </div>
             </div>
           </div>
@@ -558,8 +558,8 @@ export default function LandingPage() {
               <div
                 className="h-full rounded-xl p-6 md:p-10 bg-white/5 border border-[#0071e3]/20 hover:border-[#0071e3]/40 transition-colors duration-200"
               >
-                <div className="w-12 h-12 rounded-2xl bg-blue-600/10 flex items-center justify-center mb-5 md:mb-8">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center mb-5 md:mb-8">
+                  <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
@@ -572,8 +572,8 @@ export default function LandingPage() {
                     'You ace the exam without AI',
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <span className="w-5 h-5 rounded-full bg-blue-600/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <span className="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </span>
@@ -695,7 +695,7 @@ export default function LandingPage() {
                 <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-2">Step {s.step}</p>
                 <h3 className="text-lg font-bold text-gray-900 tracking-tight mb-4">{s.title}</h3>
                 {s.avatar === 'result' ? (
-                  <div className="rounded-xl p-5 text-center bg-blue-50 border border-blue-100">
+                  <div className="rounded-xl p-5 text-center bg-amber-50 border border-amber-100">
                     <div className="text-3xl font-bold text-gray-900 tracking-tighter mb-1">A*</div>
                     <p className="text-xs text-gray-500 font-medium">Earned, not copied</p>
                   </div>
@@ -786,7 +786,7 @@ export default function LandingPage() {
                 reverse
               >
                 <div className="w-full max-w-sm flex flex-col items-center gap-4">
-                  <div className="w-full rounded-2xl p-6 text-center bg-blue-600/10 border border-[#0071e3]/15">
+                  <div className="w-full rounded-2xl p-6 text-center bg-amber-50 border border-amber-200">
                     <div className="text-4xl font-bold text-gray-900 tracking-tighter mb-2">A*</div>
                     <p className="text-sm text-gray-500 font-medium">Exam result — earned, not copied</p>
                   </div>
@@ -914,8 +914,8 @@ export default function LandingPage() {
             {/* Scientific Retention */}
             <ScrollReveal delay={0.08}>
               <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
-                <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center mb-6">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-6">
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
                   </svg>
                 </div>
@@ -1027,7 +1027,7 @@ export default function LandingPage() {
 
                 <div className="flex items-center justify-between mb-6 relative">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-xl bg-amber-600 flex items-center justify-center">
                       <span className="text-xs font-bold text-white">N</span>
                     </div>
                     <span className="text-sm font-semibold text-gray-900">Newton</span>
@@ -1047,7 +1047,7 @@ export default function LandingPage() {
                       'What pulls the chromatids apart?',
                     ].map((q, i) => (
                       <div key={i} className="flex items-start gap-2.5">
-                        <span className="w-5 h-5 rounded-md bg-blue-600/15 text-blue-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                        <span className="w-5 h-5 rounded-md bg-amber-600/15 text-amber-600 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
                         <p className="text-[13px] text-gray-500 leading-relaxed">{q}</p>
                       </div>
                     ))}
@@ -1057,7 +1057,7 @@ export default function LandingPage() {
                 {/* Input field */}
                 <div className="flex items-center px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 mb-5">
                   <span className="text-[13px] text-gray-400">Your answer here...</span>
-                  <div className="ml-auto w-1.5 h-4 bg-blue-600 rounded-full animate-pulse" />
+                  <div className="ml-auto w-1.5 h-4 bg-amber-600 rounded-full animate-pulse" />
                 </div>
 
                 <div className="flex items-center gap-2.5 text-xs text-emerald-400/60">
@@ -1079,8 +1079,8 @@ export default function LandingPage() {
                 { value: '3-layer', label: 'Integrity verification', icon: 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z' },
               ].map((stat) => (
                 <div key={stat.label} className="rounded-xl bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200 p-5 md:p-6 text-center">
-                  <div className="w-8 h-8 rounded-xl bg-blue-600/10 flex items-center justify-center mx-auto mb-3">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d={stat.icon} />
                     </svg>
                   </div>
@@ -1127,8 +1127,8 @@ export default function LandingPage() {
                 },
               ].map((item) => (
                 <div key={item.title} className="rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center mb-6">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-6">
+                    <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                     </svg>
                   </div>
@@ -1148,7 +1148,7 @@ export default function LandingPage() {
 
           {/* Institutional Value Prop */}
           <ScrollReveal delay={0.1}>
-            <div className="rounded-xl p-6 md:p-10 bg-white border border-blue-100 hover:border-blue-200 card-shadow transition-colors duration-200">
+            <div className="rounded-xl p-6 md:p-10 bg-white border border-amber-100 hover:border-amber-200 card-shadow transition-colors duration-200">
               <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-12">
                 <div className="flex-1">
                   <h3 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight mb-3">
@@ -1188,8 +1188,8 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-4 md:gap-6">
             <ScrollReveal>
               <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
-                <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center mb-6">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-6">
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                   </svg>
                 </div>

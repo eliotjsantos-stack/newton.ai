@@ -81,12 +81,12 @@ export default function StudentsPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by email..."
-          className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 placeholder:text-gray-400"
+          className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 placeholder:text-gray-400"
         />
         <select
           value={filterClass}
           onChange={e => setFilterClass(e.target.value)}
-          className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+          className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200"
         >
           <option value="all">All classes</option>
           {classes.map(c => (

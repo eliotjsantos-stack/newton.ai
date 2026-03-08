@@ -97,7 +97,7 @@ export default function SettingsPage() {
   }
   if (!authorized) return null;
 
-  const inputCls = "w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all placeholder:text-gray-400";
+  const inputCls = "w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 transition-all placeholder:text-gray-400";
 
   return (
     <div className="max-w-2xl">
@@ -162,7 +162,7 @@ export default function SettingsPage() {
         </section>
 
         <button type="submit" disabled={saving}
-          className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors">
+          className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-full transition-colors">
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
         </button>
       </form>

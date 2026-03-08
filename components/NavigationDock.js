@@ -149,7 +149,7 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                 key={item.href}
                 href={item.href}
                 className={`relative flex flex-col items-center gap-0.5 py-1.5 px-3 transition-colors ${
-                  active ? 'text-blue-600' : 'text-gray-400'
+                  active ? 'text-amber-600' : 'text-gray-400'
                 }`}
               >
                 {item.icon}

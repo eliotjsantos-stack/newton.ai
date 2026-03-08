@@ -73,7 +73,7 @@ function ResetPasswordForm() {
               <p className="text-sm text-gray-500 mb-6">Your password has been changed. You can now log in with your new password.</p>
               <Link
                 href="/login"
-                className="inline-block px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+                className="inline-block px-6 py-2.5 bg-amber-600 text-white text-sm font-semibold rounded-xl hover:bg-amber-700 transition-colors"
               >
                 Go to login
               </Link>
@@ -97,7 +97,7 @@ function ResetPasswordForm() {
                     required
                     minLength={8}
                     disabled={!token}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-gray-900 placeholder:text-gray-400 text-sm disabled:opacity-40"
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 transition-all text-gray-900 placeholder:text-gray-400 text-sm disabled:opacity-40"
                   />
                 </div>
 
@@ -110,14 +110,14 @@ function ResetPasswordForm() {
                     placeholder="Repeat your new password"
                     required
                     disabled={!token}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-gray-900 placeholder:text-gray-400 text-sm disabled:opacity-40"
+                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 transition-all text-gray-900 placeholder:text-gray-400 text-sm disabled:opacity-40"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading || !token}
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50 text-sm"
+                  className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50 text-sm"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">

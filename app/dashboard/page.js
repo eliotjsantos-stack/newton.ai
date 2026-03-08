@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LayoutDashboard, MessageSquare, BookOpen } from 'lucide-react';
 import { ClassIcon } from '@/components/ClassIcons';
 import SkeletonDashboard from '@/components/dashboard/SkeletonDashboard';
 import NavigationDock from '@/components/NavigationDock';
+import { Sidebar } from '@/components/ui/sidebar';
 
 /* ── Knowledge Radar (SVG pentagon chart) ── */
 function KnowledgeRadar({ data }) {
@@ -43,9 +45,9 @@ function KnowledgeRadar({ data }) {
         {spokes.map((p, i) => (
           <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(0,0,0,0.08)" strokeWidth="0.5" />
         ))}
-        <path d={dataPath} fill="rgba(37,99,235,0.12)" stroke="#2563eb" strokeWidth="1.5" />
+        <path d={dataPath} fill="rgba(217,119,6,0.12)" stroke="#D97706" strokeWidth="1.5" />
         {dataPts.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#2563eb" />
+          <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#D97706" />
         ))}
       </svg>
       <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-2">
@@ -59,9 +61,16 @@ function KnowledgeRadar({ data }) {
   );
 }
 
+const navItems = [
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/chat', icon: MessageSquare, label: 'Chat' },
+  { href: '/quiz', icon: BookOpen, label: 'Quizzes' },
+];
+
 export default function Dashboard() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState(null);
   const [classes, setClasses] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [quizStats, setQuizStats] = useState({});
@@ -92,6 +101,7 @@ export default function Dashboard() {
         const meRes = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
         const meData = await meRes.json();
         if (meData.accountType === 'teacher') { router.push('/teacher/classes'); return; }
+        setUser({ name: meData.fullName || meData.email || 'Student', role: 'Student' });
 
         const headers = { Authorization: `Bearer ${token}` };
         const [classRes, quizRes, actRes, masteryRes, upcomingRes] = await Promise.all([
@@ -163,6 +173,11 @@ export default function Dashboard() {
     load();
   }, [mounted]);
 
+  const handleLogout = () => {
+    localStorage.removeItem('newton-auth-token');
+    router.push('/login');
+  };
+
   const handleCodeInput = (val) => {
     const clean = val.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (clean.length <= 4) setJoinCode(clean);
@@ -207,243 +222,242 @@ export default function Dashboard() {
     : null;
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7]">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-gray-900 rounded-xl flex items-center justify-center">
-              <span className="text-sm font-bold text-white">N</span>
-            </div>
-            <span className="text-[15px] font-semibold text-gray-900 tracking-tight">Newton</span>
-          </Link>
-          <div className="flex items-center gap-4 shrink-0">
-            {streak > 0 && (
-              <span className="text-[11px] font-medium text-gray-400 whitespace-nowrap">
-                {streak} day streak
-              </span>
-            )}
-            <button
-              onClick={() => setShowJoin(true)}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-xl hover:bg-gray-100"
-              title="Join Class"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="flex min-h-screen bg-[var(--c-canvas)]">
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block sticky top-0 h-screen shrink-0">
+        <Sidebar user={user} navItems={navItems} onLogout={handleLogout} />
+      </div>
 
-      <main className="max-w-7xl mx-auto px-6 py-8 pb-24 md:pb-28 space-y-8">
-        <AnimatePresence mode="wait">
-          {loading ? (
-            <motion.div
-              key="skeleton"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.2 } }}
-            >
-              <SkeletonDashboard />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="content"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-8"
-            >
-              {/* Your Insights */}
-              <div>
-                <h3 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-4">Your Insights</h3>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0">
-                  {/* Knowledge Radar */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-6 sm:p-8 min-w-0">
-                    <h3 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-4">Knowledge Radar</h3>
-                    {radarData ? (
-                      <KnowledgeRadar data={radarData} />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-32 text-center">
-                        <p className="text-sm text-gray-400">No data yet</p>
-                        <p className="text-xs text-gray-300 mt-1">Start chatting to build your profile</p>
-                      </div>
+      <div className="flex-1 min-w-0">
+        <main className="max-w-5xl mx-auto px-6 py-8 pb-24 lg:pb-8 space-y-8">
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div
+                key="skeleton"
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              >
+                <SkeletonDashboard />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-8"
+              >
+                {/* Page header */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-2xl font-semibold text-[var(--c-text)] tracking-tight">Dashboard</h1>
+                    {streak > 0 && (
+                      <p className="text-sm text-[var(--c-text-muted)] mt-0.5">{streak} day streak</p>
                     )}
                   </div>
-
-                  {/* Mastery Overview */}
-                  <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6 sm:p-8 min-w-0">
-                    <h3 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-4">Your Mastery</h3>
-                    <div className="flex flex-col items-center justify-center h-32 text-center">
-                      <p className="text-sm text-gray-400">No active tasks — Ready to start?</p>
-                      <p className="text-xs text-gray-300 mt-1">Complete quizzes to see your progress here</p>
-                    </div>
-                  </div>
-
-                  {/* Newton's Observation */}
-                  {observation && (
-                    <div className="lg:col-span-3 bg-white border border-gray-200 rounded-xl p-6 sm:p-8 min-w-0">
-                      <h3 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-4">Observation</h3>
-                      <div className="flex flex-col justify-center min-w-0">
-                        <p className="text-gray-900 text-[15px] leading-relaxed mb-3 break-words">
-                          &ldquo;{observation.text}&rdquo;
-                        </p>
-                        {observation.focus && (
-                          <p className="text-sm text-gray-500 break-words">
-                            Focus next on: <span className="text-blue-600 font-medium">{observation.focus}</span>
-                          </p>
-                        )}
-                        {observation.subject && (
-                          <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-wider">{observation.subject}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  <button
+                    onClick={() => setShowJoin(true)}
+                    className="flex items-center gap-2 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Join Class
+                  </button>
                 </div>
-              </div>
 
-              {/* Upcoming Assignments */}
-              {upcoming.length > 0 && (
+                {/* Your Insights */}
                 <div>
-                  <h3 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-4">Upcoming</h3>
-                  <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                    {upcoming.slice(0, 8).map((item, i) => {
-                      const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
-                      const isQuiz = item.type === 'quiz';
-                      return (
-                        <Link
-                          key={`${item.type}-${item.id}`}
-                          href={isQuiz ? '/quiz' : `/subject/${encodeURIComponent(item.subject)}`}
-                          className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors ${
-                            i < Math.min(upcoming.length, 8) - 1 ? 'border-b border-gray-200' : ''
-                          }`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className={`text-sm font-medium truncate ${isOverdue ? 'text-red-500' : 'text-gray-900'}`}>
-                                {item.title}
-                              </p>
-                              <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0 ${
-                                isQuiz ? 'bg-blue-600/10 text-blue-600' : 'bg-gray-100 text-gray-400'
-                              }`}>
-                                {isQuiz ? 'Quiz' : 'Task'}
-                              </span>
-                            </div>
-                            <p className={`text-xs mt-0.5 ${isOverdue ? 'text-red-400' : 'text-gray-400'}`}>
-                              {item.subject} · {item.className}
-                              {item.dueDate
-                                ? ` · ${isOverdue ? 'Overdue' : 'Due'} ${new Date(item.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`
-                                : ''}
-                            </p>
-                          </div>
-                          <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                          </svg>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Subject Tiles */}
-              <div>
-                <h3 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-4">Subjects</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {/* General Chat */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0 }}
-                  >
-                    <Link
-                      href="/chat"
-                      className="block bg-white border border-gray-200 rounded-xl p-5 group hover:border-gray-300 transition-colors text-center"
-                    >
-                      <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                      </div>
-                      <h3 className="text-sm font-medium text-gray-900 tracking-tight">General</h3>
-                    </Link>
-                  </motion.div>
-
-                  {/* Class subject tiles */}
-                  {activeClasses.map((cls, idx) => (
-                    <motion.div
-                      key={cls.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: (idx + 1) * 0.05 }}
-                    >
-                      <Link
-                        href={`/chat?classId=${cls.id}&new=true`}
-                        className="block bg-white border border-gray-200 rounded-xl p-5 group hover:border-gray-300 transition-colors text-center"
-                      >
-                        <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                          <ClassIcon subject={cls.subject} size={20} />
+                  <h3 className="text-[11px] font-medium text-[var(--c-text-faint)] uppercase tracking-wider mb-4">Your Insights</h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0">
+                    {/* Knowledge Radar */}
+                    <div className="bg-white rounded-xl p-6 sm:p-8 min-w-0 [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]">
+                      <h3 className="text-[11px] font-medium text-[var(--c-text-faint)] uppercase tracking-wider mb-4">Knowledge Radar</h3>
+                      {radarData ? (
+                        <KnowledgeRadar data={radarData} />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-32 text-center">
+                          <p className="text-sm text-[var(--c-text-muted)]">No data yet</p>
+                          <p className="text-xs text-[var(--c-text-faint)] mt-1">Start chatting to build your profile</p>
                         </div>
-                        <h3 className="text-sm font-medium text-gray-900 tracking-tight truncate">{cls.subject}</h3>
-                        {cls.board && (
-                          <p className="text-[10px] text-gray-400 mt-0.5 truncate">{cls.board}</p>
-                        )}
-                      </Link>
-                    </motion.div>
-                  ))}
-
-                  {/* Join Class tile */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: 'spring', stiffness: 100, damping: 20, delay: (activeClasses.length + 1) * 0.05 }}
-                  >
-                    <button
-                      onClick={() => setShowJoin(true)}
-                      className="w-full border border-dashed border-gray-300 rounded-xl p-5 group hover:border-gray-400 transition-colors text-center bg-white"
-                    >
-                      <div className="w-10 h-10 border border-dashed border-gray-300 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:border-gray-400 transition-colors">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                      </div>
-                      <h3 className="text-sm font-medium text-gray-400 tracking-tight">Join</h3>
-                    </button>
-                  </motion.div>
-                </div>
-              </div>
-
-              {/* Your Progress */}
-              <Link href="/quiz" className="block bg-white border border-gray-200 rounded-xl p-6 sm:p-8 group hover:border-gray-300 transition-colors min-w-0">
-                <div className="flex items-center justify-between min-w-0">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-lg font-semibold text-gray-900 tracking-tight">Your Progress</h3>
-                      {quizStats.completed > 0 && (
-                        <span className="text-[11px] font-medium text-gray-400">
-                          {quizStats.completed} completed
-                        </span>
                       )}
                     </div>
-                    {lastQuiz ? (
-                      <p className="text-sm text-gray-500">
-                        Last: {lastQuiz.topic_name || lastQuiz.topicName || 'Untitled'} &middot; {lastQuizScore}%
-                      </p>
-                    ) : (
-                      <p className="text-sm text-gray-500">Start your first quiz to track progress</p>
+
+                    {/* Mastery Overview */}
+                    <div className="lg:col-span-2 bg-white rounded-xl p-6 sm:p-8 min-w-0 [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]">
+                      <h3 className="text-[11px] font-medium text-[var(--c-text-faint)] uppercase tracking-wider mb-4">Your Mastery</h3>
+                      <div className="flex flex-col items-center justify-center h-32 text-center">
+                        <p className="text-sm text-[var(--c-text-muted)]">No active tasks — Ready to start?</p>
+                        <p className="text-xs text-[var(--c-text-faint)] mt-1">Complete quizzes to see your progress here</p>
+                      </div>
+                    </div>
+
+                    {/* Newton's Observation */}
+                    {observation && (
+                      <div className="lg:col-span-3 bg-white rounded-xl p-6 sm:p-8 min-w-0 [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]">
+                        <h3 className="text-[11px] font-medium text-[var(--c-text-faint)] uppercase tracking-wider mb-4">Observation</h3>
+                        <div className="flex flex-col justify-center min-w-0">
+                          <p className="text-[var(--c-text)] text-[15px] leading-relaxed mb-3 break-words">
+                            &ldquo;{observation.text}&rdquo;
+                          </p>
+                          {observation.focus && (
+                            <p className="text-sm text-[var(--c-text-muted)] break-words">
+                              Focus next on: <span className="text-amber-600 font-medium">{observation.focus}</span>
+                            </p>
+                          )}
+                          {observation.subject && (
+                            <p className="text-[10px] text-[var(--c-text-faint)] mt-2 uppercase tracking-wider">{observation.subject}</p>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
-                  <svg className="w-5 h-5 text-gray-300 group-hover:text-gray-400 transition-colors shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                  </svg>
                 </div>
-              </Link>
 
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+                {/* Upcoming Assignments */}
+                {upcoming.length > 0 && (
+                  <div>
+                    <h3 className="text-[11px] font-medium text-[var(--c-text-faint)] uppercase tracking-wider mb-4">Upcoming</h3>
+                    <div className="bg-white rounded-xl overflow-hidden [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]">
+                      {upcoming.slice(0, 8).map((item, i) => {
+                        const isOverdue = item.dueDate && new Date(item.dueDate) < new Date();
+                        const isQuiz = item.type === 'quiz';
+                        return (
+                          <Link
+                            key={`${item.type}-${item.id}`}
+                            href={isQuiz ? '/quiz' : `/subject/${encodeURIComponent(item.subject)}`}
+                            className={`flex items-center gap-3 px-4 py-3 hover:bg-[var(--c-canvas)] transition-colors ${
+                              i < Math.min(upcoming.length, 8) - 1 ? 'border-b border-[var(--c-border)]' : ''
+                            }`}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className={`text-sm font-medium truncate ${isOverdue ? 'text-red-500' : 'text-[var(--c-text)]'}`}>
+                                  {item.title}
+                                </p>
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0 ${
+                                  isQuiz ? 'bg-amber-100 text-amber-700' : 'bg-neutral-100 text-neutral-400'
+                                }`}>
+                                  {isQuiz ? 'Quiz' : 'Task'}
+                                </span>
+                              </div>
+                              <p className={`text-xs mt-0.5 ${isOverdue ? 'text-red-400' : 'text-[var(--c-text-muted)]'}`}>
+                                {item.subject} · {item.className}
+                                {item.dueDate
+                                  ? ` · ${isOverdue ? 'Overdue' : 'Due'} ${new Date(item.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`
+                                  : ''}
+                              </p>
+                            </div>
+                            <svg className="w-4 h-4 text-[var(--c-border-strong)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
+                {/* Subject Tiles */}
+                <div>
+                  <h3 className="text-[11px] font-medium text-[var(--c-text-faint)] uppercase tracking-wider mb-4">Subjects</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {/* General Chat */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0 }}
+                    >
+                      <Link
+                        href="/chat"
+                        className="block bg-white rounded-xl p-5 group hover:shadow-md transition-all text-center [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]"
+                      >
+                        <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                          <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-sm font-medium text-[var(--c-text)] tracking-tight">General</h3>
+                      </Link>
+                    </motion.div>
+
+                    {/* Class subject tiles */}
+                    {activeClasses.map((cls, idx) => (
+                      <motion.div
+                        key={cls.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ type: 'spring', stiffness: 100, damping: 20, delay: (idx + 1) * 0.05 }}
+                      >
+                        <Link
+                          href={`/chat?classId=${cls.id}&new=true`}
+                          className="block bg-white rounded-xl p-5 group hover:shadow-md transition-all text-center [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]"
+                        >
+                          <div className="w-10 h-10 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <ClassIcon subject={cls.subject} size={20} />
+                          </div>
+                          <h3 className="text-sm font-medium text-[var(--c-text)] tracking-tight truncate">{cls.subject}</h3>
+                          {cls.board && (
+                            <p className="text-[10px] text-[var(--c-text-faint)] mt-0.5 truncate">{cls.board}</p>
+                          )}
+                        </Link>
+                      </motion.div>
+                    ))}
+
+                    {/* Join Class tile */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: (activeClasses.length + 1) * 0.05 }}
+                    >
+                      <button
+                        onClick={() => setShowJoin(true)}
+                        className="w-full border border-dashed border-[var(--c-border)] rounded-xl p-5 group hover:border-[var(--c-border-strong)] transition-colors text-center bg-white"
+                      >
+                        <div className="w-10 h-10 border border-dashed border-[var(--c-border)] rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:border-[var(--c-border-strong)] transition-colors">
+                          <svg className="w-4 h-4 text-[var(--c-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                          </svg>
+                        </div>
+                        <h3 className="text-sm font-medium text-[var(--c-text-faint)] tracking-tight">Join</h3>
+                      </button>
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Your Progress */}
+                <Link href="/quiz" className="block bg-white rounded-xl p-6 sm:p-8 group hover:shadow-md transition-all min-w-0 [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]">
+                  <div className="flex items-center justify-between min-w-0">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-lg font-semibold text-[var(--c-text)] tracking-tight">Your Progress</h3>
+                        {quizStats.completed > 0 && (
+                          <span className="text-[11px] font-medium text-[var(--c-text-faint)]">
+                            {quizStats.completed} completed
+                          </span>
+                        )}
+                      </div>
+                      {lastQuiz ? (
+                        <p className="text-sm text-[var(--c-text-muted)]">
+                          Last: {lastQuiz.topic_name || lastQuiz.topicName || 'Untitled'} &middot; {lastQuizScore}%
+                        </p>
+                      ) : (
+                        <p className="text-sm text-[var(--c-text-muted)]">Start your first quiz to track progress</p>
+                      )}
+                    </div>
+                    <svg className="w-5 h-5 text-[var(--c-border-strong)] group-hover:text-[var(--c-text-muted)] transition-colors shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </div>
+                </Link>
+
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+      </div>
+
+      {/* Mobile nav */}
       <NavigationDock />
 
       {/* Join Class Modal */}
@@ -457,7 +471,7 @@ export default function Dashboard() {
           >
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeJoinModal} />
             <motion.div
-              className="relative bg-white border border-gray-200 shadow-xl rounded-2xl max-w-sm w-full p-6"
+              className="relative bg-white rounded-2xl max-w-sm w-full p-6 [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]"
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -470,19 +484,19 @@ export default function Dashboard() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-1">Joined {joinSuccess.name}!</h2>
-                  <p className="text-sm text-gray-500 mb-5">{joinSuccess.subject}</p>
+                  <h2 className="text-lg font-semibold text-[var(--c-text)] mb-1">Joined {joinSuccess.name}!</h2>
+                  <p className="text-sm text-[var(--c-text-muted)] mb-5">{joinSuccess.subject}</p>
                   <button
                     onClick={closeJoinModal}
-                    className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-200"
+                    className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-md transition-colors duration-200"
                   >
                     Done
                   </button>
                 </div>
               ) : (
                 <>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-1">Join a Class</h2>
-                  <p className="text-sm text-gray-500 mb-5">Enter the code from your teacher.</p>
+                  <h2 className="text-lg font-semibold text-[var(--c-text)] mb-1">Join a Class</h2>
+                  <p className="text-sm text-[var(--c-text-muted)] mb-5">Enter the code from your teacher.</p>
                   {joinError && (
                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl">
                       <p className="text-sm text-red-600">{joinError}</p>
@@ -496,16 +510,16 @@ export default function Dashboard() {
                       placeholder="ABCD-1234"
                       maxLength={9}
                       autoFocus
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-center text-xl font-mono font-semibold tracking-widest text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-transparent placeholder:text-gray-400 placeholder:tracking-normal"
+                      className="w-full px-4 py-3 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-md text-center text-xl font-mono font-semibold tracking-widest text-[var(--c-text)] focus:outline-none focus:ring-2 focus:ring-amber-500/25 focus:border-amber-500 placeholder:text-[var(--c-text-faint)] placeholder:tracking-normal"
                     />
                     <div className="flex gap-3 mt-5">
-                      <button type="button" onClick={closeJoinModal} className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-full transition-colors">
+                      <button type="button" onClick={closeJoinModal} className="flex-1 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-[var(--c-text-soft)] font-medium rounded-md transition-colors">
                         Cancel
                       </button>
                       <button
                         type="submit"
                         disabled={joining || joinCode.replace(/-/g, '').length < 8}
-                        className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 text-white disabled:text-gray-400 font-medium rounded-full transition-colors duration-200"
+                        className="flex-1 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:bg-neutral-100 text-white disabled:text-neutral-400 font-medium rounded-md transition-colors duration-200"
                       >
                         {joining ? 'Joining...' : 'Join'}
                       </button>

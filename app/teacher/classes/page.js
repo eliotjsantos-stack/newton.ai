@@ -60,7 +60,7 @@ export default function MyClassesPage() {
         </div>
         <Link
           href="/teacher/create-class"
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
           Create Class
@@ -72,17 +72,17 @@ export default function MyClassesPage() {
         <div className="flex gap-6">
           <button
             onClick={() => setFilter('active')}
-            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'active' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'active' ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'}`}
           >
             Active
-            {filter === 'active' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />}
+            {filter === 'active' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600 rounded-full" />}
           </button>
           <button
             onClick={() => setFilter('archived')}
-            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'archived' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'archived' ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'}`}
           >
             Archived
-            {filter === 'archived' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />}
+            {filter === 'archived' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600 rounded-full" />}
           </button>
         </div>
       </div>
@@ -100,7 +100,7 @@ export default function MyClassesPage() {
             {filter === 'active' ? 'Create your first class to get started.' : 'Archived classes will appear here.'}
           </p>
           {filter === 'active' && (
-            <Link href="/teacher/create-class" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full transition-colors inline-block">
+            <Link href="/teacher/create-class" className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors inline-block">
               Create Class
             </Link>
           )}
@@ -108,7 +108,7 @@ export default function MyClassesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(cls => (
-            <div key={cls.id} className="bg-white border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors">
+            <div key={cls.id} className="bg-white rounded-xl hover:shadow-md transition-all [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]">
               <Link href={`/teacher/class/${cls.id}`} className="block p-5 pb-3">
                 <div className="flex items-start gap-3">
                   <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (cls.color || '#3B82F6') + '20', color: cls.color || '#3B82F6' }}>
@@ -121,7 +121,7 @@ export default function MyClassesPage() {
                 </div>
               </Link>
 
-              <div className="flex items-center justify-between px-5 py-3 border-t border-gray-200">
+              <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--c-border)]">
                 <button
                   onClick={(e) => { e.stopPropagation(); copyCode(cls.class_code, cls.id); }}
                   className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-xs font-mono text-gray-500 transition-colors"

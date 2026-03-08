@@ -186,7 +186,7 @@ export default function SubjectPage({ params }) {
           </div>
           <button
             onClick={() => router.push(classData ? `/chat?classId=${classData.id}&new=true` : `/chat?subject=${encodeURIComponent(subject)}&new=true`)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-full transition-colors"
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-full transition-colors"
           >
             Chat
           </button>
@@ -224,7 +224,7 @@ export default function SubjectPage({ params }) {
               {/* Progress bar */}
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
                 <div
-                  className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                  className="h-full bg-amber-600 rounded-full transition-all duration-500"
                   style={{ width: `${coveragePercent}%` }}
                 />
               </div>
@@ -357,7 +357,7 @@ export default function SubjectPage({ params }) {
                           <td className={`px-3 py-2.5 text-sm ${isOverdue ? 'text-red-500' : 'text-gray-900'}`}>{a.title}</td>
                           <td className="px-3 py-2.5 text-xs">
                             <span className={`px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
-                              isQuiz ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'
+                              isQuiz ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500'
                             }`}>
                               {isQuiz ? 'Quiz' : 'Task'}
                             </span>

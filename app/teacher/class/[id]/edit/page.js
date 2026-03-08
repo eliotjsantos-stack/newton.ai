@@ -176,7 +176,7 @@ export default function EditClassPage() {
   }
   if (!authorized) return null;
 
-  const inputCls = "w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all placeholder:text-gray-400";
+  const inputCls = "w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 transition-all placeholder:text-gray-400";
 
   return (
     <div className="max-w-2xl">
@@ -192,13 +192,13 @@ export default function EditClassPage() {
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Edit Class</h1>
 
       {/* Class code banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between">
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-0.5">Current Class Code</p>
+          <p className="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-0.5">Current Class Code</p>
           <p className="text-2xl font-mono font-bold text-gray-900 tracking-wider">{classCode}</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={copyCode} className="px-3 py-1.5 bg-white border border-blue-200 hover:bg-blue-50 text-blue-600 rounded-md text-xs font-medium transition-colors">
+          <button onClick={copyCode} className="px-3 py-1.5 bg-white border border-amber-200 hover:bg-amber-50 text-amber-600 rounded-md text-xs font-medium transition-colors">
             {copied ? 'Copied!' : 'Copy'}
           </button>
           <button onClick={regenerateCode} className="px-3 py-1.5 bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100 rounded-md text-xs font-medium transition-colors">
@@ -246,7 +246,7 @@ export default function EditClassPage() {
             <div className="flex gap-2.5 flex-wrap">
               {CLASS_COLORS.map(c => (
                 <button key={c} type="button" onClick={() => setColor(c)}
-                  className={`w-9 h-9 rounded-lg transition-all ${color === c ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-white scale-110' : 'hover:scale-105'}`}
+                  className={`w-9 h-9 rounded-lg transition-all ${color === c ? 'ring-2 ring-amber-500 ring-offset-2 ring-offset-white scale-110' : 'hover:scale-105'}`}
                   style={{ backgroundColor: c }} />
               ))}
             </div>
@@ -256,7 +256,7 @@ export default function EditClassPage() {
             <div className="flex gap-2 flex-wrap">
               {CLASS_ICON_KEYS.map(key => (
                 <button key={key} type="button" onClick={() => setIcon(key)}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${icon === key ? 'bg-blue-50 ring-2 ring-blue-500 ring-offset-1 ring-offset-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${icon === key ? 'bg-amber-50 ring-2 ring-amber-500 ring-offset-1 ring-offset-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
                   <ClassIcon name={key} size={20} className="text-gray-600" />
                 </button>
               ))}
@@ -274,7 +274,7 @@ export default function EditClassPage() {
           <div className="flex items-center justify-between py-1">
             <p className="text-sm font-medium text-gray-700">Students can see classmates</p>
             <button type="button" onClick={() => setShowClassmates(!showClassmates)}
-              className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${showClassmates ? 'bg-blue-600' : 'bg-gray-200'}`}>
+              className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${showClassmates ? 'bg-amber-600' : 'bg-gray-200'}`}>
               <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${showClassmates ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
             </button>
           </div>
@@ -294,7 +294,7 @@ export default function EditClassPage() {
 
         {/* Save */}
         <button type="submit" disabled={saving}
-          className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-400 text-white text-sm font-medium rounded-lg transition-colors">
+          className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-100 disabled:text-gray-400 text-white text-sm font-medium rounded-lg transition-colors">
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
         </button>
       </form>

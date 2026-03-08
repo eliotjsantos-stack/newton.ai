@@ -99,7 +99,7 @@ export default function UnderstandingRatingModal({
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-lg font-bold text-gray-900">How well do you understand</h2>
-            <p className="text-lg font-bold text-blue-600">{topicName}?</p>
+            <p className="text-lg font-bold text-amber-600">{topicName}?</p>
           </div>
           <button
             onClick={onClose}
@@ -161,7 +161,7 @@ export default function UnderstandingRatingModal({
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               placeholder="Let Newton know what confused you..."
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
               rows={3}
             />
           </div>
@@ -178,7 +178,7 @@ export default function UnderstandingRatingModal({
           <button
             onClick={handleSubmit}
             disabled={rating === 0 || submitting}
-            className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl transition-colors"
+            className="flex-1 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl transition-colors"
           >
             {submitting ? 'Submitting...' : 'Submit'}
           </button>

@@ -169,8 +169,8 @@ export default function Calculator({ onClose }) {
               h-10 rounded-md text-sm font-medium transition-colors
               ${btn.span === 2 ? 'col-span-2' : ''}
               ${btn.style === 'fn' ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : ''}
-              ${btn.style === 'op' ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}
-              ${btn.style === 'eq' ? 'bg-blue-600 text-white hover:bg-blue-700' : ''}
+              ${btn.style === 'op' ? 'bg-amber-500 text-white hover:bg-amber-600' : ''}
+              ${btn.style === 'eq' ? 'bg-amber-600 text-white hover:bg-amber-700' : ''}
               ${!btn.style ? 'bg-gray-100 text-gray-800 hover:bg-gray-200' : ''}
             `}
           >

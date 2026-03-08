@@ -439,7 +439,7 @@ export default function ClassDashboardPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-amber-200 text-amber-600'
                   : 'border-transparent text-gray-400 hover:text-gray-500'
               }`}
             >
@@ -494,26 +494,26 @@ export default function ClassDashboardPage() {
                 placeholder="Assignment title"
                 value={newAssignment.title}
                 onChange={e => setNewAssignment(p => ({ ...p, title: e.target.value }))}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
               <textarea
                 placeholder="Description (optional)"
                 value={newAssignment.description}
                 onChange={e => setNewAssignment(p => ({ ...p, description: e.target.value }))}
                 rows={2}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
               />
               <div className="flex items-center gap-3">
                 <input
                   type="datetime-local"
                   value={newAssignment.dueDate}
                   onChange={e => setNewAssignment(p => ({ ...p, dueDate: e.target.value }))}
-                  className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
                 <button
                   type="submit"
                   disabled={addingAssignment || !newAssignment.title.trim()}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-100 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
                 >
                   {addingAssignment ? 'Adding...' : 'Add'}
                 </button>
@@ -572,7 +572,7 @@ export default function ClassDashboardPage() {
                 placeholder="Topic name (e.g. Quadratic Equations)"
                 value={quizAssignTopic}
                 onChange={e => setQuizAssignTopic(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
               {/* Mode selector */}
               <div className="grid grid-cols-4 gap-1.5">
@@ -588,7 +588,7 @@ export default function ClassDashboardPage() {
                     onClick={() => { setQuizAssignMode(m.id); setQuizAssignMarks(m.marks); }}
                     className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
                       quizAssignMode === m.id
-                        ? 'bg-blue-50 border-blue-300 text-blue-700'
+                        ? 'bg-amber-50 border-amber-200 text-amber-600'
                         : 'bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300'
                     }`}
                   >
@@ -610,21 +610,21 @@ export default function ClassDashboardPage() {
                   type="datetime-local"
                   value={quizAssignDue}
                   onChange={e => setQuizAssignDue(e.target.value)}
-                  className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
                 <button
                   type="submit"
                   disabled={assigningQuiz || !quizAssignTopic.trim()}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-100 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
                 >
                   {assigningQuiz ? 'Generating...' : 'Assign Quiz'}
                 </button>
               </div>
               {assigningQuiz && (
-                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                <div className="p-3 bg-amber-500/10 border border-amber-200/20 rounded-xl">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
-                    <p className="text-sm text-blue-400">Generating {quizAssignMarks}-mark quiz with AI... this may take a moment.</p>
+                    <div className="w-4 h-4 border-2 border-amber-200/30 border-t-blue-400 rounded-full animate-spin" />
+                    <p className="text-sm text-amber-600">Generating {quizAssignMarks}-mark quiz with AI... this may take a moment.</p>
                   </div>
                 </div>
               )}
@@ -691,12 +691,12 @@ export default function ClassDashboardPage() {
                   placeholder="Resource title"
                   value={newResource.title}
                   onChange={e => setNewResource(p => ({ ...p, title: e.target.value }))}
-                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
                 <select
                   value={newResource.type}
                   onChange={e => setNewResource(p => ({ ...p, type: e.target.value }))}
-                  className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   <option value="link">Link</option>
                   <option value="note">Note</option>
@@ -708,7 +708,7 @@ export default function ClassDashboardPage() {
                   placeholder="URL (e.g. https://example.com)"
                   value={newResource.url}
                   onChange={e => setNewResource(p => ({ ...p, url: e.target.value }))}
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
               )}
               <textarea
@@ -716,12 +716,12 @@ export default function ClassDashboardPage() {
                 value={newResource.description}
                 onChange={e => setNewResource(p => ({ ...p, description: e.target.value }))}
                 rows={2}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
               />
               <button
                 type="submit"
                 disabled={addingResource || !newResource.title.trim()}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-100 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {addingResource ? 'Adding...' : 'Add Resource'}
               </button>
@@ -742,11 +742,11 @@ export default function ClassDashboardPage() {
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium text-gray-900">{r.title}</p>
                         <span className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded ${
-                          r.type === 'link' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'
+                          r.type === 'link' ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500'
                         }`}>{r.type}</span>
                       </div>
                       {r.url && (
-                        <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline mt-1 block truncate">
+                        <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-xs text-amber-600 hover:underline mt-1 block truncate">
                           {r.url}
                         </a>
                       )}
@@ -781,7 +781,7 @@ export default function ClassDashboardPage() {
               <select
                 value={topicsDateRange}
                 onChange={(e) => setTopicsDateRange(e.target.value)}
-                className="text-sm px-3 py-1.5 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-sm px-3 py-1.5 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <option value="all">All Time</option>
                 <option value="week">This Week</option>
@@ -799,9 +799,9 @@ export default function ClassDashboardPage() {
               <div className="space-y-8">
                 {/* Summary Stats */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="p-4 bg-blue-500/10 rounded-xl">
-                    <p className="text-2xl font-bold text-blue-400">{topicsData.totalTopics}</p>
-                    <p className="text-xs text-blue-400 mt-1">Topics Discussed</p>
+                  <div className="p-4 bg-amber-500/10 rounded-xl">
+                    <p className="text-2xl font-bold text-amber-600">{topicsData.totalTopics}</p>
+                    <p className="text-xs text-amber-600 mt-1">Topics Discussed</p>
                   </div>
                   <div className="p-4 bg-green-500/10 rounded-xl">
                     <p className="text-2xl font-bold text-green-400">{topicsData.totalStudentsEngaged}</p>
@@ -905,7 +905,7 @@ export default function ClassDashboardPage() {
             <select
               value={quizzesDateRange}
               onChange={(e) => setQuizzesDateRange(e.target.value)}
-              className="px-3 py-1.5 text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
             >
               <option value="all">All Time</option>
               <option value="week">This Week</option>
@@ -936,7 +936,7 @@ export default function ClassDashboardPage() {
                   <p className="text-sm text-gray-400">Completed</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-2xl p-4">
-                  <p className="text-2xl font-bold text-blue-400">{quizzesData.stats?.studentsEngaged || 0}</p>
+                  <p className="text-2xl font-bold text-amber-600">{quizzesData.stats?.studentsEngaged || 0}</p>
                   <p className="text-sm text-gray-400">Students Engaged</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-2xl p-4">
@@ -1119,7 +1119,7 @@ export default function ClassDashboardPage() {
             <select
               value={masteryDateRange}
               onChange={(e) => setMasteryDateRange(e.target.value)}
-              className="px-3 py-1.5 text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
             >
               <option value="all">All Time</option>
               <option value="week">This Week</option>
@@ -1153,7 +1153,7 @@ export default function ClassDashboardPage() {
                   <p className="text-sm text-gray-400">Chat Sessions Analyzed</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-2xl p-4">
-                  <p className="text-2xl font-bold text-blue-400">{masteryData.stats?.studentsAnalyzed || 0}</p>
+                  <p className="text-2xl font-bold text-amber-600">{masteryData.stats?.studentsAnalyzed || 0}</p>
                   <p className="text-sm text-gray-400">Students Analyzed</p>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-2xl p-4">

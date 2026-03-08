@@ -171,12 +171,12 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#F5F5F7]">
+      <div className="flex h-screen items-center justify-center bg-[var(--c-canvas)]">
         <div className="text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl flex items-center justify-center shadow-2xl mb-6 mx-auto animate-pulse">
-            <span className="text-3xl font-bold text-gray-900">A</span>
+          <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center mb-6 mx-auto animate-pulse">
+            <span className="text-xl font-semibold text-white">N</span>
           </div>
-          <p className="text-gray-600 font-medium text-lg">Loading admin dashboard...</p>
+          <p className="text-[var(--c-text-muted)] font-medium text-base">Loading admin dashboard...</p>
         </div>
       </div>
     );
@@ -185,12 +185,12 @@ export default function AdminDashboard() {
   if (!isAdmin) return null;
 
   return (
-    <div className="flex h-screen bg-[#F5F5F7]">
+    <div className="flex h-screen bg-[var(--c-canvas)]">
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-neutral-100 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
-            <span className="text-sm font-bold text-white">A</span>
+          <div className="w-7 h-7 rounded-md bg-amber-500 flex items-center justify-center">
+            <span className="text-sm font-semibold text-white">N</span>
           </div>
           <span className="text-gray-900 font-semibold">Admin Panel</span>
         </div>
@@ -219,15 +219,15 @@ export default function AdminDashboard() {
       {/* Sidebar Navigation */}
       <div className={`
         fixed md:relative z-50 md:z-auto
-        w-64 bg-white border-r border-gray-200 flex flex-col
+        w-64 bg-white border-r border-neutral-100 flex flex-col
         h-full md:h-screen
         transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-neutral-100">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
-              <span className="text-lg font-bold text-gray-900">A</span>
+            <div className="w-7 h-7 rounded-md bg-amber-500 flex items-center justify-center">
+              <span className="text-sm font-semibold text-white">N</span>
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900">Admin Panel</h1>
@@ -241,8 +241,8 @@ export default function AdminDashboard() {
             onClick={() => { setCurrentTab('overview'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'overview'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-amber-50 text-amber-700 font-medium'
+                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,8 +255,8 @@ export default function AdminDashboard() {
             onClick={() => { setCurrentTab('users'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'users'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-amber-50 text-amber-700 font-medium'
+                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,8 +272,8 @@ export default function AdminDashboard() {
             onClick={() => { setCurrentTab('conversations'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'conversations'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-amber-50 text-amber-700 font-medium'
+                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,8 +286,8 @@ export default function AdminDashboard() {
             onClick={() => { setCurrentTab('reports'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'reports'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-amber-50 text-amber-700 font-medium'
+                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,8 +305,8 @@ export default function AdminDashboard() {
             onClick={() => { setCurrentTab('analytics'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
               currentTab === 'analytics'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-amber-50 text-amber-700 font-medium'
+                : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
           </button>
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-neutral-100">
           <Link
             href="/"
             onClick={() => setSidebarOpen(false)}
@@ -333,7 +333,7 @@ export default function AdminDashboard() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden pt-14 md:pt-0">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 md:py-6">
+        <div className="bg-white border-b border-neutral-100 px-4 md:px-8 py-4 md:py-6">
           <h2 className="text-2xl font-bold text-gray-900 capitalize">{currentTab}</h2>
           <p className="text-gray-500 text-sm mt-1">
             {currentTab === 'overview' && 'System overview and key metrics'}
@@ -345,16 +345,16 @@ export default function AdminDashboard() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-[#F5F5F7] p-4 md:p-8">
+        <div className="flex-1 overflow-y-auto bg-[var(--c-canvas)] p-4 md:p-8">
           {currentTab === 'overview' && analytics && (
             <div className="max-w-7xl mx-auto space-y-6">
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-blue-600 transition-all">
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-amber-400 transition-all">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-gray-500 text-sm font-medium">Total Users</p>
-                    <div className="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center">
-                      <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                      <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     </div>
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-200">
+                      <tr className="border-b border-neutral-100">
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Email</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Year Group</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Chats</th>
@@ -488,7 +488,7 @@ export default function AdminDashboard() {
                         .sort((a, b) => new Date(b.lastLogin || 0) - new Date(a.lastLogin || 0))
                         .slice(0, 10)
                         .map((user, index) => (
-                          <tr key={index} className="border-b border-gray-200/50 hover:bg-gray-50 transition-colors">
+                          <tr key={index} className="border-b border-neutral-100/50 hover:bg-gray-50 transition-colors">
                             <td className="py-3 px-4 text-sm text-gray-700">{user.email}</td>
                             <td className="py-3 px-4 text-sm text-gray-500">{user.yearGroup || 'Not set'}</td>
                             <td className="py-3 px-4 text-sm text-gray-500">{user.chatCount}</td>
@@ -516,7 +516,7 @@ export default function AdminDashboard() {
                     placeholder="Search users by email..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-3 pl-11 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-600 transition-all"
+                    className="w-full px-4 py-3 pl-11 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/25 transition-all"
                   />
                   <svg className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -525,7 +525,7 @@ export default function AdminDashboard() {
                 <select
                   value={filterYearGroup}
                   onChange={(e) => setFilterYearGroup(e.target.value)}
-                  className="w-full sm:w-auto px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:border-blue-600 transition-all"
+                  className="w-full sm:w-auto px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/25 transition-all"
                 >
                   <option value="all">All Year Groups</option>
                   <option value="year7">Year 7</option>
@@ -560,7 +560,7 @@ export default function AdminDashboard() {
                           : 0;
                         
                         return (
-                          <tr key={user.id} className="border-t border-gray-200 hover:bg-gray-50 transition-colors">
+                          <tr key={user.id} className="border-t border-neutral-100 hover:bg-gray-50 transition-colors">
                             <td className="py-4 px-6">
                               <div>
                                 <p className="text-sm font-medium text-gray-900">{user.email}</p>
@@ -609,7 +609,7 @@ export default function AdminDashboard() {
                                     setSelectedUser(user);
                                     setCurrentTab('conversations');
                                   }}
-                                  className="px-2 sm:px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-all"
+                                  className="px-2 sm:px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-md transition-all"
                                 >
                                   View
                                 </button>
@@ -655,7 +655,7 @@ export default function AdminDashboard() {
                     placeholder="Search users..."
                     value={convSearch}
                     onChange={(e) => setConvSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-500"
                   />
                 </div>
 
@@ -683,7 +683,7 @@ export default function AdminDashboard() {
                             }
                           }}
                           className={`w-full flex items-center gap-2 p-2 rounded-lg text-left transition-all ${
-                            isOpen ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                            isOpen ? 'bg-amber-50 text-amber-700 font-medium' : 'text-neutral-600 hover:bg-neutral-50'
                           }`}
                         >
                           <svg className={`w-3 h-3 flex-shrink-0 transition-transform ${isOpen ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
@@ -714,7 +714,7 @@ export default function AdminDashboard() {
                                       }
                                     }}
                                     className={`w-full flex items-center gap-2 p-1.5 rounded-lg text-left transition-all ${
-                                      subOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'
+                                      subOpen ? 'bg-amber-50 text-amber-700' : 'text-neutral-500 hover:bg-neutral-50'
                                     }`}
                                   >
                                     <svg className={`w-2.5 h-2.5 flex-shrink-0 transition-transform ${subOpen ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
@@ -733,8 +733,8 @@ export default function AdminDashboard() {
                                           onClick={() => setSelectedChat(chat)}
                                           className={`w-full p-1.5 rounded-lg text-left transition-all ${
                                             selectedChat?.id === chat.id
-                                              ? 'bg-blue-600 text-white'
-                                              : 'text-gray-500 hover:bg-gray-100'
+                                              ? 'bg-amber-50 text-amber-700'
+                                              : 'text-neutral-500 hover:bg-neutral-50'
                                           }`}
                                         >
                                           <p className="text-xs line-clamp-1">{chat.messages[0]?.content?.substring(0, 50)}...</p>
@@ -758,7 +758,7 @@ export default function AdminDashboard() {
               <div className="flex-1 bg-white border border-gray-200 rounded-2xl flex flex-col min-h-[400px] lg:min-h-0">
                 {selectedChat ? (
                   <>
-                    <div className="p-6 border-b border-gray-200">
+                    <div className="p-6 border-b border-neutral-100">
                       <h3 className="text-lg font-bold text-gray-900">
                         {selectedUser.email} - {selectedSubject}
                       </h3>
@@ -781,8 +781,8 @@ export default function AdminDashboard() {
                           <div
   className={`max-w-[90%] rounded-2xl p-5 ${
                               message.role === 'user'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-gray-800'
+                                ? 'bg-amber-600 text-white'
+                                : 'bg-neutral-100 text-neutral-800'
                             }`}
                           >
                             <div className="prose prose-invert prose-sm max-w-none">
@@ -854,8 +854,8 @@ export default function AdminDashboard() {
                       </div>
 
                       {report.chat_context && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                          <p className="text-xs font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                          <p className="text-xs font-semibold text-amber-600 mb-3 flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
@@ -863,7 +863,7 @@ export default function AdminDashboard() {
                           </p>
                           <div className="space-y-2 max-h-60 overflow-y-auto">
                             {JSON.parse(report.chat_context).messages.map((msg, i) => (
-                              <div key={i} className={`p-2 rounded text-xs ${msg.role === 'user' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>
+                              <div key={i} className={`p-2 rounded text-xs ${msg.role === 'user' ? 'bg-amber-100 text-amber-700' : 'bg-neutral-100 text-neutral-600'}`}>
                                 <span className="font-semibold">{msg.role === 'user' ? 'Student' : 'Newton'}:</span> {msg.content.substring(0, 200)}{msg.content.length > 200 ? '...' : ''}
                               </div>
                             ))}
@@ -979,7 +979,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b border-gray-200">
+                    <thead className="border-b border-neutral-100">
                       <tr>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Email</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-500">Year Group</th>
@@ -990,7 +990,7 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody>
                       {analytics.users.map((user, index) => (
-                        <tr key={index} className="border-b border-gray-200/50 hover:bg-gray-50 transition-colors">
+                        <tr key={index} className="border-b border-neutral-100/50 hover:bg-gray-50 transition-colors">
                           <td className="py-3 px-4 text-sm text-gray-700">{user.email}</td>
                           <td className="py-3 px-4 text-sm text-gray-500">{user.yearGroup || 'Not set'}</td>
                           <td className="py-3 px-4 text-sm text-gray-500">{user.chatCount}</td>

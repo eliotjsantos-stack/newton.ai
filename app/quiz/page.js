@@ -225,7 +225,7 @@ export default function QuizHub() {
           <h1 className="text-xl font-bold text-gray-900 tracking-tight">Quizzes</h1>
           <button
             onClick={() => setShowNewQuiz(true)}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-amber-600 text-white text-sm font-semibold rounded-full hover:bg-amber-700 transition-colors"
           >
             + New
           </button>
@@ -343,7 +343,7 @@ export default function QuizHub() {
                       className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-gray-300 text-left`}
                     >
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        mission.type === 'blind_spot' ? 'bg-amber-100' : 'bg-blue-50'
+                        mission.type === 'blind_spot' ? 'bg-amber-100' : 'bg-amber-50'
                       }`}>
                         {mission.type === 'blind_spot' ? (
                           <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -361,7 +361,7 @@ export default function QuizHub() {
                         <div className="shrink-0 flex items-center gap-1">
                           <div className="w-8 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-blue-600 rounded-full"
+                              className="h-full bg-amber-600 rounded-full"
                               style={{ width: `${(mission.mastery / 5) * 100}%` }}
                             />
                           </div>
@@ -406,7 +406,7 @@ export default function QuizHub() {
             {/* ── Assigned by Teacher ── */}
             {assignedQuizzes.length > 0 && (
               <div>
-                <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wider mb-4">Assigned by Teacher</h2>
+                <h2 className="text-sm font-semibold text-amber-600 uppercase tracking-wider mb-4">Assigned by Teacher</h2>
                 <div className="space-y-2">
                   {assignedQuizzes.map(aq => {
                     const isOverdue = aq.dueDate && new Date(aq.dueDate) < new Date() && !aq.completed;
@@ -418,7 +418,7 @@ export default function QuizHub() {
                         className={`w-full ${cardBase} p-4 flex items-center gap-4 hover:border-gray-300 text-left ${isOverdue ? 'border-red-300' : ''}`}
                       >
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          aq.completed ? 'bg-emerald-100' : 'bg-blue-50'
+                          aq.completed ? 'bg-emerald-100' : 'bg-amber-50'
                         }`}>
                           {aq.completed ? (
                             <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -439,7 +439,7 @@ export default function QuizHub() {
                             ? 'bg-emerald-100 text-emerald-700'
                             : aq.started
                               ? 'bg-amber-100 text-amber-700'
-                              : 'bg-blue-100 text-blue-700'
+                              : 'bg-amber-100 text-amber-600'
                         }`}>
                           {startingAssignment === aq.id ? 'Starting...' : aq.completed ? 'Done' : aq.started ? 'Continue' : 'Start'}
                         </span>
@@ -502,7 +502,7 @@ export default function QuizHub() {
                               {quiz.topic_name || quiz.topicName || 'Untitled'}
                             </p>
                             {quiz.quiz_assignment_id ? (
-                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 shrink-0">Set by Teacher</span>
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-600 shrink-0">Set by Teacher</span>
                             ) : (
                               <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-gray-100 text-gray-400 shrink-0">Personal</span>
                             )}
@@ -519,7 +519,7 @@ export default function QuizHub() {
                               {score}%
                             </span>
                           ) : (
-                            <span className="text-xs font-semibold text-blue-600">Continue</span>
+                            <span className="text-xs font-semibold text-amber-600">Continue</span>
                           )}
                         </div>
                       </Link>
@@ -531,7 +531,7 @@ export default function QuizHub() {
                   <p className="text-gray-400 text-sm mb-4">No quizzes yet</p>
                   <button
                     onClick={() => setShowNewQuiz(true)}
-                    className="px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors"
+                    className="px-6 py-2.5 bg-amber-600 text-white text-sm font-semibold rounded-full hover:bg-amber-700 transition-colors"
                   >
                     Create Your First Quiz
                   </button>
@@ -595,7 +595,7 @@ export default function QuizHub() {
                   >
                     {/* Topic pill */}
                     <div className="flex items-center gap-2 mb-6">
-                      <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
                         <ClassIcon subject={newQuizSubject} size={14} />
                       </div>
                       <div>
@@ -608,11 +608,11 @@ export default function QuizHub() {
                     <div className="mb-3">
                       <div className="flex justify-between items-center mb-2">
                         <p className="text-xs font-medium text-gray-500">{GEN_STEPS[genStep]}</p>
-                        <p className="text-xs font-bold text-blue-600 tabular-nums">{genProgress}%</p>
+                        <p className="text-xs font-bold text-amber-600 tabular-nums">{genProgress}%</p>
                       </div>
                       <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-blue-600"
+                          className="h-full rounded-full bg-amber-600"
                           style={{ width: `${genProgress}%` }}
                           transition={{ duration: 0.3, ease: 'easeOut' }}
                         />
@@ -625,7 +625,7 @@ export default function QuizHub() {
                         <div
                           key={i}
                           className={`h-1 rounded-full transition-all duration-300 ${
-                            i <= genStep ? 'bg-blue-600 flex-1' : 'bg-gray-200 flex-1'
+                            i <= genStep ? 'bg-amber-600 flex-1' : 'bg-gray-200 flex-1'
                           }`}
                         />
                       ))}
@@ -648,7 +648,7 @@ export default function QuizHub() {
                         <select
                           value={newQuizSubject}
                           onChange={(e) => setNewQuizSubject(e.target.value)}
-                          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                         >
                           <option value="">Select a subject</option>
                           {allSubjects.map(s => (
@@ -658,7 +658,7 @@ export default function QuizHub() {
                           ))}
                         </select>
                         {newQuizSubject && subjectSpecMap[newQuizSubject] && (
-                          <p className="mt-1.5 text-xs text-blue-600 truncate">
+                          <p className="mt-1.5 text-xs text-amber-600 truncate">
                             {subjectSpecMap[newQuizSubject].board}: {subjectSpecMap[newQuizSubject].qualTitle}
                           </p>
                         )}
@@ -670,7 +670,7 @@ export default function QuizHub() {
                           value={newQuizTopic}
                           onChange={(e) => setNewQuizTopic(e.target.value)}
                           placeholder="e.g., Quadratic equations"
-                          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/50 placeholder:text-gray-400"
+                          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/50 placeholder:text-gray-400"
                           onKeyDown={(e) => e.key === 'Enter' && !creatingQuiz && newQuizSubject && handleCreateQuiz()}
                         />
                       </div>
@@ -691,7 +691,7 @@ export default function QuizHub() {
                               onClick={() => { setQuizMode(m.id); setQuizMarks(m.marks); }}
                               className={`px-3 py-2 rounded-lg text-left text-xs transition-colors border ${
                                 quizMode === m.id
-                                  ? 'bg-blue-50 border-blue-300 text-blue-900'
+                                  ? 'bg-amber-50 border-amber-200 text-amber-600'
                                   : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300'
                               }`}
                             >
@@ -734,7 +734,7 @@ export default function QuizHub() {
                       <button
                         onClick={handleCreateQuiz}
                         disabled={!newQuizTopic.trim() || !newQuizSubject}
-                        className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 text-white disabled:text-gray-400 font-semibold rounded-xl transition-colors duration-200"
+                        className="flex-1 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-100 text-white disabled:text-gray-400 font-semibold rounded-xl transition-colors duration-200"
                       >
                         Start Quiz
                       </button>

@@ -168,8 +168,8 @@ function QuizDetailPanel({ studentId, studentName, chapter, classId, onClose }) 
             <>
               {/* AI Summary */}
               {(summary || summaryLoading) && (
-                <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-                  <h3 className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">AI Summary</h3>
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                  <h3 className="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-2">AI Summary</h3>
                   {summaryLoading ? (
                     <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
                   ) : (
@@ -362,7 +362,7 @@ function AssignQuizModal({ classId, className, subject, onClose }) {
                   value={topic}
                   onChange={e => setTopic(e.target.value)}
                   placeholder="e.g. Quadratic equations"
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder:text-gray-400"
                 />
               </div>
 
@@ -376,7 +376,7 @@ function AssignQuizModal({ classId, className, subject, onClose }) {
                       onClick={() => setMode(m.value)}
                       className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-colors border ${
                         mode === m.value
-                          ? 'bg-blue-600 text-gray-900border-blue-600'
+                          ? 'bg-amber-600 text-gray-900border-amber-200'
                           : 'bg-gray-100 text-gray-400 border-gray-200 hover:text-gray-600'
                       }`}
                     >
@@ -397,7 +397,7 @@ function AssignQuizModal({ classId, className, subject, onClose }) {
                     -
                   </button>
                   <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-600 rounded-full transition-all" style={{ width: `${((totalMarks - 5) / 95) * 100}%` }} />
+                    <div className="h-full bg-amber-600 rounded-full transition-all" style={{ width: `${((totalMarks - 5) / 95) * 100}%` }} />
                   </div>
                   <button
                     onClick={() => setTotalMarks(Math.min(100, totalMarks + 5))}
@@ -415,7 +415,7 @@ function AssignQuizModal({ classId, className, subject, onClose }) {
                   type="date"
                   value={dueDate}
                   onChange={e => setDueDate(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
@@ -423,7 +423,7 @@ function AssignQuizModal({ classId, className, subject, onClose }) {
               <button
                 onClick={handleSubmit}
                 disabled={submitting || !topic.trim()}
-                className="w-full py-2.5 bg-blue-600 text-gray-900text-sm font-semibold rounded-full hover:bg-blue-700 disabled:opacity-50 transition"
+                className="w-full py-2.5 bg-amber-600 text-gray-900text-sm font-semibold rounded-full hover:bg-amber-700 disabled:opacity-50 transition"
               >
                 {submitting ? 'Generating & Assigning...' : 'Generate & Assign'}
               </button>
@@ -508,9 +508,9 @@ function InterventionModal({ student, className, onClose }) {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setMode('worksheet')}
-                className="flex flex-col items-center gap-2 p-5 rounded-2xl border border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50 transition text-center"
+                className="flex flex-col items-center gap-2 p-5 rounded-2xl border border-gray-200 bg-gray-50 hover:border-amber-200 hover:bg-amber-50 transition text-center"
               >
-                <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                 </svg>
                 <span className="text-sm font-semibold text-gray-600">Generate Worksheet</span>
@@ -531,7 +531,7 @@ function InterventionModal({ student, className, onClose }) {
 
           {mode === 'worksheet' && !worksheet && (
             <div className="space-y-4">
-              <button onClick={() => setMode(null)} className="text-sm text-blue-600 hover:underline">&larr; Back</button>
+              <button onClick={() => setMode(null)} className="text-sm text-amber-600 hover:underline">&larr; Back</button>
               <div>
                 <label className="text-sm font-medium text-gray-500 block mb-1">Topic</label>
                 <input
@@ -539,7 +539,7 @@ function InterventionModal({ student, className, onClose }) {
                   value={worksheetTopic}
                   onChange={e => setWorksheetTopic(e.target.value)}
                   placeholder="e.g. Quadratic equations"
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder:text-gray-400"
                 />
               </div>
               <div>
@@ -547,7 +547,7 @@ function InterventionModal({ student, className, onClose }) {
                 <select
                   value={worksheetDifficulty}
                   onChange={e => setWorksheetDifficulty(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
                   <option value="easy">Foundation</option>
                   <option value="medium">Intermediate</option>
@@ -557,7 +557,7 @@ function InterventionModal({ student, className, onClose }) {
               <button
                 onClick={generateWorksheet}
                 disabled={generating || !worksheetTopic.trim()}
-                className="w-full py-2.5 bg-blue-600 text-gray-900text-sm font-semibold rounded-full hover:bg-blue-700 disabled:opacity-50 transition"
+                className="w-full py-2.5 bg-amber-600 text-gray-900text-sm font-semibold rounded-full hover:bg-amber-700 disabled:opacity-50 transition"
               >
                 {generating ? 'Generating...' : 'Generate Worksheet'}
               </button>
@@ -566,7 +566,7 @@ function InterventionModal({ student, className, onClose }) {
 
           {mode === 'worksheet' && worksheet && (
             <div className="space-y-4">
-              <button onClick={() => { setWorksheet(null); setMode(null); }} className="text-sm text-blue-600 hover:underline">&larr; Back</button>
+              <button onClick={() => { setWorksheet(null); setMode(null); }} className="text-sm text-amber-600 hover:underline">&larr; Back</button>
               <h4 className="text-base font-bold text-gray-900">{worksheet.title}</h4>
               <div className="space-y-3 max-h-60 overflow-y-auto">
                 {worksheet.questions?.map((q, i) => (
@@ -575,7 +575,7 @@ function InterventionModal({ student, className, onClose }) {
                       <p className="text-sm text-gray-700"><strong>Q{q.number}.</strong> {q.question}</p>
                       <span className="text-xs font-medium text-gray-400 whitespace-nowrap">[{q.marks} marks]</span>
                     </div>
-                    {q.hint && <p className="text-xs text-blue-600 mt-1">Hint: {q.hint}</p>}
+                    {q.hint && <p className="text-xs text-amber-600 mt-1">Hint: {q.hint}</p>}
                   </div>
                 ))}
               </div>
@@ -593,7 +593,7 @@ function InterventionModal({ student, className, onClose }) {
 
           {mode === 'notify' && (
             <div className="space-y-4">
-              <button onClick={() => setMode(null)} className="text-sm text-blue-600 hover:underline">&larr; Back</button>
+              <button onClick={() => setMode(null)} className="text-sm text-amber-600 hover:underline">&larr; Back</button>
               {notifyResult === 'sent' ? (
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 text-center">
                   <p className="text-sm font-semibold text-emerald-400">Notification sent successfully</p>
@@ -915,7 +915,7 @@ export default function TeacherAnalyticsPage() {
               <div className="flex items-center gap-3 flex-wrap">
                 <button
                   onClick={() => setShowAssignQuiz(true)}
-                  className="px-4 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-gray-900rounded-full transition-colors"
+                  className="px-4 py-2 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-gray-900rounded-full transition-colors"
                 >
                   Assign Quiz
                 </button>
@@ -935,7 +935,7 @@ export default function TeacherAnalyticsPage() {
                   <select
                     value={selectedClassId || ''}
                     onChange={(e) => setSelectedClassId(e.target.value)}
-                    className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     {classes.map(c => (
                       <option key={c.id} value={c.id} >{c.name} — {c.subject}</option>
@@ -1011,7 +1011,7 @@ export default function TeacherAnalyticsPage() {
                         setInterventionStudent(analytics.priorityList[0]);
                       }
                     }}
-                    className="px-4 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-gray-900rounded-full transition-colors"
+                    className="px-4 py-2 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-gray-900rounded-full transition-colors"
                   >
                     Generate Targeted Review
                   </button>
@@ -1111,7 +1111,7 @@ export default function TeacherAnalyticsPage() {
                             <div>
                               <button
                                 onClick={() => setForensicStudent(student)}
-                                className="text-sm font-semibold text-gray-900hover:text-blue-700 transition-colors text-left"
+                                className="text-sm font-semibold text-gray-900hover:text-amber-600 transition-colors text-left"
                               >
                                 {student.name}
                               </button>
@@ -1141,7 +1141,7 @@ export default function TeacherAnalyticsPage() {
                             )}
                             <button
                               onClick={() => setInterventionStudent(student)}
-                              className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                              className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-600 hover:bg-amber-100 transition"
                             >
                               Intervene
                             </button>

@@ -110,7 +110,7 @@ export default function QuizQuestion({
                 disabled={disabled}
                 className={`w-full p-4 text-left rounded-xl border-2 transition-all ${
                   selectedOption === option
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-amber-200 bg-amber-50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'
                 } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
@@ -151,7 +151,7 @@ export default function QuizQuestion({
             onPaste={(e) => { e.preventDefault(); onPasteBlocked?.(); }}
             disabled={disabled}
             placeholder="Type your answer..."
-            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:opacity-50"
           />
         );
 
@@ -164,7 +164,7 @@ export default function QuizQuestion({
             disabled={disabled}
             placeholder="Explain your reasoning..."
             rows={4}
-            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:opacity-50"
+            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none disabled:opacity-50"
           />
         );
 
@@ -208,7 +208,7 @@ export default function QuizQuestion({
           <div className="mt-4 p-4 bg-gray-50 rounded-xl">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">How confident are you?</span>
-              <span className="text-sm font-semibold text-blue-600">{confidence}/5</span>
+              <span className="text-sm font-semibold text-amber-600">{confidence}/5</span>
             </div>
             <input
               type="range"
@@ -231,7 +231,7 @@ export default function QuizQuestion({
           <button
             onClick={handleSubmit}
             disabled={!isAnswerValid() || disabled || submitting}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
           >
             {submitting ? (
               <>

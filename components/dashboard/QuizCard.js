@@ -32,7 +32,7 @@ export default function QuizCard({
           <h3 className="text-sm font-semibold text-gray-900">Quizzes</h3>
           {creatingQuiz && (
             <motion.div
-              className="w-2 h-2 bg-blue-500 rounded-full"
+              className="w-2 h-2 bg-amber-500 rounded-full"
               animate={{
                 boxShadow: [
                   '0 0 0 0 rgba(59,130,246,0.6)',
@@ -87,7 +87,7 @@ export default function QuizCard({
             {tab === 'active' && (
               <button
                 onClick={onNewQuiz}
-                className="mt-2 text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline"
+                className="mt-2 text-xs font-semibold text-amber-600 hover:text-amber-600 hover:underline"
               >
                 Create one →
               </button>
@@ -128,7 +128,7 @@ export default function QuizCard({
               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={(e) => onRestart(quiz.id, e)}
-                  className="p-1 text-gray-400 hover:text-blue-600 rounded-md transition-colors"
+                  className="p-1 text-gray-400 hover:text-amber-600 rounded-md transition-colors"
                   title="Restart"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

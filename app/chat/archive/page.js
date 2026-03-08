@@ -133,7 +133,7 @@ export default function ArchivePage() {
                 placeholder="Search archives..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-10 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 focus:bg-white transition-all placeholder:text-gray-400"
+                className="w-full px-4 py-2 pl-10 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 focus:bg-white transition-all placeholder:text-gray-400"
               />
               <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -212,14 +212,14 @@ export default function ArchivePage() {
                                 onClick={() => setSelectedChat({ ...chat, subject })}
                                 className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm ${
                                   selectedChat?.id === chat.id
-                                    ? 'bg-blue-600 text-white'
+                                    ? 'bg-amber-600 text-white'
                                     : 'hover:bg-gray-50 text-gray-700'
                                 }`}
                               >
                                 <div className="truncate font-medium">
                                   {generateChatTitle(chat.messages, chat.title)}
                                 </div>
-                                <div className={`text-xs mt-1 ${selectedChat?.id === chat.id ? 'text-blue-100' : 'text-gray-400'}`}>
+                                <div className={`text-xs mt-1 ${selectedChat?.id === chat.id ? 'text-amber-600' : 'text-gray-400'}`}>
                                   Archived {new Date(chat.archivedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                                 </div>
                               </button>
