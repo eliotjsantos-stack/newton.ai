@@ -2,20 +2,13 @@
 
 import { cn } from '../../lib/cn';
 
-const variants = {
-  default: 'bg-[var(--c-card)] border border-[var(--c-border)]',
-  ghost:   'bg-transparent border border-[var(--c-border-subtle)]',
-  glass:   'glass',
-  solid:   'bg-[var(--c-card)] shadow-md',
-};
-
-function Card({ variant = 'default', hover = false, className, children, ...props }) {
+function Card({ hover = false, padding = true, className, children, ...props }) {
   return (
     <div
       className={cn(
-        'rounded-2xl',
-        variants[variant],
-        hover && 'card-lift cursor-pointer',
+        'bg-white rounded-lg border border-[var(--c-border)] card-shadow',
+        padding && 'p-5',
+        hover && 'transition-shadow duration-150 hover:card-shadow-md cursor-pointer',
         className,
       )}
       {...props}
@@ -27,7 +20,7 @@ function Card({ variant = 'default', hover = false, className, children, ...prop
 
 function CardHeader({ className, children, ...props }) {
   return (
-    <div className={cn('px-6 pt-6 pb-4', className)} {...props}>
+    <div className={cn('flex items-center justify-between mb-4', className)} {...props}>
       {children}
     </div>
   );
@@ -35,7 +28,7 @@ function CardHeader({ className, children, ...props }) {
 
 function CardTitle({ className, children, ...props }) {
   return (
-    <h3 className={cn('text-base font-semibold text-[var(--c-text)] tracking-tight', className)} {...props}>
+    <h3 className={cn('text-sm font-semibold text-[var(--c-text)]', className)} {...props}>
       {children}
     </h3>
   );
@@ -43,7 +36,7 @@ function CardTitle({ className, children, ...props }) {
 
 function CardDescription({ className, children, ...props }) {
   return (
-    <p className={cn('text-sm text-[var(--c-text-soft)] mt-1', className)} {...props}>
+    <p className={cn('text-sm text-[var(--c-text-muted)] mt-0.5', className)} {...props}>
       {children}
     </p>
   );
@@ -51,7 +44,7 @@ function CardDescription({ className, children, ...props }) {
 
 function CardBody({ className, children, ...props }) {
   return (
-    <div className={cn('px-6 pb-6', className)} {...props}>
+    <div className={cn('px-5 pb-5', className)} {...props}>
       {children}
     </div>
   );
@@ -60,7 +53,7 @@ function CardBody({ className, children, ...props }) {
 function CardFooter({ className, children, ...props }) {
   return (
     <div className={cn(
-      'px-6 py-4 border-t border-[var(--c-border-subtle)] flex items-center gap-3',
+      'px-5 py-4 border-t border-[var(--c-border)] flex items-center gap-3',
       className,
     )} {...props}>
       {children}

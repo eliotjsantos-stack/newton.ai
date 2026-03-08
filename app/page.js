@@ -180,10 +180,10 @@ function ExamBoardScroll() {
     <section className="py-24 px-6 border-t border-gray-200 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <ScrollReveal className="text-center mb-10 md:mb-20">
-          <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">
+          <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">
             Grounding Engine
           </p>
-          <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
+          <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
             Grounded. Not Guessing.
           </h2>
           <p className="hidden sm:block text-xl text-gray-500 max-w-2xl mx-auto font-medium">
@@ -235,7 +235,7 @@ function ExamBoardScroll() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ ...spring, delay: 0.35 }}
         >
-          <div className="rounded-2xl p-6 flex items-start gap-4 bg-white border border-gray-200 shadow-sm">
+          <div className="rounded-xl p-6 flex items-start gap-4 bg-white border border-gray-200 card-shadow">
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -271,8 +271,8 @@ function FeatureRow({ label, title, description, children, reverse = false }) {
   return (
     <div className={`flex flex-col ${reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-8 md:gap-16 lg:gap-24`}>
       <div className="flex-1 max-w-xl min-w-0">
-        <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">{label}</p>
-        <h3 className="text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter mb-6">{title}</h3>
+        <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">{label}</p>
+        <h3 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter mb-6">{title}</h3>
         <p className="hidden sm:block text-lg text-gray-500 leading-relaxed">{description}</p>
       </div>
       <div className="flex-1 flex justify-center min-w-0">{children}</div>
@@ -329,10 +329,10 @@ export default function LandingPage() {
   const paneY = useTransform(heroProgress, [0, 0.5], [0, -60]);
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7]">
+    <div className="min-h-screen bg-[var(--c-canvas)]">
       {/* ─── Entrance ─── */}
       <motion.div
-        className="fixed inset-0 bg-[#F5F5F7] z-[100] pointer-events-none"
+        className="fixed inset-0 bg-[var(--c-canvas)] z-[100] pointer-events-none"
         initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -379,7 +379,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="/signup"
-                className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+                className="px-5 py-2 bg-[var(--c-accent)] text-white text-sm font-semibold rounded-md hover:bg-[var(--c-accent-hover)] transition-colors duration-200"
               >
                 Get Started
               </Link>
@@ -424,7 +424,7 @@ export default function LandingPage() {
                   <Link href="/login" className="block px-4 py-3 text-gray-600 hover:text-gray-900 font-medium rounded-lg hover:bg-gray-50 transition-all">
                     Log In
                   </Link>
-                  <Link href="/signup" className="block px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl text-center">
+                  <Link href="/signup" className="block px-4 py-3 bg-[var(--c-accent)] text-white font-semibold rounded-md text-center">
                     Get Started
                   </Link>
                 </div>
@@ -445,7 +445,7 @@ export default function LandingPage() {
                 className="flex-1 text-left min-w-0"
               >
                 <motion.h1
-                  className="text-6xl sm:text-7xl md:text-8xl lg:text-[7rem] font-bold text-gray-900 tracking-tighter leading-[0.9]"
+                  className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-[7rem] font-bold text-gray-900 tracking-tighter leading-[0.9]"
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ ...spring, delay: 0.2 }}
@@ -471,7 +471,7 @@ export default function LandingPage() {
                 >
                   <Link
                     href="/signup"
-                    className="w-full sm:w-auto text-center px-8 py-4 bg-blue-600 text-white text-base font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+                    className="w-full sm:w-auto text-center px-8 py-4 bg-[var(--c-accent)] text-white text-base font-semibold rounded-md hover:bg-[var(--c-accent-hover)] transition-colors duration-200"
                   >
                     Try Now
                   </Link>
@@ -512,8 +512,8 @@ export default function LandingPage() {
       <section id="features" className="py-24 px-6 lg:px-12">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal className="text-center mb-12 md:mb-24">
-            <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">The Problem</p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">The Problem</p>
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
               AI broke homework.
             </h2>
             <p className="hidden sm:block text-xl text-gray-500 max-w-2xl mx-auto font-medium">
@@ -525,7 +525,7 @@ export default function LandingPage() {
             {/* The Problem */}
             <ScrollReveal>
               <div
-                className="h-full rounded-2xl p-6 md:p-10 bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200"
+                className="h-full rounded-xl p-6 md:p-10 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200"
               >
                 <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center mb-5 md:mb-8">
                   <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -556,7 +556,7 @@ export default function LandingPage() {
             {/* The Fix */}
             <ScrollReveal delay={0.1}>
               <div
-                className="h-full rounded-2xl p-6 md:p-10 bg-white/5 border border-[#0071e3]/20 hover:border-[#0071e3]/40 transition-colors duration-200"
+                className="h-full rounded-xl p-6 md:p-10 bg-white/5 border border-[#0071e3]/20 hover:border-[#0071e3]/40 transition-colors duration-200"
               >
                 <div className="w-12 h-12 rounded-2xl bg-blue-600/10 flex items-center justify-center mb-5 md:mb-8">
                   <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -594,10 +594,10 @@ export default function LandingPage() {
       <section className="py-24 px-6 lg:px-12 border-t border-gray-200 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal className="text-center mb-10 md:mb-20">
-            <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">
               Not generic. Specific.
             </p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
               Your exact syllabus.<br />Built in.
             </h2>
             <p className="hidden sm:block text-xl text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed">
@@ -626,7 +626,7 @@ export default function LandingPage() {
             ].map((b) => (
               <ScrollReveal key={b.board} className="min-w-[260px] sm:min-w-0 snap-start shrink-0 sm:shrink">
                 <div
-                  className="rounded-2xl p-6 sm:p-8 h-full flex flex-col bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200"
+                  className="rounded-xl p-6 sm:p-8 h-full flex flex-col bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200"
                 >
                   <h3 className="text-2xl font-bold text-gray-900 tracking-tight mb-1">{b.board}</h3>
                   <p className="text-sm text-gray-500 mb-3">{b.full}</p>
@@ -642,7 +642,7 @@ export default function LandingPage() {
 
           <ScrollReveal className="text-center">
             <div
-              className="inline-flex items-center gap-3 rounded-2xl px-6 py-4 bg-white border border-gray-200 shadow-sm"
+              className="inline-flex items-center gap-3 rounded-xl px-6 py-4 bg-white border border-gray-200 card-shadow"
             >
               <span className="text-4xl font-bold text-gray-900 tracking-tighter">1,318</span>
               <span className="text-sm text-gray-500 text-left leading-tight">
@@ -657,8 +657,8 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-24 px-6 lg:px-12 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal className="text-center mb-12 md:mb-24">
-            <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">Method</p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Method</p>
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter">
               Four steps. Real learning.
             </h2>
           </ScrollReveal>
@@ -691,8 +691,8 @@ export default function LandingPage() {
                 text: null,
               },
             ].map((s) => (
-              <div key={s.step} className="min-w-[280px] snap-start shrink-0 rounded-2xl p-6 bg-white border border-gray-200 shadow-sm">
-                <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-2">Step {s.step}</p>
+              <div key={s.step} className="min-w-[280px] snap-start shrink-0 rounded-xl p-6 bg-white border border-gray-200 card-shadow">
+                <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-2">Step {s.step}</p>
                 <h3 className="text-lg font-bold text-gray-900 tracking-tight mb-4">{s.title}</h3>
                 {s.avatar === 'result' ? (
                   <div className="rounded-xl p-5 text-center bg-blue-50 border border-blue-100">
@@ -726,7 +726,7 @@ export default function LandingPage() {
                 title="You ask your question."
                 description="Type what you're stuck on. A maths problem, an essay topic, a chemistry concept. Newton listens."
               >
-                <div className="w-full max-w-sm rounded-2xl p-6 bg-white border border-gray-200 shadow-sm">
+                <div className="w-full max-w-sm rounded-xl p-6 bg-white border border-gray-200 card-shadow">
                   <div className="flex gap-3 justify-end">
                     <p className="text-gray-700 text-[15px] leading-relaxed">
                       &ldquo;I don&apos;t understand how to factorise quadratics. Can you help?&rdquo;
@@ -746,7 +746,7 @@ export default function LandingPage() {
                 description="Instead of an answer, you get a question. One that makes you think about what you already know."
                 reverse
               >
-                <div className="w-full max-w-sm rounded-2xl p-6 bg-white border border-gray-200 shadow-sm">
+                <div className="w-full max-w-sm rounded-xl p-6 bg-white border border-gray-200 card-shadow">
                   <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center flex-shrink-0">
                       <span className="text-[10px] font-bold text-white">N</span>
@@ -765,7 +765,7 @@ export default function LandingPage() {
                 title="You discover the answer."
                 description="Through guided reasoning, you find it yourself. The understanding is yours, not the machine's."
               >
-                <div className="w-full max-w-sm rounded-2xl p-6 bg-white border border-gray-200 shadow-sm">
+                <div className="w-full max-w-sm rounded-xl p-6 bg-white border border-gray-200 card-shadow">
                   <div className="flex gap-3 justify-end">
                     <p className="text-gray-700 text-[15px] leading-relaxed">
                       &ldquo;2 and 3! So it&apos;s (x+2)(x+3) = 0, meaning x = -2 or x = -3!&rdquo;
@@ -801,8 +801,8 @@ export default function LandingPage() {
       <section id="subjects" className="py-24 px-6 lg:px-12 border-t border-gray-200 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal className="text-center mb-10 md:mb-20">
-            <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">Coverage</p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Coverage</p>
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
               Every subject. Every level.
             </h2>
             <p className="hidden sm:block text-xl text-gray-500 max-w-2xl mx-auto font-medium">
@@ -836,7 +836,7 @@ export default function LandingPage() {
             ].map((cat) => (
               <ScrollReveal key={cat.name} className="min-w-[280px] sm:min-w-0 snap-start shrink-0 sm:shrink">
                 <div
-                  className="rounded-2xl p-8 h-full bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200"
+                  className="rounded-xl p-8 h-full bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200"
                 >
                   <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-6">
                     <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -856,8 +856,8 @@ export default function LandingPage() {
       <section id="institutions" className="py-24 px-6 lg:px-12 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal className="text-center mb-10 md:mb-20">
-            <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">For Schools</p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">For Schools</p>
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
               Institutional Intelligence.
             </h2>
             <p className="hidden sm:block text-xl text-gray-500 max-w-2xl mx-auto font-medium">
@@ -881,7 +881,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-8">
             {/* Integrity & Honesty */}
             <ScrollReveal>
-              <div className="h-full rounded-2xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200">
+              <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
                 <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center mb-6">
                   <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -913,7 +913,7 @@ export default function LandingPage() {
 
             {/* Scientific Retention */}
             <ScrollReveal delay={0.08}>
-              <div className="h-full rounded-2xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200">
+              <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
                 <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center mb-6">
                   <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
@@ -939,7 +939,7 @@ export default function LandingPage() {
 
             {/* Teacher Workload */}
             <ScrollReveal delay={0.16}>
-              <div className="h-full rounded-2xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200 md:col-span-2 lg:col-span-1">
+              <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200 md:col-span-2 lg:col-span-1">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-6">
                   <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -969,8 +969,8 @@ export default function LandingPage() {
       <section className="py-24 px-6 lg:px-12 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal className="text-center mb-10 md:mb-20">
-            <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">Academic Integrity</p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Academic Integrity</p>
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
               Structurally Incapable<br className="hidden sm:block" /> of Cheating.
             </h2>
             <p className="hidden sm:block text-xl text-gray-500 max-w-2xl mx-auto font-medium">
@@ -981,7 +981,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Left: Standard LLM */}
             <ScrollReveal>
-              <div className="h-full rounded-2xl p-6 md:p-8 bg-white border border-red-100 hover:border-red-200 shadow-sm transition-colors duration-200 relative overflow-hidden">
+              <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-red-100 hover:border-red-200 card-shadow transition-colors duration-200 relative overflow-hidden">
                 {/* Subtle red glow */}
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-red-500/[0.04] rounded-full blur-3xl pointer-events-none" />
 
@@ -1021,7 +1021,7 @@ export default function LandingPage() {
 
             {/* Right: Newton */}
             <ScrollReveal delay={0.08}>
-              <div className="h-full rounded-2xl p-6 md:p-8 bg-white border border-emerald-100 hover:border-emerald-200 shadow-sm transition-colors duration-200 relative overflow-hidden">
+              <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-emerald-100 hover:border-emerald-200 card-shadow transition-colors duration-200 relative overflow-hidden">
                 {/* Subtle emerald glow */}
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/[0.04] rounded-full blur-3xl pointer-events-none" />
 
@@ -1078,7 +1078,7 @@ export default function LandingPage() {
                 { value: '100%', label: 'Socratic response rate', icon: 'M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342' },
                 { value: '3-layer', label: 'Integrity verification', icon: 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z' },
               ].map((stat) => (
-                <div key={stat.label} className="rounded-2xl bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200 p-5 md:p-6 text-center">
+                <div key={stat.label} className="rounded-xl bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200 p-5 md:p-6 text-center">
                   <div className="w-8 h-8 rounded-xl bg-blue-600/10 flex items-center justify-center mx-auto mb-3">
                     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d={stat.icon} />
@@ -1097,8 +1097,8 @@ export default function LandingPage() {
       <section className="py-24 px-6 lg:px-12 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal className="text-center mb-10 md:mb-20">
-            <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">Competitive Edge</p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Competitive Edge</p>
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
               Active Learning Beats<br className="hidden sm:block" /> Passive Copying.
             </h2>
             <p className="hidden sm:block text-xl text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed">
@@ -1126,7 +1126,7 @@ export default function LandingPage() {
                   icon: 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z',
                 },
               ].map((item) => (
-                <div key={item.title} className="rounded-2xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200">
+                <div key={item.title} className="rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
                   <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center mb-6">
                     <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
@@ -1141,14 +1141,14 @@ export default function LandingPage() {
 
           {/* Grade curve — clearly labelled as illustrative */}
           <ScrollReveal className="max-w-3xl mx-auto mb-10 md:mb-16">
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 md:p-8">
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 md:p-8">
               <GradeCurveDemo />
             </div>
           </ScrollReveal>
 
           {/* Institutional Value Prop */}
           <ScrollReveal delay={0.1}>
-            <div className="rounded-2xl p-6 md:p-10 bg-white border border-blue-100 hover:border-blue-200 shadow-sm transition-colors duration-200">
+            <div className="rounded-xl p-6 md:p-10 bg-white border border-blue-100 hover:border-blue-200 card-shadow transition-colors duration-200">
               <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-12">
                 <div className="flex-1">
                   <h3 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight mb-3">
@@ -1161,7 +1161,7 @@ export default function LandingPage() {
                 <div className="flex-shrink-0">
                   <Link
                     href="/signup"
-                    className="inline-block px-8 py-3.5 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+                    className="inline-block px-8 py-3.5 bg-[var(--c-accent)] text-white text-sm font-semibold rounded-md hover:bg-[var(--c-accent-hover)] transition-colors duration-200"
                   >
                     Deploy Newton
                   </Link>
@@ -1176,8 +1176,8 @@ export default function LandingPage() {
       <section id="privacy" className="py-24 px-6 lg:px-12 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal className="text-center mb-10 md:mb-20">
-            <p className="text-sm font-semibold tracking-widest uppercase text-blue-600 mb-4">Trust</p>
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
+            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Trust</p>
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">
               Built for Institutional Trust.
             </h2>
             <p className="hidden sm:block text-xl text-gray-500 max-w-2xl mx-auto font-medium">
@@ -1187,7 +1187,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-4 md:gap-6">
             <ScrollReveal>
-              <div className="h-full rounded-2xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200">
+              <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
                 <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center mb-6">
                   <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -1201,7 +1201,7 @@ export default function LandingPage() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.08}>
-              <div className="h-full rounded-2xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200">
+              <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-6">
                   <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -1215,7 +1215,7 @@ export default function LandingPage() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.16}>
-              <div className="h-full rounded-2xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 shadow-sm transition-colors duration-200">
+              <div className="h-full rounded-xl p-6 md:p-8 bg-white border border-gray-200 hover:border-gray-300 card-shadow transition-colors duration-200">
                 <div className="w-10 h-10 rounded-xl bg-amber-400/10 flex items-center justify-center mb-6">
                   <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 00-.12-1.03l-2.268-9.64a3.375 3.375 0 00-3.285-2.602H7.923a3.375 3.375 0 00-3.285 2.602l-2.268 9.64a4.5 4.5 0 00-.12 1.03v.228m19.5 0a3 3 0 01-3 3H5.25a3 3 0 01-3-3m19.5 0a3 3 0 00-3-3H5.25a3 3 0 00-3 3m16.5 0h.008v.008h-.008v-.008zm-3 0h.008v.008h-.008v-.008z" />
@@ -1235,7 +1235,7 @@ export default function LandingPage() {
       <section id="faq" className="py-24 px-6 lg:px-12 border-t border-gray-200">
         <div className="max-w-3xl mx-auto">
           <ScrollReveal className="text-center mb-8 md:mb-16">
-            <h2 className="text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">FAQ</h2>
+            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-gray-900 tracking-tighter mb-6">FAQ</h2>
           </ScrollReveal>
 
           <div className="space-y-2">
@@ -1250,7 +1250,7 @@ export default function LandingPage() {
             ].map((faq, i) => (
               <ScrollReveal key={i} delay={i * 0.03}>
                 <div
-                  className="rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-colors duration-200"
+                  className="rounded-xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-colors duration-200"
                 >
                   <button
                     onClick={() => setActiveAccordion(activeAccordion === i ? null : i)}
@@ -1294,7 +1294,7 @@ export default function LandingPage() {
       {/* ─── Final CTA ─── */}
       <section className="py-24 px-6 lg:px-12">
         <ScrollReveal className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 tracking-tighter leading-[0.92] mb-8">
+          <h2 className="font-display text-2xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 tracking-tighter leading-[0.92] mb-8">
             Official Specs.<br />Real Learning.
           </h2>
           <p className="hidden sm:block text-xl text-gray-500 mb-8 md:mb-12 max-w-xl mx-auto font-medium leading-relaxed">
@@ -1302,7 +1302,7 @@ export default function LandingPage() {
           </p>
           <Link
             href="/signup"
-            className="block sm:inline-block w-full sm:w-auto text-center px-10 py-4 bg-blue-600 text-white text-lg font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200"
+            className="block sm:inline-block w-full sm:w-auto text-center px-10 py-4 bg-[var(--c-accent)] text-white text-lg font-semibold rounded-md hover:bg-[var(--c-accent-hover)] transition-colors duration-200"
           >
             Start Learning Free
           </Link>

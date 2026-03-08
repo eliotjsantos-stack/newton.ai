@@ -110,59 +110,71 @@ export default function SignupPage() {
     }
   };
 
-  const inputClass = "w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-gray-900 placeholder:text-gray-400 text-sm";
-  const selectClass = "w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-gray-900 text-sm";
+  const inputClass = "w-full px-3 py-2.5 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-md text-sm text-[var(--c-text)] placeholder:text-[var(--c-text-faint)] focus:outline-none focus:ring-2 focus:ring-[var(--c-accent-ring)] focus:border-[var(--c-accent)] transition-colors";
+  const selectClass = "w-full px-3 py-2.5 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-md text-sm text-[var(--c-text)] focus:outline-none focus:ring-2 focus:ring-[var(--c-accent-ring)] focus:border-[var(--c-accent)] transition-colors";
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
+    <div className="min-h-screen bg-[var(--c-canvas)] flex items-center justify-center p-4">
+      <div className="w-full max-w-[420px]">
+
+        {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center">
-              <span className="text-lg font-bold text-white">N</span>
+          <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-3">
+            <div className="w-9 h-9 bg-[var(--c-text)] rounded-lg flex items-center justify-center shrink-0">
+              <span className="text-base font-bold text-white">N</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Newton</h1>
+            <span className="font-display text-xl text-[var(--c-text)]">Newton</span>
           </Link>
-          <p className="text-gray-500 text-sm mt-2">Create your free account</p>
+          <p className="text-sm text-[var(--c-text-muted)]">Create your free account</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-8">
+        <div className="bg-[var(--c-card)] rounded-xl card-shadow p-7">
+
           {/* Account Type Toggle */}
-          <div className="flex rounded-xl bg-gray-100 p-1 mb-6">
+          <div className="flex rounded-lg bg-[var(--c-canvas)] p-1 mb-6 border border-[var(--c-border)]">
             <button
               type="button"
               onClick={() => { setAccountType('student'); setError(''); }}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${accountType === 'student' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${accountType === 'student' ? 'bg-white text-[var(--c-text)] card-shadow' : 'text-[var(--c-text-muted)] hover:text-[var(--c-text-soft)]'}`}
             >
               Student
             </button>
             <button
               type="button"
               onClick={() => { setAccountType('teacher'); setError(''); }}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${accountType === 'teacher' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${accountType === 'teacher' ? 'bg-white text-[var(--c-text)] card-shadow' : 'text-[var(--c-text-muted)] hover:text-[var(--c-text-soft)]'}`}
             >
               Teacher
             </button>
           </div>
 
           {accountType === 'teacher' && (
-            <div className="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-              <p className="text-xs text-amber-700 font-medium">For authorised teachers only. You will need a teacher access code.</p>
+            <div className="mb-5 px-3.5 py-3 bg-amber-50 border border-amber-100 rounded-lg">
+              <p className="text-xs text-amber-700">For authorised teachers only. You will need a teacher access code.</p>
             </div>
           )}
 
-          {/* Progress Indicator */}
-          <div className="flex items-center justify-center mb-7">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs transition-all ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>1</div>
-            <div className={`w-14 h-0.5 transition-all ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs transition-all ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>2</div>
+          {/* Step indicator */}
+          <div className="flex items-center justify-center mb-6">
+            {[1, 2].map((s, i) => (
+              <>
+                <div
+                  key={s}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${step >= s ? 'bg-[var(--c-accent)] text-white' : 'bg-[var(--c-canvas)] text-[var(--c-text-muted)] border border-[var(--c-border)]'}`}
+                >
+                  {s}
+                </div>
+                {i === 0 && (
+                  <div className={`w-12 h-px mx-1 transition-colors ${step >= 2 ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-border)]'}`} />
+                )}
+              </>
+            ))}
           </div>
 
           {error && (
-            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-600 text-sm font-medium">{error}</p>
+            <div className="mb-5 px-3.5 py-3 bg-red-50 border border-red-100 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
 
@@ -170,7 +182,7 @@ export default function SignupPage() {
           {step === 1 && (
             <form onSubmit={handleSendCode} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
+                <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">Email address</label>
                 <input
                   type="email"
                   value={email}
@@ -179,18 +191,18 @@ export default function SignupPage() {
                   required
                   className={inputClass}
                 />
-                <p className="text-xs text-gray-400 mt-1.5">We&apos;ll send a 6-digit verification code</p>
+                <p className="text-xs text-[var(--c-text-faint)] mt-1.5">We&apos;ll send a 6-digit verification code</p>
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50 text-sm"
+                className="w-full py-2.5 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                     Sending code...
                   </span>
@@ -203,7 +215,7 @@ export default function SignupPage() {
           {step === 2 && (
             <form onSubmit={handleVerifyAndCreate} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Verification code</label>
+                <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">Verification code</label>
                 <input
                   type="text"
                   value={code}
@@ -211,15 +223,15 @@ export default function SignupPage() {
                   placeholder="000000"
                   maxLength="6"
                   required
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-center text-2xl tracking-widest font-mono text-gray-900 placeholder:text-gray-300"
+                  className="w-full px-3 py-2.5 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-md text-center text-2xl tracking-widest font-mono text-[var(--c-text)] placeholder:text-[var(--c-text-faint)] focus:outline-none focus:ring-2 focus:ring-[var(--c-accent-ring)] focus:border-[var(--c-accent)] transition-colors"
                 />
                 <div className="flex items-center justify-between mt-1.5">
-                  <p className="text-xs text-gray-400">Sent to {email}</p>
+                  <p className="text-xs text-[var(--c-text-faint)]">Sent to {email}</p>
                   <button
                     type="button"
                     onClick={handleResendCode}
                     disabled={resendCooldown > 0 || loading}
-                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 disabled:text-gray-400 transition-colors"
+                    className="text-xs font-medium text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] disabled:text-[var(--c-text-faint)] transition-colors"
                   >
                     {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
                   </button>
@@ -227,23 +239,23 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Create password</label>
+                <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">Create password</label>
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters, 1 number" required className={inputClass} />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm password</label>
+                <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">Confirm password</label>
                 <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Re-enter password" required className={inputClass} />
               </div>
 
               {accountType === 'teacher' && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Full name</label>
+                    <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">Full name</label>
                     <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Sarah Johnson" required className={inputClass} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">How should students address you?</label>
+                    <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">How should students address you?</label>
                     <select
                       value={isCustomTitle ? 'custom' : preferredTitle}
                       onChange={(e) => {
@@ -275,7 +287,7 @@ export default function SignupPage() {
 
               {accountType === 'teacher' ? (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Teacher access code</label>
+                  <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">Teacher access code</label>
                   <input
                     type="text"
                     value={teacherCode}
@@ -287,12 +299,12 @@ export default function SignupPage() {
                     maxLength={9}
                     placeholder="XXXX-XXXX"
                     required
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-center text-lg tracking-widest font-mono text-gray-900 placeholder:text-gray-300"
+                    className="w-full px-3 py-2.5 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-md text-center text-lg tracking-widest font-mono text-[var(--c-text)] placeholder:text-[var(--c-text-faint)] focus:outline-none focus:ring-2 focus:ring-[var(--c-accent-ring)] focus:border-[var(--c-accent)] transition-colors"
                   />
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Year group</label>
+                  <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">Year group</label>
                   <select value={yearGroup} onChange={(e) => setYearGroup(e.target.value)} className={selectClass}>
                     {yearGroups.map(({ value, label }) => (
                       <option key={value} value={value}>{label}</option>
@@ -304,13 +316,13 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50 text-sm"
+                className="w-full py-2.5 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                     Creating account...
                   </span>
@@ -320,24 +332,24 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={() => { setStep(1); setError(''); }}
-                className="w-full py-2 text-gray-500 hover:text-gray-700 text-sm transition-colors"
+                className="w-full py-2 text-[var(--c-text-muted)] hover:text-[var(--c-text-soft)] text-sm transition-colors"
               >
                 ← Back to email
               </button>
             </form>
           )}
 
-          <div className="mt-5 pt-5 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-500">
+          <div className="mt-5 pt-5 border-t border-[var(--c-border)] text-center">
+            <p className="text-sm text-[var(--c-text-muted)]">
               Already have an account?{' '}
-              <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+              <Link href="/login" className="text-[var(--c-accent)] font-medium hover:text-[var(--c-accent-hover)] transition-colors">
                 Sign in
               </Link>
             </p>
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-5">
+        <p className="text-center text-xs text-[var(--c-text-faint)] mt-5">
           By creating an account, you agree to use Newton for learning purposes only
         </p>
       </div>

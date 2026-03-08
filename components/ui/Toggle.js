@@ -8,10 +8,6 @@ const sizes = {
   lg: { track: 'w-14 h-7',  thumb: 'w-6 h-6',   translate: 'translate-x-7' },
 };
 
-/**
- * Toggle switch.
- * Controlled — pass `checked` and `onChange`.
- */
 function Toggle({ checked = false, onChange, disabled = false, size = 'md', label, className }) {
   const s = sizes[size] ?? sizes.md;
 
@@ -28,10 +24,10 @@ function Toggle({ checked = false, onChange, disabled = false, size = 'md', labe
         disabled={disabled}
         onClick={() => !disabled && onChange?.(!checked)}
         className={cn(
-          'relative inline-flex items-center rounded-full transition-colors duration-200 focus-visible:outline-none',
-          'focus-visible:ring-2 focus-visible:ring-brand/50 shrink-0',
+          'relative inline-flex items-center rounded-full transition-colors duration-200',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--c-accent-ring)] shrink-0',
           s.track,
-          checked ? 'bg-brand' : 'bg-[var(--c-border-strong)]',
+          checked ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-border-strong)]',
         )}
       >
         <span className={cn(

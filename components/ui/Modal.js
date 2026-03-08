@@ -40,8 +40,8 @@ function Modal({ open, onClose, size = 'md', className, children }) {
 
       {/* Panel */}
       <div className={cn(
-        'relative w-full bg-[var(--c-card)] border border-[var(--c-border)] rounded-2xl shadow-xl',
-        'animate-scale-in overflow-hidden',
+        'relative w-full bg-white border border-[var(--c-border)] rounded-lg card-shadow-lg',
+        'animate-scaleIn overflow-hidden',
         sizes[size],
         className,
       )}>
@@ -54,14 +54,14 @@ function Modal({ open, onClose, size = 'md', className, children }) {
 function ModalHeader({ onClose, className, children }) {
   return (
     <div className={cn(
-      'flex items-center justify-between px-6 py-5 border-b border-[var(--c-border-subtle)]',
+      'flex items-center justify-between px-6 py-5 border-b border-[var(--c-border)]',
       className,
     )}>
       <div className="font-semibold text-[var(--c-text)] text-base">{children}</div>
       {onClose && (
         <button
           onClick={onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--c-text-muted)] hover:bg-[var(--c-hover)] hover:text-[var(--c-text)] transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-md text-[var(--c-text-muted)] hover:bg-[var(--c-canvas)] hover:text-[var(--c-text)] transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 6 6 18M6 6l12 12" />
@@ -83,7 +83,7 @@ function ModalBody({ className, children }) {
 function ModalFooter({ className, children }) {
   return (
     <div className={cn(
-      'flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--c-border-subtle)]',
+      'flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--c-border)]',
       className,
     )}>
       {children}

@@ -113,24 +113,24 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
   const linkCount = (linksContent.match(/\[.*?\]\(.*?\)/g) || []).length;
 
   return (
-    <div className="mt-4 border border-blue-200 bg-blue-50 rounded-2xl overflow-hidden">
+    <div className="mt-4 border border-amber-200 bg-amber-50 rounded-xl overflow-hidden">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-100/70 transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-amber-100/70 transition-colors"
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+            <svg className="w-4 h-4 text-[var(--c-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
           </div>
           <div className="text-left">
-            <p className="text-sm font-semibold text-blue-700">Helpful Resources</p>
-            <p className="text-xs text-blue-500">{linkCount} link{linkCount !== 1 ? 's' : ''} to learn more</p>
+            <p className="text-sm font-semibold text-amber-700">Helpful Resources</p>
+            <p className="text-xs text-amber-600">{linkCount} link{linkCount !== 1 ? 's' : ''} to learn more</p>
           </div>
         </div>
         <svg
-          className={`w-5 h-5 text-blue-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-amber-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -140,7 +140,7 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
       </button>
 
       {isExpanded && (
-        <div className="px-4 pb-4 pt-1 border-t border-blue-200">
+        <div className="px-4 pb-4 pt-1 border-t border-amber-200">
           <div className="prose prose-sm max-w-none">
             <ReactMarkdown
               remarkPlugins={remarkPlugins}
@@ -152,14 +152,14 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
                     {...props}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 underline font-medium transition-colors"
+                    className="text-[var(--c-accent)] hover:text-[var(--c-accent-hover)] underline font-medium transition-colors"
                   />
                 ),
                 p: ({node, ...props}) => <p {...props} className="mb-2 last:mb-0 text-gray-600" />,
                 ul: ({node, ...props}) => <ul {...props} className="list-none ml-0 space-y-2 mt-2" />,
                 li: ({node, ...props}) => (
                   <li {...props} className="flex items-start gap-2 text-sm text-gray-600">
-                    <span className="text-blue-500 mt-0.5">→</span>
+                    <span className="text-[var(--c-accent)] mt-0.5">→</span>
                     <span className="flex-1">{props.children}</span>
                   </li>
                 ),
@@ -798,7 +798,7 @@ useChatStorage(chatsBySubject, ['General'], currentSubject, currentChatId);
         {...props}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-blue-600 underline hover:text-blue-700 font-semibold transition-colors duration-200"
+        className="text-[var(--c-accent)] underline hover:text-[var(--c-accent-hover)] font-semibold transition-colors duration-200"
       />
     ),
     p: ({node, ...props}) => <p {...props} className="mb-4 last:mb-0 leading-relaxed" />,
@@ -1830,7 +1830,7 @@ const sendMessage = async (e) => {
 
 if (isLoadingData) {
   return (
-    <div className="flex h-screen bg-[#F5F5F7] items-center justify-center">
+    <div className="flex h-screen bg-[var(--c-canvas)] items-center justify-center">
       <div className="text-center">
         <div className="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mb-4 mx-auto animate-pulse">
           <span className="text-2xl font-bold text-white">N</span>
@@ -1852,7 +1852,7 @@ if (isLoadingData) {
   ];
 
   return (
-   <div className="flex h-screen overflow-hidden bg-[#F5F5F7]">
+   <div className="flex h-screen overflow-hidden bg-[var(--c-canvas)]">
       {/* Sidebar */}
       <div
   className={`${
@@ -1877,7 +1877,7 @@ if (isLoadingData) {
 
           <button
             onClick={startNewChat}
-            className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full transition-colors duration-200"
+            className="w-full px-4 py-2.5 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white text-sm font-medium rounded-md transition-colors duration-200"
           >
             New conversation
           </button>
@@ -2254,7 +2254,7 @@ if (isLoadingData) {
       </div>
 
       {/* ── Input Area (fixed bottom, centered) ── */}
-      <div className={`fixed bottom-0 ${sidebarOpen ? 'md:left-72' : 'left-0'} right-0 ${sidebarOpen ? 'z-[30] md:z-[100]' : 'z-[100]'} flex flex-col items-center pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 pointer-events-none`} style={{ background: 'linear-gradient(to top, #F5F5F7 50%, transparent)' }}>
+      <div className={`fixed bottom-0 ${sidebarOpen ? 'md:left-72' : 'left-0'} right-0 ${sidebarOpen ? 'z-[30] md:z-[100]' : 'z-[100]'} flex flex-col items-center pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 pointer-events-none`} style={{ background: 'linear-gradient(to top, var(--c-canvas) 50%, transparent)' }}>
         <div className="w-full max-w-3xl px-4 pointer-events-auto">
           <form onSubmit={sendMessage}>
             {/* File Upload Preview */}
@@ -2368,7 +2368,7 @@ if (isLoadingData) {
                   <button
                     type="submit"
                     disabled={!input.trim()}
-                    className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
+                    className="p-2 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -2486,7 +2486,7 @@ if (isLoadingData) {
                         }}
                         className={`px-3 py-3 rounded-xl text-left text-sm font-semibold transition-all active:scale-95 ${
                           yearGroup === option.value
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-[var(--c-accent)] text-white'
                             : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
                         }`}
                       >
@@ -2558,7 +2558,7 @@ if (isLoadingData) {
                       <p className="text-sm font-semibold text-gray-900">Link Recommendations</p>
                       <p className="text-xs text-gray-500">Show resources after each response</p>
                     </div>
-                    <div className={`w-10 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-3 ${showLinkRecommendations ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                    <div className={`w-10 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-3 ${showLinkRecommendations ? 'bg-[var(--c-accent)]' : 'bg-gray-300'}`}>
                       <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${showLinkRecommendations ? 'translate-x-5' : 'translate-x-1'}`} />
                     </div>
                   </div>
@@ -2570,7 +2570,7 @@ if (isLoadingData) {
                       setShowSettings(false);
                       startTutorial();
                     }}
-                    className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -2700,7 +2700,7 @@ if (isLoadingData) {
                   </button>
                   <button
                     onClick={nextTutorialStep}
-                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors duration-200"
+                    className="px-8 py-3 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white rounded-xl font-semibold transition-colors duration-200"
                   >
                     Start Tour →
                   </button>
@@ -2718,7 +2718,7 @@ if (isLoadingData) {
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-[var(--c-accent)] rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 1
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">New Conversations</h3>
@@ -2731,7 +2731,7 @@ if (isLoadingData) {
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Next →
                 </button>
@@ -2748,7 +2748,7 @@ if (isLoadingData) {
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-[var(--c-accent)] rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 2
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Organize by Subject</h3>
@@ -2761,7 +2761,7 @@ if (isLoadingData) {
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Next →
                 </button>
@@ -2772,7 +2772,7 @@ if (isLoadingData) {
           {tutorialStep === 3 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
               <div className="bg-white border border-gray-200 rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-3xl w-full p-5 sm:p-10 animate-scaleIn">
-                <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                <div className="absolute -top-3 -left-3 w-8 h-8 bg-[var(--c-accent)] rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                   3
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">How Newton Helps You Learn</h3>
@@ -2788,12 +2788,12 @@ if (isLoadingData) {
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-[var(--c-accent)] rounded-xl flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">N</span>
                     </div>
-                    <div className="flex-1 bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                    <div className="flex-1 bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
                       <p className="text-gray-800 mb-3">Great question! Let's work through this together. First, what do you think we should do to get x by itself?</p>
-                      <p className="text-sm text-blue-600 font-semibold">Newton guides you to discover answers yourself!</p>
+                      <p className="text-sm text-amber-700 font-semibold">Newton guides you to discover answers yourself!</p>
                     </div>
                   </div>
                 </div>
@@ -2834,7 +2834,7 @@ if (isLoadingData) {
                   </button>
                   <button
                     onClick={nextTutorialStep}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors duration-200"
+                    className="px-6 py-3 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white rounded-xl font-semibold transition-colors duration-200"
                   >
                     Next →
                   </button>
@@ -2863,7 +2863,7 @@ if (isLoadingData) {
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   {currentUserEmail ? 'Next →' : 'Finish! 🚀'}
                 </button>
@@ -2880,7 +2880,7 @@ if (isLoadingData) {
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-[var(--c-accent)] rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 5
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Your Dashboard</h3>
@@ -2895,7 +2895,7 @@ if (isLoadingData) {
                   onClick={() => {
                     window.location.href = '/dashboard?tutorial=true';
                   }}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Visit Dashboard →
                 </button>
@@ -3183,7 +3183,7 @@ if (isLoadingData) {
 export default function Newton() {
   return (
     <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-[#F5F5F7]">
+      <div className="flex items-center justify-center min-h-screen bg-[var(--c-canvas)]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-700 rounded-full animate-spin"></div>
           <p className="text-gray-500 text-sm">Loading Newton...</p>

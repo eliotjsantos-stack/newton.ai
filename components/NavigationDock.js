@@ -64,7 +64,7 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                 key={item.href}
                 href={item.href}
                 className={`relative flex flex-col items-center gap-0.5 py-1.5 px-3 transition-colors ${
-                  active ? 'text-blue-600' : 'text-gray-400'
+                  active ? 'text-[var(--c-accent)]' : 'text-gray-400'
                 }`}
               >
                 {item.icon}
@@ -98,12 +98,12 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                   />
                 )}
                 <span className={`relative z-10 transition-colors duration-150 ${
-                  active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+                  active ? 'text-[var(--c-accent)]' : 'text-gray-400 group-hover:text-gray-600'
                 }`}>
                   {item.icon}
                 </span>
                 <span className={`relative z-10 text-[10px] font-semibold mt-0.5 transition-colors duration-150 ${
-                  active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+                  active ? 'text-[var(--c-accent)]' : 'text-gray-400 group-hover:text-gray-600'
                 }`}>
                   {item.label}
                 </span>
@@ -186,12 +186,12 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                 />
               )}
               <span className={`relative z-10 transition-colors duration-150 ${
-                active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+                active ? 'text-[var(--c-accent)]' : 'text-gray-400 group-hover:text-gray-600'
               }`}>
                 {item.icon}
               </span>
               <span className={`relative z-10 text-[10px] font-semibold mt-0.5 transition-colors duration-150 ${
-                active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+                active ? 'text-[var(--c-accent)]' : 'text-gray-400 group-hover:text-gray-600'
               }`}>
                 {item.label}
               </span>
