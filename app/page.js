@@ -16,6 +16,8 @@ import ChatDemo from '@/components/landing/ChatDemo';
 import GradeCurveDemo from '@/components/landing/GradeCurveDemo';
 import { LiveHeatmap, ForgettingCurve } from '@/components/landing/InstitutionalIntelligence';
 import { EtheralShadow } from '@/components/ui/etheral-shadow';
+import { FloatingPaths } from '@/components/ui/background-paths';
+import { DottedSurface } from '@/components/ui/dotted-surface';
 
 /* ─── Physics ─── */
 const spring = { type: 'spring', stiffness: 100, damping: 20, mass: 1 };
@@ -288,6 +290,214 @@ function StatBlock({ value, label }) {
       <div className="text-2xl sm:text-5xl md:text-6xl font-bold text-white tracking-tighter">{value}</div>
       <div className="text-sm text-white font-medium mt-2">{label}</div>
     </div>
+  );
+}
+
+/* ─── How It Works Section ─── */
+function HowItWorksSection() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  return (
+    <section id="how-it-works" ref={ref} className="relative py-24 px-6 lg:px-12 overflow-x-hidden">
+      <FloatingPaths position={1} inView={inView} className="-top-40 -bottom-40" />
+      <FloatingPaths position={-1} inView={inView} className="-top-40 -bottom-40" />
+      <div className="relative z-10 max-w-6xl mx-auto">
+        <ScrollReveal className="text-center mb-12 md:mb-24">
+          <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Method</p>
+          <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter">
+            Four steps. Real learning.
+          </h2>
+        </ScrollReveal>
+
+        {/* Mobile: horizontal scroll cards */}
+        <ScrollCarousel count={4} className="flex sm:hidden gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory -mx-6 px-6">
+          {[
+            {
+              step: '1',
+              title: 'You ask your question.',
+              avatar: 'student',
+              text: '\u201cI don\u2019t understand how to factorise quadratics. Can you help?\u201d',
+            },
+            {
+              step: '2',
+              title: 'Newton asks, not tells.',
+              avatar: 'newton',
+              text: '\u201cCan you think of two numbers that multiply to give 6 and add to give 5?\u201d',
+            },
+            {
+              step: '3',
+              title: 'You discover the answer.',
+              avatar: 'student',
+              text: '\u201c2 and 3! So it\u2019s (x+2)(x+3) = 0, meaning x = \u22122 or x = \u22123!\u201d',
+            },
+            {
+              step: '4',
+              title: 'You remember it.',
+              avatar: 'result',
+              text: null,
+            },
+          ].map((s) => (
+            <div key={s.step} className="min-w-[280px] snap-start shrink-0 rounded-xl p-6 bg-[var(--bg-elevated)] border border-white/8 card-shadow">
+              <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-2">Step {s.step}</p>
+              <h3 className="text-lg font-bold text-white tracking-tight mb-4">{s.title}</h3>
+              {s.avatar === 'result' ? (
+                <div className="rounded-xl p-5 text-center bg-blue-500/10 border border-blue-100">
+                  <div className="text-3xl font-bold text-white tracking-tighter mb-1">A*</div>
+                  <p className="text-xs text-white font-medium">Earned, not copied</p>
+                </div>
+              ) : (
+                <div className={`flex gap-3 ${s.avatar === 'student' ? 'justify-end' : ''}`}>
+                  {s.avatar === 'newton' && (
+                    <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[9px] font-bold text-white">N</span>
+                    </div>
+                  )}
+                  <p className="text-sm leading-relaxed text-white">{s.text}</p>
+                  {s.avatar === 'student' && (
+                    <div className="w-7 h-7 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[9px] font-semibold text-white">You</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </ScrollCarousel>
+
+        {/* Desktop: full FeatureRow layout */}
+        <div className="hidden sm:block space-y-32">
+          <ScrollReveal>
+            <FeatureRow
+              label="Step 1"
+              title="You ask your question."
+              description="Type what you're stuck on. A maths problem, an essay topic, a chemistry concept. Newton listens."
+            >
+              <div className="w-full max-w-sm rounded-xl p-6 bg-[var(--bg-elevated)] border border-white/8 card-shadow">
+                <div className="flex gap-3 justify-end">
+                  <p className="text-white text-[15px] leading-relaxed">
+                    &ldquo;I don&apos;t understand how to factorise quadratics. Can you help?&rdquo;
+                  </p>
+                  <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[10px] font-semibold text-white">You</span>
+                  </div>
+                </div>
+              </div>
+            </FeatureRow>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <FeatureRow
+              label="Step 2"
+              title="Newton asks, not tells."
+              description="Instead of an answer, you get a question. One that makes you think about what you already know."
+              reverse
+            >
+              <div className="w-full max-w-sm rounded-xl p-6 bg-[var(--bg-elevated)] border border-white/8 card-shadow">
+                <div className="flex gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[10px] font-bold text-white">N</span>
+                  </div>
+                  <p className="text-white text-[15px] leading-relaxed">
+                    &ldquo;Can you think of two numbers that multiply to give 6 and add to give 5?&rdquo;
+                  </p>
+                </div>
+              </div>
+            </FeatureRow>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <FeatureRow
+              label="Step 3"
+              title="You discover the answer."
+              description="Through guided reasoning, you find it yourself. The understanding is yours, not the machine's."
+            >
+              <div className="w-full max-w-sm rounded-xl p-6 bg-[var(--bg-elevated)] border border-white/8 card-shadow">
+                <div className="flex gap-3 justify-end">
+                  <p className="text-white text-[15px] leading-relaxed">
+                    &ldquo;2 and 3! So it&apos;s (x+2)(x+3) = 0, meaning x = -2 or x = -3!&rdquo;
+                  </p>
+                  <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[10px] font-semibold text-white">You</span>
+                  </div>
+                </div>
+              </div>
+            </FeatureRow>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <FeatureRow
+              label="Step 4"
+              title="You remember it."
+              description="Active learning sticks. When the exam comes, you don't need AI. You know the method."
+              reverse
+            >
+              <div className="w-full max-w-sm flex flex-col items-center gap-4">
+                <div className="w-full rounded-2xl p-6 text-center bg-blue-500/10 border border-blue-200">
+                  <div className="text-4xl font-bold text-white tracking-tighter mb-2">A*</div>
+                  <p className="text-sm text-white font-medium">Exam result — earned, not copied</p>
+                </div>
+              </div>
+            </FeatureRow>
+          </ScrollReveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── Subjects Section ─── */
+function SubjectsSection() {
+  const ref = useRef(null);
+
+  const categories = [
+    {
+      name: 'STEM',
+      subjects: 'Maths, Physics, Chemistry, Biology, Computer Science',
+      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />,
+    },
+    {
+      name: 'Humanities',
+      subjects: 'History, Geography, Religious Studies, Philosophy, Economics',
+      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />,
+    },
+    {
+      name: 'Languages & Arts',
+      subjects: 'English, French, Spanish, German, Art, Music',
+      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />,
+    },
+  ];
+
+  return (
+    <section id="subjects" ref={ref} className="py-24 px-6 lg:px-12 border-t border-white/8">
+      <div className="max-w-6xl mx-auto">
+        <ScrollReveal className="text-center mb-10 md:mb-20">
+          <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Coverage</p>
+          <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter mb-6">
+            Every subject. Every level.
+          </h2>
+          <p className="hidden sm:block text-xl text-white max-w-2xl mx-auto font-medium">
+            Year 7 to Year 13. GCSEs to A Levels. Newton adapts.
+          </p>
+        </ScrollReveal>
+
+        <ScrollCarousel count={3} className="flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory sm:overflow-visible -mx-6 px-6 sm:mx-0 sm:px-0">
+          {categories.map((cat) => (
+            <ScrollReveal key={cat.name} className="min-w-[280px] sm:min-w-0 snap-start shrink-0 sm:shrink">
+              <div className="rounded-xl p-8 h-full bg-[var(--bg-elevated)] border border-white/8 hover:border-white/15 card-shadow transition-colors duration-200">
+                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-6">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {cat.icon}
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 tracking-tight">{cat.name}</h3>
+                <p className="text-white text-sm leading-relaxed">{cat.subjects}</p>
+              </div>
+            </ScrollReveal>
+          ))}
+        </ScrollCarousel>
+      </div>
+    </section>
   );
 }
 
@@ -635,203 +845,10 @@ export default function LandingPage() {
       </section>
 
       {/* ─── How It Works ─── */}
-      <section id="how-it-works" className="py-24 px-6 lg:px-12 overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <ScrollReveal className="text-center mb-12 md:mb-24">
-            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Method</p>
-            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter">
-              Four steps. Real learning.
-            </h2>
-          </ScrollReveal>
-
-          {/* Mobile: horizontal scroll cards */}
-          <ScrollCarousel count={4} className="flex sm:hidden gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory -mx-6 px-6">
-            {[
-              {
-                step: '1',
-                title: 'You ask your question.',
-                avatar: 'student',
-                text: '\u201cI don\u2019t understand how to factorise quadratics. Can you help?\u201d',
-              },
-              {
-                step: '2',
-                title: 'Newton asks, not tells.',
-                avatar: 'newton',
-                text: '\u201cCan you think of two numbers that multiply to give 6 and add to give 5?\u201d',
-              },
-              {
-                step: '3',
-                title: 'You discover the answer.',
-                avatar: 'student',
-                text: '\u201c2 and 3! So it\u2019s (x+2)(x+3) = 0, meaning x = \u22122 or x = \u22123!\u201d',
-              },
-              {
-                step: '4',
-                title: 'You remember it.',
-                avatar: 'result',
-                text: null,
-              },
-            ].map((s) => (
-              <div key={s.step} className="min-w-[280px] snap-start shrink-0 rounded-xl p-6 bg-[var(--bg-elevated)] border border-white/8 card-shadow">
-                <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-2">Step {s.step}</p>
-                <h3 className="text-lg font-bold text-white tracking-tight mb-4">{s.title}</h3>
-                {s.avatar === 'result' ? (
-                  <div className="rounded-xl p-5 text-center bg-blue-500/10 border border-blue-100">
-                    <div className="text-3xl font-bold text-white tracking-tighter mb-1">A*</div>
-                    <p className="text-xs text-white font-medium">Earned, not copied</p>
-                  </div>
-                ) : (
-                  <div className={`flex gap-3 ${s.avatar === 'student' ? 'justify-end' : ''}`}>
-                    {s.avatar === 'newton' && (
-                      <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-[9px] font-bold text-white">N</span>
-                      </div>
-                    )}
-                    <p className="text-sm leading-relaxed text-white">{s.text}</p>
-                    {s.avatar === 'student' && (
-                      <div className="w-7 h-7 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-[9px] font-semibold text-white">You</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </ScrollCarousel>
-
-          {/* Desktop: full FeatureRow layout */}
-          <div className="hidden sm:block space-y-32">
-            <ScrollReveal>
-              <FeatureRow
-                label="Step 1"
-                title="You ask your question."
-                description="Type what you're stuck on. A maths problem, an essay topic, a chemistry concept. Newton listens."
-              >
-                <div className="w-full max-w-sm rounded-xl p-6 bg-[var(--bg-elevated)] border border-white/8 card-shadow">
-                  <div className="flex gap-3 justify-end">
-                    <p className="text-white text-[15px] leading-relaxed">
-                      &ldquo;I don&apos;t understand how to factorise quadratics. Can you help?&rdquo;
-                    </p>
-                    <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-[10px] font-semibold text-white">You</span>
-                    </div>
-                  </div>
-                </div>
-              </FeatureRow>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <FeatureRow
-                label="Step 2"
-                title="Newton asks, not tells."
-                description="Instead of an answer, you get a question. One that makes you think about what you already know."
-                reverse
-              >
-                <div className="w-full max-w-sm rounded-xl p-6 bg-[var(--bg-elevated)] border border-white/8 card-shadow">
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-[10px] font-bold text-white">N</span>
-                    </div>
-                    <p className="text-white text-[15px] leading-relaxed">
-                      &ldquo;Can you think of two numbers that multiply to give 6 and add to give 5?&rdquo;
-                    </p>
-                  </div>
-                </div>
-              </FeatureRow>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <FeatureRow
-                label="Step 3"
-                title="You discover the answer."
-                description="Through guided reasoning, you find it yourself. The understanding is yours, not the machine's."
-              >
-                <div className="w-full max-w-sm rounded-xl p-6 bg-[var(--bg-elevated)] border border-white/8 card-shadow">
-                  <div className="flex gap-3 justify-end">
-                    <p className="text-white text-[15px] leading-relaxed">
-                      &ldquo;2 and 3! So it&apos;s (x+2)(x+3) = 0, meaning x = -2 or x = -3!&rdquo;
-                    </p>
-                    <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-[10px] font-semibold text-white">You</span>
-                    </div>
-                  </div>
-                </div>
-              </FeatureRow>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <FeatureRow
-                label="Step 4"
-                title="You remember it."
-                description="Active learning sticks. When the exam comes, you don't need AI. You know the method."
-                reverse
-              >
-                <div className="w-full max-w-sm flex flex-col items-center gap-4">
-                  <div className="w-full rounded-2xl p-6 text-center bg-blue-500/10 border border-blue-200">
-                    <div className="text-4xl font-bold text-white tracking-tighter mb-2">A*</div>
-                    <p className="text-sm text-white font-medium">Exam result — earned, not copied</p>
-                  </div>
-                </div>
-              </FeatureRow>
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
+      <HowItWorksSection />
 
       {/* ─── Subjects ─── */}
-      <section id="subjects" className="py-24 px-6 lg:px-12 border-t border-white/8 overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <ScrollReveal className="text-center mb-10 md:mb-20">
-            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Coverage</p>
-            <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter mb-6">
-              Every subject. Every level.
-            </h2>
-            <p className="hidden sm:block text-xl text-white max-w-2xl mx-auto font-medium">
-              Year 7 to Year 13. GCSEs to A Levels. Newton adapts.
-            </p>
-          </ScrollReveal>
-
-          <ScrollCarousel count={3} className="flex sm:grid sm:grid-cols-3 gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory sm:overflow-visible -mx-6 px-6 sm:mx-0 sm:px-0">
-            {[
-              {
-                name: 'STEM',
-                subjects: 'Maths, Physics, Chemistry, Biology, Computer Science',
-                icon: (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                ),
-              },
-              {
-                name: 'Humanities',
-                subjects: 'History, Geography, Religious Studies, Philosophy, Economics',
-                icon: (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                ),
-              },
-              {
-                name: 'Languages & Arts',
-                subjects: 'English, French, Spanish, German, Art, Music',
-                icon: (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                ),
-              },
-            ].map((cat) => (
-              <ScrollReveal key={cat.name} className="min-w-[280px] sm:min-w-0 snap-start shrink-0 sm:shrink">
-                <div
-                  className="rounded-xl p-8 h-full bg-[var(--bg-elevated)] border border-white/8 hover:border-white/15 card-shadow transition-colors duration-200"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-6">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      {cat.icon}
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3 tracking-tight">{cat.name}</h3>
-                  <p className="text-white text-sm leading-relaxed">{cat.subjects}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </ScrollCarousel>
-        </div>
-      </section>
+      <SubjectsSection />
 
       {/* ─── Institutional Intelligence (B2B) ─── */}
       <section id="institutions" className="py-24 px-6 lg:px-12 border-t border-white/8">
@@ -1273,8 +1290,9 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Final CTA ─── */}
-      <section className="py-24 px-6 lg:px-12">
-        <ScrollReveal className="max-w-3xl mx-auto text-center">
+      <section className="relative py-24 px-6 lg:px-12 bg-[#1a1a1a] overflow-hidden">
+        <DottedSurface />
+        <ScrollReveal className="relative z-10 max-w-3xl mx-auto text-center">
           <h2 className="font-display text-2xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white tracking-tighter leading-[0.92] mb-8">
             Official Specs.<br />Real Learning.
           </h2>
@@ -1289,6 +1307,7 @@ export default function LandingPage() {
           </Link>
         </ScrollReveal>
       </section>
+
 
       {/* ─── Footer ─── */}
       <footer className="py-10 px-6 sm:px-8 lg:px-12 border-t border-white/8">
