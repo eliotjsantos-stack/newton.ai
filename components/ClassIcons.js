@@ -83,10 +83,39 @@ const icons = {
 
 export const CLASS_ICON_KEYS = Object.keys(icons);
 
-export function ClassIcon({ name, size = 24, className = '' }) {
-  const icon = icons[name] || icons.book;
+function subjectToIconKey(subject = '') {
+  const s = subject.toLowerCase();
+  if (s.includes('math')) return 'calculator';
+  if (s.includes('physic')) return 'atom';
+  if (s.includes('chem')) return 'flask';
+  if (s.includes('bio')) return 'dna';
+  if (s.includes('science')) return 'flask';
+  if (s.includes('english') || s.includes('literature') || s.includes('language arts')) return 'pencil';
+  if (s.includes('history') || s.includes('ancient')) return 'columns';
+  if (s.includes('geog')) return 'globe';
+  if (s.includes('comput') || s.includes('ict') || s.includes('coding')) return 'laptop';
+  if (s.includes('art') || s.includes('design') || s.includes('graphic')) return 'palette';
+  if (s.includes('drama') || s.includes('theatre')) return 'drama';
+  if (s.includes('music')) return 'music';
+  if (s.includes('pe') || s.includes('sport') || s.includes('physical')) return 'running';
+  if (s.includes('psych')) return 'lightbulb';
+  if (s.includes('econ') || s.includes('business') || s.includes('account') || s.includes('finance')) return 'chart';
+  if (s.includes('french') || s.includes('spanish') || s.includes('german') || s.includes('mandarin') || s.includes('latin')) return 'globe';
+  if (s.includes('religious') || s.includes(' rs') || s.includes('philosophy') || s.includes('ethics')) return 'book';
+  if (s.includes('engineer') || s.includes('tech') || s.includes('product')) return 'ruler';
+  if (s.includes('media') || s.includes('film')) return 'palette';
+  if (s.includes('general')) return 'book';
+  return 'book';
+}
+
+export function ClassIcon({ name, subject, size = 24, className = '' }) {
+  const key = name || (subject ? subjectToIconKey(subject) : 'book');
+  const icon = icons[key] || icons.book;
   return (
-    <span className={`inline-flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+    <span
+      className={`inline-flex items-center justify-center text-white/60 ${className}`}
+      style={{ width: size, height: size }}
+    >
       {icon}
     </span>
   );

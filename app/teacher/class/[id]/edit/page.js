@@ -176,32 +176,32 @@ export default function EditClassPage() {
   }
   if (!authorized) return null;
 
-  const inputCls = "w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 transition-all placeholder:text-gray-400";
+  const inputCls = "w-full px-3 py-2 bg-[var(--bg-surface)] border border-gray-300 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#0071E3]/30/30 focus:border-[#0071E3]/20 transition-all placeholder:text-white/40";
 
   return (
     <div className="max-w-2xl">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-gray-500 mb-6">
-        <Link href="/teacher/classes" className="hover:text-gray-900 transition-colors">My Classes</Link>
-        <svg className="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-        <Link href={`/teacher/class/${id}`} className="hover:text-gray-900 transition-colors truncate max-w-[150px]">{name}</Link>
-        <svg className="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-        <span className="text-gray-900 font-medium">Edit</span>
+      <nav className="flex items-center gap-1.5 text-sm text-white/50 mb-6">
+        <Link href="/teacher/classes" className="hover:text-white transition-colors">My Classes</Link>
+        <svg className="w-4 h-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        <Link href={`/teacher/class/${id}`} className="hover:text-white transition-colors truncate max-w-[150px]">{name}</Link>
+        <svg className="w-4 h-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        <span className="text-white font-medium">Edit</span>
       </nav>
 
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Edit Class</h1>
+      <h1 className="text-2xl font-semibold text-white mb-6">Edit Class</h1>
 
       {/* Class code banner */}
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between">
+      <div className="bg-[#0071E3]/10 border border-[#0071E3]/20 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-0.5">Current Class Code</p>
-          <p className="text-2xl font-mono font-bold text-gray-900 tracking-wider">{classCode}</p>
+          <p className="text-xs font-semibold text-[#0071E3] uppercase tracking-wider mb-0.5">Current Class Code</p>
+          <p className="text-2xl font-mono font-bold text-white tracking-wider">{classCode}</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={copyCode} className="px-3 py-1.5 bg-white border border-amber-200 hover:bg-amber-50 text-amber-600 rounded-md text-xs font-medium transition-colors">
+          <button onClick={copyCode} className="px-3 py-1.5 bg-[var(--c-card)] border border-[#0071E3]/20 hover:bg-[#0071E3]/10 text-[#0071E3] rounded-md text-xs font-medium transition-colors">
             {copied ? 'Copied!' : 'Copy'}
           </button>
-          <button onClick={regenerateCode} className="px-3 py-1.5 bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100 rounded-md text-xs font-medium transition-colors">
+          <button onClick={regenerateCode} className="px-3 py-1.5 bg-[#0071E3]/10 text-[#0071E3] border border-[#0071E3]/20 hover:bg-[#0071E3]/12 rounded-md text-xs font-medium transition-colors">
             Regenerate
           </button>
         </div>
@@ -216,33 +216,33 @@ export default function EditClassPage() {
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Basics */}
-        <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Class Basics</h2>
+        <section className="bg-[var(--c-card)] border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
+          <h2 className="text-base font-semibold text-white mb-4">Class Basics</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Class Name</label>
+            <label className="block text-sm font-medium text-white/70 mb-1.5">Class Name</label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Subject</label>
+            <label className="block text-sm font-medium text-white/70 mb-1.5">Subject</label>
             <input type="text" value={subject} onChange={e => setSubject(e.target.value)} className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Year Group</label>
+            <label className="block text-sm font-medium text-white/70 mb-1.5">Year Group</label>
             <select value={yearGroup} onChange={e => setYearGroup(e.target.value)} className={inputCls}>
               {YEAR_GROUPS.map(({ value, label }) => (<option key={value} value={value}>{label}</option>))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+            <label className="block text-sm font-medium text-white/70 mb-1.5">Description</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} className={inputCls + ' resize-none'} />
           </div>
         </section>
 
         {/* Customisation */}
-        <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Customisation</h2>
+        <section className="bg-[var(--c-card)] border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5">
+          <h2 className="text-base font-semibold text-white mb-4">Customisation</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2.5">Colour</label>
+            <label className="block text-sm font-medium text-white/70 mb-2.5">Colour</label>
             <div className="flex gap-2.5 flex-wrap">
               {CLASS_COLORS.map(c => (
                 <button key={c} type="button" onClick={() => setColor(c)}
@@ -252,64 +252,64 @@ export default function EditClassPage() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2.5">Icon</label>
+            <label className="block text-sm font-medium text-white/70 mb-2.5">Icon</label>
             <div className="flex gap-2 flex-wrap">
               {CLASS_ICON_KEYS.map(key => (
                 <button key={key} type="button" onClick={() => setIcon(key)}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${icon === key ? 'bg-amber-50 ring-2 ring-amber-500 ring-offset-1 ring-offset-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-                  <ClassIcon name={key} size={20} className="text-gray-600" />
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${icon === key ? 'bg-[#0071E3]/10 ring-2 ring-amber-500 ring-offset-1 ring-offset-white' : 'bg-white/5 hover:bg-white/8'}`}>
+                  <ClassIcon name={key} size={20} className="text-white/60" />
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Welcome Message</label>
+            <label className="block text-sm font-medium text-white/70 mb-1.5">Welcome Message</label>
             <textarea value={welcomeMessage} onChange={e => setWelcomeMessage(e.target.value)} rows={2} className={inputCls + ' resize-none'} />
           </div>
         </section>
 
         {/* Settings */}
-        <section className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Settings</h2>
+        <section className="bg-[var(--c-card)] border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
+          <h2 className="text-base font-semibold text-white mb-4">Settings</h2>
           <div className="flex items-center justify-between py-1">
-            <p className="text-sm font-medium text-gray-700">Students can see classmates</p>
+            <p className="text-sm font-medium text-white/70">Students can see classmates</p>
             <button type="button" onClick={() => setShowClassmates(!showClassmates)}
-              className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${showClassmates ? 'bg-amber-600' : 'bg-gray-200'}`}>
-              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${showClassmates ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
+              className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${showClassmates ? 'bg-[#0071E3]' : 'bg-white/8'}`}>
+              <span className={`absolute top-0.5 w-5 h-5 bg-[var(--c-card)] rounded-full transition-transform shadow-sm ${showClassmates ? 'left-[calc(100%-1.375rem)]' : 'left-0.5'}`} />
             </button>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Max Capacity</label>
+            <label className="block text-sm font-medium text-white/70 mb-1.5">Max Capacity</label>
             <input type="number" value={maxCapacity} onChange={e => setMaxCapacity(e.target.value)} min="1" placeholder="Unlimited" className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Schedule</label>
+            <label className="block text-sm font-medium text-white/70 mb-1.5">Schedule</label>
             <input type="text" value={schedule} onChange={e => setSchedule(e.target.value)} placeholder="e.g. Mon/Wed 9-10am" className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Archive Date</label>
+            <label className="block text-sm font-medium text-white/70 mb-1.5">Archive Date</label>
             <input type="date" value={archiveDate} onChange={e => setArchiveDate(e.target.value)} className={inputCls} />
           </div>
         </section>
 
         {/* Save */}
         <button type="submit" disabled={saving}
-          className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-100 disabled:text-gray-400 text-white text-sm font-medium rounded-lg transition-colors">
+          className="w-full py-2.5 bg-[#0071E3] hover:bg-[#0058B3] disabled:bg-white/5 disabled:text-white/40 text-white text-sm font-medium rounded-lg transition-colors">
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
         </button>
       </form>
 
       {/* Danger zone */}
-      <section className="mt-8 bg-white border border-red-200 rounded-2xl p-6 shadow-sm">
+      <section className="mt-8 bg-[var(--c-card)] border border-red-200 rounded-2xl p-6 shadow-sm">
         <h2 className="text-base font-semibold text-red-600 mb-1">Danger Zone</h2>
-        <p className="text-sm text-gray-500 mb-4">These actions are permanent and cannot be undone.</p>
+        <p className="text-sm text-white/50 mb-4">These actions are permanent and cannot be undone.</p>
         <div className="flex flex-wrap gap-3">
           <button onClick={exportCSV} disabled={students.length === 0}
-            className="px-4 py-2 bg-gray-100 border border-gray-200 hover:bg-gray-200 disabled:opacity-50 text-gray-700 text-sm font-medium rounded-lg transition-colors">
+            className="px-4 py-2 bg-white/5 border border-gray-200 hover:bg-white/8 disabled:opacity-50 text-white/70 text-sm font-medium rounded-lg transition-colors">
             Export Roster (CSV)
           </button>
           <button onClick={archiveClass}
-            className="px-4 py-2 bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 text-sm font-medium rounded-lg transition-colors">
+            className="px-4 py-2 bg-[#0071E3]/10 border border-[#0071E3]/20 text-[#0071E3] hover:bg-[#0071E3]/12 text-sm font-medium rounded-lg transition-colors">
             Archive Class
           </button>
           <button onClick={deleteClass}

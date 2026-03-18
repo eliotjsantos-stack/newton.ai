@@ -136,22 +136,22 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={() => { setAccountType('student'); setError(''); }}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${accountType === 'student' ? 'bg-white text-[var(--c-text)] card-shadow' : 'text-[var(--c-text-muted)] hover:text-[var(--c-text-soft)]'}`}
+              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${accountType === 'student' ? 'bg-white/10 text-white card-shadow' : 'text-[var(--c-text-muted)] hover:text-[var(--c-text-soft)]'}`}
             >
               Student
             </button>
             <button
               type="button"
               onClick={() => { setAccountType('teacher'); setError(''); }}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${accountType === 'teacher' ? 'bg-white text-[var(--c-text)] card-shadow' : 'text-[var(--c-text-muted)] hover:text-[var(--c-text-soft)]'}`}
+              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${accountType === 'teacher' ? 'bg-white/10 text-white card-shadow' : 'text-[var(--c-text-muted)] hover:text-[var(--c-text-soft)]'}`}
             >
               Teacher
             </button>
           </div>
 
           {accountType === 'teacher' && (
-            <div className="mb-5 px-3.5 py-3 bg-amber-50 border border-amber-100 rounded-lg">
-              <p className="text-xs text-amber-700">For authorised teachers only. You will need a teacher access code.</p>
+            <div className="mb-5 px-3.5 py-3 bg-[#0071E3]/10 border border-[#0071E3]/20 rounded-lg">
+              <p className="text-xs text-[#0071E3]">For authorised teachers only. You will need a teacher access code.</p>
             </div>
           )}
 

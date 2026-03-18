@@ -113,11 +113,11 @@ function FAQItem({ question, answer }) {
     <div className="border-b border-gray-200">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-6 flex items-center justify-between text-left hover:bg-gray-50 px-6 transition"
+        className="w-full py-6 flex items-center justify-between text-left hover:bg-[var(--bg-surface)] px-6 transition"
       >
         <span className="text-base font-medium text-black pr-8">{question}</span>
         <svg
-          className={`w-5 h-5 text-gray-600 flex-shrink-0 transition-transform ${isOpen ? 'rotate-45' : ''}`}
+          className={`w-5 h-5 text-white/60 flex-shrink-0 transition-transform ${isOpen ? 'rotate-45' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ function FAQItem({ question, answer }) {
       </button>
       {isOpen && (
         <div className="px-6 pb-6">
-          <p className="text-gray-600 leading-relaxed">{answer}</p>
+          <p className="text-white/60 leading-relaxed">{answer}</p>
         </div>
       )}
     </div>
@@ -136,7 +136,7 @@ function FAQItem({ question, answer }) {
 
 export default function FAQ() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[var(--c-card)]">
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-xl border-b border-gray-200 z-50">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
@@ -146,9 +146,9 @@ export default function FAQ() {
             </Link>
             
             <div className="hidden md:flex items-center space-x-10">
-              <Link href="/#how-it-works" className="text-sm text-gray-600 hover:text-black transition">How it works</Link>
-              <Link href="/#features" className="text-sm text-gray-600 hover:text-black transition">Features</Link>
-              <Link href="/about" className="text-sm text-gray-600 hover:text-black transition">About</Link>
+              <Link href="/#how-it-works" className="text-sm text-white/60 hover:text-black transition">How it works</Link>
+              <Link href="/#features" className="text-sm text-white/60 hover:text-black transition">Features</Link>
+              <Link href="/about" className="text-sm text-white/60 hover:text-black transition">About</Link>
               <Link href="/faq" className="text-sm text-black font-medium">FAQ</Link>
               <Link href="/chat" className="px-5 py-2 bg-black text-white text-sm rounded-full hover:bg-gray-800 transition">
                 Try Newton
@@ -161,11 +161,11 @@ export default function FAQ() {
       {/* Hero */}
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-sm text-gray-500 mb-8 tracking-wide uppercase">Frequently Asked Questions</p>
+          <p className="text-sm text-white/50 mb-8 tracking-wide uppercase">Frequently Asked Questions</p>
           <h1 className="text-5xl md:text-7xl font-semibold text-black mb-8 leading-tight tracking-tight">
             Questions?
           </h1>
-          <p className="text-xl text-gray-600 font-light leading-relaxed">
+          <p className="text-xl text-white/60 font-light leading-relaxed">
             Everything you need to know about Newton.
           </p>
         </div>
@@ -177,7 +177,7 @@ export default function FAQ() {
           {faqs.map((section, idx) => (
             <div key={idx}>
               <h2 className="text-2xl font-semibold text-black mb-6 px-6">{section.category}</h2>
-              <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+              <div className="bg-[var(--c-card)] border border-gray-200 rounded-3xl overflow-hidden">
                 {section.questions.map((faq, faqIdx) => (
                   <FAQItem key={faqIdx} question={faq.q} answer={faq.a} />
                 ))}
@@ -188,10 +188,10 @@ export default function FAQ() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-20 px-6 bg-gray-50">
+      <section className="py-20 px-6 bg-[var(--bg-surface)]">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-semibold text-black mb-6">Still have questions?</h2>
-          <p className="text-lg text-gray-600 font-light mb-8">
+          <p className="text-lg text-white/60 font-light mb-8">
             Get in touch and we will help you get started with Newton.
           </p>
           <a 
@@ -209,17 +209,17 @@ export default function FAQ() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-center md:text-left">
               <p className="text-2xl font-semibold text-black mb-2">Newton</p>
-              <p className="text-sm text-gray-500">Teaching students to think.</p>
+              <p className="text-sm text-white/50">Teaching students to think.</p>
             </div>
             <div className="flex items-center space-x-8 text-sm">
-              <Link href="/" className="text-gray-600 hover:text-black transition">Home</Link>
-              <Link href="/about" className="text-gray-600 hover:text-black transition">About</Link>
-              <Link href="/faq" className="text-gray-600 hover:text-black transition">FAQ</Link>
-              <Link href="/chat" className="text-gray-600 hover:text-black transition">Chat</Link>
+              <Link href="/" className="text-white/60 hover:text-black transition">Home</Link>
+              <Link href="/about" className="text-white/60 hover:text-black transition">About</Link>
+              <Link href="/faq" className="text-white/60 hover:text-black transition">FAQ</Link>
+              <Link href="/chat" className="text-white/60 hover:text-black transition">Chat</Link>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-200 text-center">
-            <p className="text-xs text-gray-400">© 2025 Newton AI</p>
+            <p className="text-xs text-white/40">© 2025 Newton AI</p>
           </div>
         </div>
       </footer>

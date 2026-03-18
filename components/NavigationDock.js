@@ -11,7 +11,7 @@ const items = [
     label: 'Home',
     tooltip: 'Dashboard',
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1m-6 0h6" />
       </svg>
     ),
@@ -21,7 +21,7 @@ const items = [
     label: 'Chat',
     tooltip: 'Chat',
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
     ),
@@ -31,7 +31,7 @@ const items = [
     label: 'Quizzes',
     tooltip: 'Quizzes',
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
       </svg>
     ),
@@ -64,7 +64,7 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                 key={item.href}
                 href={item.href}
                 className={`relative flex flex-col items-center gap-0.5 py-1.5 px-3 transition-colors ${
-                  active ? 'text-[var(--c-accent)]' : 'text-gray-400'
+                  active ? 'text-[var(--amber)]' : 'text-[var(--text-muted)]'
                 }`}
               >
                 {item.icon}
@@ -76,7 +76,8 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
 
         {/* Desktop inline dock */}
         <motion.nav
-          className="hidden md:flex items-center gap-1 px-2 py-2 rounded-full bg-white border border-gray-200 shadow-sm w-fit mx-auto"
+          className="hidden md:flex items-center gap-1 px-2 py-2 rounded-full w-fit mx-auto"
+          style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)' }}
           animate={{ opacity: focused ? 0.2 : 1, scale: focused ? 0.9 : 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
@@ -86,24 +87,25 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative flex flex-col items-center px-5 py-2 rounded-full transition-all duration-200 group hover:scale-110"
+                className="relative flex flex-col items-center px-5 py-2 rounded-full transition-all duration-200 group"
                 onMouseEnter={() => setHoveredItem(item.href)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
                 {active && (
                   <motion.div
                     layoutId="active-pill-inline"
-                    className="absolute inset-0 rounded-full bg-gray-100"
+                    className="absolute inset-0 rounded-full"
+                    style={{ background: 'var(--amber-dim)' }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
                 <span className={`relative z-10 transition-colors duration-150 ${
-                  active ? 'text-[var(--c-accent)]' : 'text-gray-400 group-hover:text-gray-600'
+                  active ? 'text-[var(--amber)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'
                 }`}>
                   {item.icon}
                 </span>
                 <span className={`relative z-10 text-[10px] font-semibold mt-0.5 transition-colors duration-150 ${
-                  active ? 'text-[var(--c-accent)]' : 'text-gray-400 group-hover:text-gray-600'
+                  active ? 'text-[var(--amber)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'
                 }`}>
                   {item.label}
                 </span>
@@ -115,9 +117,10 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 4 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md bg-gray-800 whitespace-nowrap pointer-events-none"
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md whitespace-nowrap pointer-events-none"
+                      style={{ background: 'var(--bg-overlay)', border: '1px solid var(--border-default)' }}
                     >
-                      <span className="text-[10px] font-semibold text-white">{item.tooltip}</span>
+                      <span className="text-[10px] font-semibold text-[var(--text-primary)]">{item.tooltip}</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -136,10 +139,10 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
     <>
       {/* Mobile: Full-width bottom bar */}
       <motion.nav
-        className="fixed bottom-0 left-0 right-0 z-[100] md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
+        className="fixed bottom-0 left-0 right-0 z-[100] md:hidden pb-[env(safe-area-inset-bottom)]"
+        style={{ pointerEvents: hidden ? 'none' : 'auto', background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)' }}
         animate={{ opacity: resolvedOpacity, y: resolvedY }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        style={{ pointerEvents: hidden ? 'none' : 'auto' }}
       >
         <div className="flex items-center justify-around h-14">
           {items.map((item) => {
@@ -149,7 +152,7 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                 key={item.href}
                 href={item.href}
                 className={`relative flex flex-col items-center gap-0.5 py-1.5 px-3 transition-colors ${
-                  active ? 'text-amber-600' : 'text-gray-400'
+                  active ? 'text-[var(--amber)]' : 'text-[var(--text-muted)]'
                 }`}
               >
                 {item.icon}
@@ -162,10 +165,16 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
 
       {/* Desktop: Floating dock */}
       <motion.nav
-        className="fixed bottom-6 left-1/2 z-[100] hidden md:flex items-center gap-1 px-2 py-2 rounded-full bg-white border border-gray-200 shadow-lg w-fit"
-        style={{ x: '-50%', pointerEvents: hidden ? 'none' : 'auto' }}
+        className="fixed bottom-6 left-1/2 z-[100] hidden md:flex items-center gap-1 px-2 py-2 rounded-full w-fit"
+        style={{
+          x: '-50%',
+          pointerEvents: hidden ? 'none' : 'auto',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-default)',
+          boxShadow: 'var(--shadow-card)',
+        }}
         animate={{ opacity: resolvedOpacity, y: resolvedY }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.03 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
         {items.map((item) => {
@@ -174,24 +183,25 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
             <Link
               key={item.href}
               href={item.href}
-              className="relative flex flex-col items-center px-5 py-2 rounded-full transition-all duration-200 group hover:scale-110"
+              className="relative flex flex-col items-center px-5 py-2 rounded-full transition-all duration-200 group"
               onMouseEnter={() => setHoveredItem(item.href)}
               onMouseLeave={() => setHoveredItem(null)}
             >
               {active && (
                 <motion.div
                   layoutId="active-pill"
-                  className="absolute inset-0 rounded-full bg-gray-100"
+                  className="absolute inset-0 rounded-full"
+                  style={{ background: 'var(--amber-dim)' }}
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
               <span className={`relative z-10 transition-colors duration-150 ${
-                active ? 'text-[var(--c-accent)]' : 'text-gray-400 group-hover:text-gray-600'
+                active ? 'text-[var(--amber)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'
               }`}>
                 {item.icon}
               </span>
               <span className={`relative z-10 text-[10px] font-semibold mt-0.5 transition-colors duration-150 ${
-                active ? 'text-[var(--c-accent)]' : 'text-gray-400 group-hover:text-gray-600'
+                active ? 'text-[var(--amber)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'
               }`}>
                 {item.label}
               </span>
@@ -203,9 +213,10 @@ export default function NavigationDock({ dimmed = false, hidden = false, inline 
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 4 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md bg-gray-800 whitespace-nowrap pointer-events-none"
+                    className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md whitespace-nowrap pointer-events-none"
+                    style={{ background: 'var(--bg-overlay)', border: '1px solid var(--border-default)' }}
                   >
-                    <span className="text-[10px] font-semibold text-white">{item.tooltip}</span>
+                    <span className="text-[10px] font-semibold text-[var(--text-primary)]">{item.tooltip}</span>
                   </motion.div>
                 )}
               </AnimatePresence>

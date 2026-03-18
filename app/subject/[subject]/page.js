@@ -3,10 +3,10 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import NavigationDock from '@/components/NavigationDock';
+import AppSidebar from '@/components/AppSidebar';
 import { ClassIcon } from '@/components/ClassIcons';
 
-const cardBase = 'bg-white border border-gray-200 rounded-lg transition-colors duration-200';
+const cardBase = 'bg-[var(--c-card)] border border-gray-200 rounded-lg transition-colors duration-200';
 
 /* ── Main Subject Page ── */
 export default function SubjectPage({ params }) {
@@ -147,7 +147,7 @@ export default function SubjectPage({ params }) {
 
   const SortHeader = ({ col, label }) => (
     <th
-      className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700 select-none"
+      className="px-3 py-2 text-left text-[10px] font-semibold text-white/50 uppercase tracking-wider cursor-pointer hover:text-white/70 select-none"
       onClick={() => handleSort(col)}
     >
       {label} {sortCol === col ? (sortAsc ? '\u2191' : '\u2193') : ''}
@@ -157,49 +157,52 @@ export default function SubjectPage({ params }) {
   const masteryColor = (score) => {
     if (score == null) return '';
     if (score < 40) return 'bg-red-50';
-    if (score < 70) return 'bg-amber-50';
+    if (score < 70) return 'bg-[#0071E3]/10';
     return 'bg-emerald-50';
   };
 
   const masteryTextColor = (score) => {
-    if (score == null) return 'text-gray-400';
+    if (score == null) return 'text-white/40';
     if (score < 40) return 'text-red-500';
-    if (score < 70) return 'text-amber-600';
+    if (score < 70) return 'text-[#0071E3]';
     return 'text-emerald-600';
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7]">
+    <div className="flex h-screen overflow-hidden bg-[var(--c-canvas)]">
+      <AppSidebar />
+
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white">
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-[var(--c-card)]">
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="p-1.5 -ml-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <Link href="/dashboard" className="p-1.5 -ml-1.5 rounded-lg hover:bg-white/5 transition-colors">
+              <svg className="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </Link>
             <div className="flex items-center gap-2.5">
               <ClassIcon subject={subject} size={20} />
-              <h1 className="text-base font-bold text-gray-900 tracking-tight">{subject}</h1>
+              <h1 className="text-base font-bold text-white tracking-tight">{subject}</h1>
             </div>
           </div>
           <button
             onClick={() => router.push(classData ? `/chat?classId=${classData.id}&new=true` : `/chat?subject=${encodeURIComponent(subject)}&new=true`)}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-full transition-colors"
+            className="px-4 py-2 bg-[#0071E3] hover:bg-[#0058B3] text-white text-sm font-semibold rounded-full transition-colors"
           >
             Chat
           </button>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-6 pb-24 space-y-6">
+      <div className="flex-1 overflow-auto"><main className="max-w-5xl mx-auto px-6 py-6 pb-24 space-y-6">
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
               <div key={i} className={`${cardBase} p-6 animate-pulse`}>
-                <div className="h-4 w-32 bg-gray-200 rounded mb-3" />
-                <div className="h-3 w-48 bg-gray-200 rounded" />
+                <div className="h-4 w-32 bg-white/8 rounded mb-3" />
+                <div className="h-3 w-48 bg-white/8 rounded" />
               </div>
             ))}
           </div>
@@ -209,8 +212,8 @@ export default function SubjectPage({ params }) {
             {classData && (
               <div className={`${cardBase} px-6 py-4 flex items-center justify-between`}>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{classData.name}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{classData.year_group?.replace('year', 'Year ')} · {classData.teacher_name || 'Teacher'}</p>
+                  <p className="text-sm font-semibold text-white">{classData.name}</p>
+                  <p className="text-xs text-white/50 mt-0.5">{classData.year_group?.replace('year', 'Year ')} · {classData.teacher_name || 'Teacher'}</p>
                 </div>
               </div>
             )}
@@ -218,27 +221,27 @@ export default function SubjectPage({ params }) {
             {/* Syllabus Coverage Bar + Heatmap */}
             <div className={`${cardBase} p-5`}>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Syllabus Coverage</h2>
-                <span className="font-sans text-sm text-gray-600">{completedTopics}/{totalTopics} topics</span>
+                <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Syllabus Coverage</h2>
+                <span className="font-sans text-sm text-white/60">{completedTopics}/{totalTopics} topics</span>
               </div>
               {/* Progress bar */}
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
+              <div className="h-2 bg-white/8 rounded-full overflow-hidden mb-4">
                 <div
-                  className="h-full bg-amber-600 rounded-full transition-all duration-500"
+                  className="h-full bg-[#0071E3] rounded-full transition-all duration-500"
                   style={{ width: `${coveragePercent}%` }}
                 />
               </div>
               {/* Knowledge Heatmap */}
               {syllabusChapters.length > 0 && (
                 <div>
-                  <h3 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Topic Mastery Heatmap</h3>
+                  <h3 className="text-[10px] font-semibold text-white/40 uppercase tracking-wider mb-2">Topic Mastery Heatmap</h3>
                   <div className="flex flex-wrap gap-1">
                     {syllabusChapters.map((ch, i) => {
                       const score = ch.quizScore;
-                      let bg = 'bg-gray-200';
+                      let bg = 'bg-white/8';
                       if (score != null) {
                         if (score >= 70) bg = 'bg-emerald-600';
-                        else if (score >= 40) bg = 'bg-amber-600';
+                        else if (score >= 40) bg = 'bg-[#0071E3]';
                         else bg = 'bg-red-600';
                       }
                       return (
@@ -261,7 +264,7 @@ export default function SubjectPage({ params }) {
             {/* Syllabus Matrix Table */}
             <div className={`${cardBase} overflow-hidden`}>
               <div className="px-5 py-3 border-b border-gray-200">
-                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Syllabus Matrix</h2>
+                <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Syllabus Matrix</h2>
               </div>
               {syllabusChapters.length > 0 ? (
                 <div className="overflow-x-auto">
@@ -279,7 +282,7 @@ export default function SubjectPage({ params }) {
                       {sortedChapters.map((ch, i) => (
                         <tr
                           key={i}
-                          className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${masteryColor(ch.quizScore)}`}
+                          className={`border-b border-gray-100 hover:bg-[var(--bg-surface)] cursor-pointer ${masteryColor(ch.quizScore)}`}
                           onClick={() => {
                             const chatUrl = classData
                               ? `/chat?classId=${classData.id}&topic=${encodeURIComponent(ch.title)}&new=true`
@@ -287,17 +290,17 @@ export default function SubjectPage({ params }) {
                             router.push(chatUrl);
                           }}
                         >
-                          <td className="px-3 py-2.5 font-sans text-xs text-gray-500">{ch.code}</td>
-                          <td className="px-3 py-2.5 text-sm text-gray-900 max-w-[200px] truncate">{ch.title}</td>
+                          <td className="px-3 py-2.5 font-sans text-xs text-white/50">{ch.code}</td>
+                          <td className="px-3 py-2.5 text-sm text-white max-w-[200px] truncate">{ch.title}</td>
                           <td className={`px-3 py-2.5 font-sans text-xs font-semibold ${masteryTextColor(ch.quizScore)}`}>
                             {ch.quizScore != null ? `${ch.quizScore}%` : '—'}
                           </td>
-                          <td className="px-3 py-2.5 font-sans text-xs text-gray-500">
+                          <td className="px-3 py-2.5 font-sans text-xs text-white/50">
                             {ch.lastActivityAt
                               ? new Date(ch.lastActivityAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
                               : '—'}
                           </td>
-                          <td className="px-3 py-2.5 font-sans text-xs text-gray-500">
+                          <td className="px-3 py-2.5 font-sans text-xs text-white/50">
                             {ch.integrityScore != null ? ch.integrityScore : '—'}
                           </td>
                         </tr>
@@ -307,7 +310,7 @@ export default function SubjectPage({ params }) {
                 </div>
               ) : (
                 <div className="text-center py-8 px-5">
-                  <p className="text-sm text-gray-500">Complete quizzes and chat sessions to build your syllabus map.</p>
+                  <p className="text-sm text-white/50">Complete quizzes and chat sessions to build your syllabus map.</p>
                 </div>
               )}
             </div>
@@ -315,23 +318,23 @@ export default function SubjectPage({ params }) {
             {/* Incomplete Tasks */}
             <div className={`${cardBase} overflow-hidden`}>
               <div className="px-5 py-3 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tasks</h2>
+                <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Tasks</h2>
                 {assignments.length > 0 && (
-                  <span className="font-sans text-xs text-gray-500">{allAssignments.filter(a => !a.completed_at).length} pending</span>
+                  <span className="font-sans text-xs text-white/50">{allAssignments.filter(a => !a.completed_at).length} pending</span>
                 )}
               </div>
               {allAssignments.length === 0 ? (
                 <div className="text-center py-6 px-5">
-                  <p className="text-sm text-gray-500">No assignments set yet.</p>
+                  <p className="text-sm text-white/50">No assignments set yet.</p>
                 </div>
               ) : (
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Task Name</th>
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Type</th>
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Due Date</th>
-                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-white/50 uppercase tracking-wider">Task Name</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-white/50 uppercase tracking-wider">Type</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-white/50 uppercase tracking-wider">Due Date</th>
+                      <th className="px-3 py-2 text-left text-[10px] font-semibold text-white/50 uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -342,7 +345,7 @@ export default function SubjectPage({ params }) {
                       return (
                         <tr
                           key={`${a._type}-${a.id}`}
-                          className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${isOverdue ? 'bg-red-50' : ''}`}
+                          className={`border-b border-gray-100 hover:bg-[var(--bg-surface)] cursor-pointer ${isOverdue ? 'bg-red-50' : ''}`}
                           onClick={() => {
                             if (isQuiz) {
                               router.push(a._quizId ? `/quiz/${a._quizId}` : '/quiz');
@@ -354,15 +357,15 @@ export default function SubjectPage({ params }) {
                             }
                           }}
                         >
-                          <td className={`px-3 py-2.5 text-sm ${isOverdue ? 'text-red-500' : 'text-gray-900'}`}>{a.title}</td>
+                          <td className={`px-3 py-2.5 text-sm ${isOverdue ? 'text-red-500' : 'text-white'}`}>{a.title}</td>
                           <td className="px-3 py-2.5 text-xs">
                             <span className={`px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
-                              isQuiz ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500'
+                              isQuiz ? 'bg-[#0071E3]/10 text-[#0071E3]' : 'bg-white/5 text-white/50'
                             }`}>
                               {isQuiz ? 'Quiz' : 'Task'}
                             </span>
                           </td>
-                          <td className={`px-3 py-2.5 font-sans text-xs ${isOverdue ? 'text-red-500' : 'text-gray-500'}`}>
+                          <td className={`px-3 py-2.5 font-sans text-xs ${isOverdue ? 'text-red-500' : 'text-white/50'}`}>
                             {a.due_date ? new Date(a.due_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}
                           </td>
                           <td className="px-3 py-2.5 text-xs">
@@ -371,9 +374,9 @@ export default function SubjectPage({ params }) {
                             ) : isOverdue ? (
                               <span className="text-red-500 font-semibold">OVERDUE</span>
                             ) : isQuiz && a._started ? (
-                              <span className="text-amber-600 font-semibold">IN PROGRESS</span>
+                              <span className="text-[#0071E3] font-semibold">IN PROGRESS</span>
                             ) : (
-                              <span className="text-gray-500">Pending</span>
+                              <span className="text-white/50">Pending</span>
                             )}
                           </td>
                         </tr>
@@ -386,10 +389,10 @@ export default function SubjectPage({ params }) {
 
             {/* Exam Simulation */}
             <div className={`${cardBase} p-5`}>
-              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Exam Simulation</h2>
+              <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Exam Simulation</h2>
               <button
                 onClick={() => router.push(`/quiz?subject=${encodeURIComponent(subject)}&mode=exam`)}
-                className="w-full rounded-lg p-4 bg-white text-black border border-gray-200 hover:bg-gray-100 transition-colors text-left group"
+                className="w-full rounded-lg p-4 bg-[var(--c-card)] text-black border border-gray-200 hover:bg-white/5 transition-colors text-left group"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -407,11 +410,11 @@ export default function SubjectPage({ params }) {
             {/* Resource Vault */}
             <div className={`${cardBase} overflow-hidden`}>
               <div className="px-5 py-3 border-b border-gray-200">
-                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Resources</h2>
+                <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Resources</h2>
               </div>
               {resources.length === 0 ? (
                 <div className="text-center py-6 px-5">
-                  <p className="text-sm text-gray-500">No resources added yet.</p>
+                  <p className="text-sm text-white/50">No resources added yet.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
@@ -421,13 +424,13 @@ export default function SubjectPage({ params }) {
                       href={r.url || '#'}
                       target={r.url ? '_blank' : undefined}
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-[var(--bg-surface)] transition-colors"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{r.title}</p>
-                        {r.description && <p className="text-xs text-gray-500 truncate mt-0.5">{r.description}</p>}
+                        <p className="text-sm font-semibold text-white truncate">{r.title}</p>
+                        {r.description && <p className="text-xs text-white/50 truncate mt-0.5">{r.description}</p>}
                       </div>
-                      <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                      <span className="font-sans text-[10px] font-bold uppercase tracking-wider text-white/40">
                         {r.type || 'file'}
                       </span>
                     </a>
@@ -438,8 +441,8 @@ export default function SubjectPage({ params }) {
           </>
         )}
       </main>
-
-      <NavigationDock />
+      </div>
+      </div>
     </div>
   );
 }

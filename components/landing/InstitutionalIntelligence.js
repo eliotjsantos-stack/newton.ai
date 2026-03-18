@@ -32,7 +32,7 @@ const INITIAL_GRID = [
 ];
 
 const STATUS_COLORS = {
-  0: 'bg-gray-100',
+  0: 'bg-white/8',
   1: 'bg-red-500',
   2: 'bg-amber-400',
   3: 'bg-emerald-400',
@@ -49,14 +49,14 @@ const MOCK_DAYS_AGO = { 0: null, 1: 12, 2: 5, 3: 1 };
 
 /* Mock weekly mastery scores per student (6 weeks) */
 const MOCK_DECAY_DATA = [
-  [40, 55, 70, 85, 78, 92],   // E. Thompson — steady climb
-  [30, 25, 40, 35, 20, 28],   // J. Patel — struggling
-  [60, 75, 80, 90, 88, 95],   // S. Williams — strong
-  [50, 60, 72, 80, 75, 82],   // A. Chen — good
-  [20, 15, 25, 18, 22, 15],   // M. Davies — at risk
-  [55, 68, 80, 85, 90, 88],   // R. Khan — solid
-  [45, 50, 55, 60, 68, 65],   // L. Brown — progressing
-  [65, 78, 85, 90, 88, 93],   // O. Taylor — strong
+  [40, 55, 70, 85, 78, 92],
+  [30, 25, 40, 35, 20, 28],
+  [60, 75, 80, 90, 88, 95],
+  [50, 60, 72, 80, 75, 82],
+  [20, 15, 25, 18, 22, 15],
+  [55, 68, 80, 85, 90, 88],
+  [45, 50, 55, 60, 68, 65],
+  [65, 78, 85, 90, 88, 93],
 ];
 
 /* ─── Student Decay Panel ─── */
@@ -74,7 +74,6 @@ function StudentDecayPanel({ studentIndex, name }) {
     }).join(' ');
   };
 
-  // Forgetting curve for comparison
   const forgetPoints = [data[0], data[0] * 0.58, data[0] * 0.4, data[0] * 0.33, data[0] * 0.28, data[0] * 0.25];
 
   const latest = data[data.length - 1];
@@ -90,12 +89,12 @@ function StudentDecayPanel({ studentIndex, name }) {
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className="overflow-hidden"
     >
-      <div className="px-4 sm:px-6 py-3 bg-gray-50 border-t border-gray-100">
+      <div className="px-4 sm:px-6 py-3 bg-[var(--c-canvas)] border-t border-[var(--c-border)]">
         <div className="flex items-start gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <div className={`w-2 h-2 rounded-full ${statusColor}`} />
-              <span className="text-xs font-semibold text-gray-900">{name}</span>
+              <span className="text-xs font-semibold text-[var(--c-text)]">{name}</span>
               <span className={`text-[10px] font-medium ${trendColor} capitalize`}>{trend}</span>
             </div>
             <svg viewBox={`0 0 ${w} ${h}`} className="w-full max-w-[220px] h-auto" fill="none">
@@ -127,13 +126,13 @@ function StudentDecayPanel({ studentIndex, name }) {
             </svg>
             <div className="flex justify-between mt-1 max-w-[220px]">
               {weeks.map(w => (
-                <span key={w} className="text-[8px] text-gray-400 font-medium">{w}</span>
+                <span key={w} className="text-[8px] text-[var(--c-text-faint)] font-medium">{w}</span>
               ))}
             </div>
           </div>
           <div className="text-right shrink-0">
-            <p className="text-2xl font-bold text-gray-900 tracking-tight">{latest}%</p>
-            <p className="text-[10px] text-gray-500 font-medium">Current Mastery</p>
+            <p className="text-2xl font-bold text-[var(--c-text)] tracking-tight">{latest}%</p>
+            <p className="text-[10px] text-[var(--c-text-muted)] font-medium">Current Mastery</p>
           </div>
         </div>
       </div>
@@ -151,26 +150,21 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: false, margin: '-100px' });
 
-  // Sync real data into grid when data changes
   useEffect(() => {
     if (isReal && data) setGrid(data.grid);
   }, [isReal, data]);
 
-  // Simulate live data updates
   useEffect(() => {
     if (!isInView || isReal) return;
     const interval = setInterval(() => {
       setGrid(prev => {
         const next = prev.map(row => [...row]);
-        // Pick a random cell and nudge it
         const r = Math.floor(Math.random() * STUDENTS.length);
         const c = Math.floor(Math.random() * MODULES.length);
         const current = next[r][c];
-        // Trend upward slightly
         if (current === 0) next[r][c] = Math.random() > 0.5 ? 1 : 2;
         else if (current === 1) next[r][c] = Math.random() > 0.3 ? 2 : 1;
         else if (current === 2) next[r][c] = Math.random() > 0.4 ? 3 : 2;
-        // Occasionally decay a green
         else if (current === 3 && Math.random() > 0.85) next[r][c] = 2;
         return next;
       });
@@ -179,24 +173,24 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
   }, [isInView]);
 
   return (
-    <div ref={ref} className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
+    <div ref={ref} className="rounded-2xl bg-[var(--c-card)] border border-[var(--c-border)] overflow-hidden">
       {/* Header */}
-      <div className="px-4 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="px-4 sm:px-6 py-4 border-b border-[var(--c-border)] flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-            <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+          <div className="w-8 h-8 rounded-lg bg-[#0071E3]/10 flex items-center justify-center">
+            <svg className="w-4 h-4 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
             </svg>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900">{label || 'AQA Biology — Year 12'}</p>
-            <p className="text-xs text-gray-500">{subtitle || 'Live Class Mastery'}</p>
+            <p className="text-sm font-semibold text-[var(--c-text)]">{label || 'AQA Biology — Year 12'}</p>
+            <p className="text-xs text-[var(--c-text-muted)]">{subtitle || 'Live Class Mastery'}</p>
           </div>
         </div>
         {!isReal && (
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-gray-500 font-medium">Live</span>
+            <span className="text-xs text-[var(--c-text-muted)] font-medium">Live</span>
           </div>
         )}
       </div>
@@ -204,13 +198,13 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
       {/* Empty state for real data with no students yet */}
       {isReal && !hasData && (
         <div className="px-6 py-12 flex flex-col items-center justify-center text-center">
-          <div className="w-12 h-12 rounded-2xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-4">
-            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-[var(--c-border)] flex items-center justify-center mb-4">
+            <svg className="w-6 h-6 text-[var(--c-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-gray-500 mb-1">No mastery data yet</p>
-          <p className="text-xs text-gray-400 max-w-xs">Students will appear here as they chat with Newton and build topic mastery.</p>
+          <p className="text-sm font-medium text-[var(--c-text-muted)] mb-1">No mastery data yet</p>
+          <p className="text-xs text-[var(--c-text-faint)] max-w-xs">Students will appear here as they chat with Newton and build topic mastery.</p>
         </div>
       )}
 
@@ -218,7 +212,6 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
       {(!isReal || hasData) && (
       <div className="overflow-x-auto">
         <div className="min-w-0 sm:min-w-[520px]">
-          {/* Column headers */}
           {(() => {
             const displayStudents = isReal
               ? data.students.map(s => ({ name: s.name, flag: false }))
@@ -226,29 +219,28 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
             const displayModules = isReal ? data.topics.map(t => t.slice(0, 6)) : MODULES;
             return (
               <>
-          <div className="flex border-b border-gray-100">
+          <div className="flex border-b border-[var(--c-border)]">
             <div className="w-20 sm:w-32 md:w-36 shrink-0 px-2 sm:px-4 md:px-6 py-2.5">
-              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Student</span>
+              <span className="text-[10px] font-semibold text-[var(--c-text-faint)] uppercase tracking-wider">Student</span>
             </div>
             {displayModules.map(m => (
               <div key={m} className="flex-1 px-1 py-2.5 text-center">
-                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{m}</span>
+                <span className="text-[10px] font-semibold text-[var(--c-text-faint)] uppercase tracking-wider">{m}</span>
               </div>
             ))}
           </div>
 
-          {/* Rows */}
           {displayStudents.map((student, ri) => (
             <div key={student.name}>
               <div
-                className={`flex border-b border-gray-100 transition-colors cursor-pointer ${
-                  selectedStudent === ri ? 'bg-amber-50' : 'hover:bg-gray-50'
+                className={`flex border-b border-[var(--c-border)] transition-colors cursor-pointer ${
+                  selectedStudent === ri ? 'bg-[#0071E3]/8' : 'hover:bg-white/3'
                 }`}
                 onClick={() => setSelectedStudent(selectedStudent === ri ? null : ri)}
               >
                 <div className="w-20 sm:w-32 md:w-36 shrink-0 px-2 sm:px-4 md:px-6 py-2 flex items-center gap-2">
                   <span className={`text-xs font-medium truncate transition-colors ${
-                    selectedStudent === ri ? 'text-amber-600' : 'text-gray-700 hover:text-gray-900'
+                    selectedStudent === ri ? 'text-[#0071E3]' : 'text-[var(--c-text-soft)] hover:text-[var(--c-text)]'
                   }`}>{student.name}</span>
                   {student.flag && (
                     <svg className="w-3.5 h-3.5 text-red-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -267,13 +259,10 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
                     >
                       <motion.div
                         className={`w-6 h-6 sm:w-7 sm:h-7 rounded-md ${STATUS_COLORS[val]}`}
-                        animate={{
-                          boxShadow: val > 0 ? STATUS_GLOW[val] : 'none',
-                        }}
+                        animate={{ boxShadow: val > 0 ? STATUS_GLOW[val] : 'none' }}
                         transition={{ duration: 0.6 }}
                         layout
                       />
-                      {/* Tooltip */}
                       <AnimatePresence>
                         {hoveredCell && hoveredCell.r === ri && hoveredCell.c === ci && val > 0 && (
                           <motion.div
@@ -281,9 +270,9 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 4 }}
                             transition={{ duration: 0.15 }}
-                            className="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 rounded-md bg-gray-800 border border-gray-700 whitespace-nowrap pointer-events-none z-20"
+                            className="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 rounded-md bg-[var(--c-canvas)] border border-[var(--c-border)] whitespace-nowrap pointer-events-none z-20"
                           >
-                            <span className="text-[9px] text-gray-200 font-medium">
+                            <span className="text-[9px] text-[var(--c-text-soft)] font-medium">
                               {m} — {STATUS_LABELS[val]} {!isReal && MOCK_DAYS_AGO[val] ? `(${MOCK_DAYS_AGO[val]}d ago)` : ''}
                             </span>
                           </motion.div>
@@ -293,7 +282,6 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
                   );
                 })}
               </div>
-              {/* Decay panel */}
               <AnimatePresence>
                 {selectedStudent === ri && !isReal && (
                   <StudentDecayPanel studentIndex={ri} name={student.name} />
@@ -309,31 +297,32 @@ export function LiveHeatmap({ data = null, label = null, subtitle = null }) {
       )}
 
       {/* Legend */}
-      {(!isReal || hasData) && <div className="px-4 sm:px-6 py-3 border-t border-gray-100 flex items-center gap-4 sm:gap-6">
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-sm bg-emerald-400" />
-          <span className="text-[10px] text-gray-500 font-medium">Mastered</span>
+      {(!isReal || hasData) && (
+        <div className="px-4 sm:px-6 py-3 border-t border-[var(--c-border)] flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-sm bg-emerald-400" />
+            <span className="text-[10px] text-[var(--c-text-muted)] font-medium">Mastered</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-sm bg-amber-400" />
+            <span className="text-[10px] text-[var(--c-text-muted)] font-medium">Learning</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-sm bg-red-500" />
+            <span className="text-[10px] text-[var(--c-text-muted)] font-medium">Struggling</span>
+          </div>
+          <div className="flex items-center gap-1.5 ml-auto">
+            <svg className="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+            </svg>
+            <span className="text-[10px] text-[var(--c-text-muted)] font-medium">Integrity Flag</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-sm bg-amber-400" />
-          <span className="text-[10px] text-gray-500 font-medium">Learning</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-sm bg-red-500" />
-          <span className="text-[10px] text-gray-500 font-medium">Struggling</span>
-        </div>
-        <div className="flex items-center gap-1.5 ml-auto">
-          <svg className="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-          </svg>
-          <span className="text-[10px] text-gray-500 font-medium">Integrity Flag</span>
-        </div>
-      </div>}
-      {/* Interactive hint — only for mock demo */}
+      )}
       {!isReal && (
-      <div className="px-4 sm:px-6 py-2 border-t border-gray-100">
-        <p className="text-[10px] text-gray-400 text-center font-medium">Click a student name to see their knowledge decay timeline</p>
-      </div>
+        <div className="px-4 sm:px-6 py-2 border-t border-[var(--c-border)]">
+          <p className="text-[10px] text-[var(--c-text-faint)] text-center font-medium">Click a student name to see their knowledge decay timeline</p>
+        </div>
       )}
     </div>
   );
@@ -344,9 +333,7 @@ export function ForgettingCurve() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-50px' });
 
-  // Forgetting curve: sharp drop
   const forgetPoints = [100, 58, 44, 36, 33, 30, 28, 26, 25, 25];
-  // Newton retention: maintained with spaced repetition dips and recoveries
   const retainPoints = [100, 92, 78, 88, 82, 90, 85, 92, 88, 94];
 
   const w = 240;
@@ -365,7 +352,6 @@ export function ForgettingCurve() {
   return (
     <div ref={ref} className="relative">
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto" fill="none">
-        {/* Forgetting curve */}
         <motion.path
           d={toPath(forgetPoints)}
           stroke="#ef4444"
@@ -376,7 +362,6 @@ export function ForgettingCurve() {
           animate={isInView ? { pathLength: 1, opacity: 0.5 } : {}}
           transition={{ duration: 1.5, ease: 'easeOut' }}
         />
-        {/* Newton retention curve */}
         <motion.path
           d={toPath(retainPoints)}
           stroke="#0071e3"
@@ -391,11 +376,11 @@ export function ForgettingCurve() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div className="w-4 h-0.5 bg-red-500/50 rounded" style={{ borderTop: '2px dashed rgba(239,68,68,0.5)' }} />
-            <span className="text-[10px] text-gray-500">Forgetting Curve</span>
+            <span className="text-[10px] text-[var(--c-text-muted)]">Forgetting Curve</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-4 h-0.5 bg-amber-600 rounded" />
-            <span className="text-[10px] text-gray-500">Newton Retention</span>
+            <div className="w-4 h-0.5 bg-[#0071e3] rounded" />
+            <span className="text-[10px] text-[var(--c-text-muted)]">Newton Retention</span>
           </div>
         </div>
       </div>

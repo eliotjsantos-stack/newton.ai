@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[var(--c-card)]">
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-xl border-b border-gray-200 z-50">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
@@ -14,10 +14,10 @@ export default function About() {
             </Link>
             
             <div className="flex items-center space-x-10">
-              <Link href="/#how-it-works" className="text-sm text-gray-600 hover:text-black transition">How it works</Link>
-              <Link href="/#features" className="text-sm text-gray-600 hover:text-black transition">Features</Link>
+              <Link href="/#how-it-works" className="text-sm text-white/60 hover:text-black transition">How it works</Link>
+              <Link href="/#features" className="text-sm text-white/60 hover:text-black transition">Features</Link>
               <Link href="/about" className="text-sm text-black font-medium">About</Link>
-              <Link href="/faq" className="text-sm text-gray-600 hover:text-black transition">FAQ</Link>
+              <Link href="/faq" className="text-sm text-white/60 hover:text-black transition">FAQ</Link>
               <Link href="/chat" className="px-5 py-2 bg-black text-white text-sm rounded-full hover:bg-gray-800 transition">
                 Try Newton
               </Link>
@@ -29,23 +29,23 @@ export default function About() {
       {/* Hero */}
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-sm text-gray-500 mb-8 tracking-wide uppercase">About Newton</p>
+          <p className="text-sm text-white/50 mb-8 tracking-wide uppercase">About Newton</p>
           <h1 className="text-5xl md:text-7xl font-semibold text-black mb-8 leading-tight tracking-tight">
             Built by a student,
             <br />
             for students.
           </h1>
-          <p className="text-xl text-gray-600 font-light leading-relaxed">
+          <p className="text-xl text-white/60 font-light leading-relaxed">
             Newton was created to solve a real problem: AI tools that enable shortcuts instead of learning.
           </p>
         </div>
       </section>
 
       {/* The Story */}
-      <section className="py-20 px-6 bg-gray-50">
+      <section className="py-20 px-6 bg-[var(--bg-surface)]">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-semibold text-black mb-8">The problem</h2>
-          <div className="space-y-6 text-lg text-gray-600 leading-relaxed font-light">
+          <div className="space-y-6 text-lg text-white/60 leading-relaxed font-light">
             <p>
               In October 2025, The Guardian published research showing that students fear AI is eroding their ability to study and think independently.
             </p>
@@ -63,7 +63,7 @@ export default function About() {
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-semibold text-black mb-8">The solution</h2>
-          <div className="space-y-6 text-lg text-gray-600 leading-relaxed font-light">
+          <div className="space-y-6 text-lg text-white/60 leading-relaxed font-light">
             <p>
               Newton is AI that maintains academic integrity by design. It refuses to write essays or complete homework. Instead, it guides students to discover answers themselves through Socratic questioning.
             </p>
@@ -81,10 +81,10 @@ export default function About() {
       </section>
 
       {/* The Vision */}
-      <section className="py-20 px-6 bg-gray-50">
+      <section className="py-20 px-6 bg-[var(--bg-surface)]">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-semibold text-black mb-8">The vision</h2>
-          <div className="space-y-6 text-lg text-gray-600 leading-relaxed font-light">
+          <div className="space-y-6 text-lg text-white/60 leading-relaxed font-light">
             <p>
               Newton is currently being piloted at Bedales School in Hampshire, UK. The goal is to prove that AI can support education without compromising academic integrity.
             </p>
@@ -102,11 +102,11 @@ export default function About() {
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-semibold text-black mb-12">Built at Bedales</h2>
-          <p className="text-lg text-gray-600 font-light leading-relaxed mb-8">
+          <p className="text-lg text-white/60 font-light leading-relaxed mb-8">
             Newton was created by a Bedales student who saw classmates using AI to avoid learning instead of enhance it. Built in October 2025, Newton represents a different approach: AI that teaches rather than replaces thinking.
           </p>
           <div className="pt-8 border-t border-gray-200">
-            <p className="text-sm text-gray-500 mb-4">Questions about Newton?</p>
+            <p className="text-sm text-white/50 mb-4">Questions about Newton?</p>
             <a 
               href="mailto:eliot@newton-ai.co.uk"
               className="inline-block px-8 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition"
@@ -123,16 +123,16 @@ export default function About() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-center md:text-left">
               <p className="text-2xl font-semibold text-black mb-2">Newton</p>
-              <p className="text-sm text-gray-500">Teaching students to think.</p>
+              <p className="text-sm text-white/50">Teaching students to think.</p>
             </div>
             <div className="flex items-center space-x-8 text-sm">
-              <Link href="/" className="text-gray-600 hover:text-black transition">Home</Link>
-              <Link href="/about" className="text-gray-600 hover:text-black transition">About</Link>
-              <Link href="/chat" className="text-gray-600 hover:text-black transition">Chat</Link>
+              <Link href="/" className="text-white/60 hover:text-black transition">Home</Link>
+              <Link href="/about" className="text-white/60 hover:text-black transition">About</Link>
+              <Link href="/chat" className="text-white/60 hover:text-black transition">Chat</Link>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-200 text-center">
-            <p className="text-xs text-gray-400">© 2025 Newton AI</p>
+            <p className="text-xs text-white/40">© 2025 Newton AI</p>
           </div>
         </div>
       </footer>

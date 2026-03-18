@@ -49,19 +49,19 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--c-canvas)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center justify-center gap-3">
             <div className="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center">
               <span className="text-lg font-bold text-white">N</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Newton</h1>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Newton</h1>
           </Link>
           <p className="text-gray-500 text-sm mt-2">Set a new password</p>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-8">
+        <div className="bg-[var(--c-card)] border border-white/8 rounded-2xl shadow-sm p-6 sm:p-8">
           {done ? (
             <div className="text-center py-4">
               <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -69,11 +69,11 @@ function ResetPasswordForm() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Password updated</h2>
+              <h2 className="text-lg font-bold text-white mb-2">Password updated</h2>
               <p className="text-sm text-gray-500 mb-6">Your password has been changed. You can now log in with your new password.</p>
               <Link
                 href="/login"
-                className="inline-block px-6 py-2.5 bg-amber-600 text-white text-sm font-semibold rounded-xl hover:bg-amber-700 transition-colors"
+                className="inline-block px-6 py-2.5 bg-[#0071E3] text-white text-sm font-semibold rounded-xl hover:bg-[#0058B3] transition-colors"
               >
                 Go to login
               </Link>
@@ -97,7 +97,7 @@ function ResetPasswordForm() {
                     required
                     minLength={8}
                     disabled={!token}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 transition-all text-gray-900 placeholder:text-gray-400 text-sm disabled:opacity-40"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-surface)] border border-white/12 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0071E3]/30 focus:border-[#0071E3]/40 transition-all text-white placeholder:text-white/40 text-sm disabled:opacity-40"
                   />
                 </div>
 
@@ -110,14 +110,14 @@ function ResetPasswordForm() {
                     placeholder="Repeat your new password"
                     required
                     disabled={!token}
-                    className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 transition-all text-gray-900 placeholder:text-gray-400 text-sm disabled:opacity-40"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-surface)] border border-white/12 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0071E3]/30 focus:border-[#0071E3]/40 transition-all text-white placeholder:text-white/40 text-sm disabled:opacity-40"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading || !token}
-                  className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50 text-sm"
+                  className="w-full py-2.5 bg-[#0071E3] hover:bg-[#0058B3] text-white font-semibold rounded-xl transition-colors duration-200 disabled:opacity-50 text-sm"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">

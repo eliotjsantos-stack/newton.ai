@@ -70,8 +70,8 @@ export default function StudentsPage() {
   return (
     <div className="max-w-5xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Students</h1>
-        <p className="text-sm text-gray-400 mt-1">{uniqueStudentIds.size} student{uniqueStudentIds.size !== 1 ? 's' : ''} across {classes.length} class{classes.length !== 1 ? 'es' : ''}</p>
+        <h1 className="text-2xl font-semibold text-white">Students</h1>
+        <p className="text-sm text-white/40 mt-1">{uniqueStudentIds.size} student{uniqueStudentIds.size !== 1 ? 's' : ''} across {classes.length} class{classes.length !== 1 ? 'es' : ''}</p>
       </div>
 
       {/* Filters */}
@@ -81,12 +81,12 @@ export default function StudentsPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by email..."
-          className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200 placeholder:text-gray-400"
+          className="flex-1 px-3 py-2 bg-[var(--bg-surface)] border border-gray-300 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#0071E3]/30/30 focus:border-[#0071E3]/20 placeholder:text-white/40"
         />
         <select
           value={filterClass}
           onChange={e => setFilterClass(e.target.value)}
-          className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-200"
+          className="px-3 py-2 bg-[var(--bg-surface)] border border-gray-300 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#0071E3]/30/30 focus:border-[#0071E3]/20"
         >
           <option value="all">All classes</option>
           {classes.map(c => (
@@ -96,9 +96,9 @@ export default function StudentsPage() {
       </div>
 
       {/* Student list */}
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-        <div className="px-6 py-3 border-b border-gray-200 bg-gray-50">
-          <div className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wide">
+      <div className="bg-[var(--c-card)] border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="px-6 py-3 border-b border-gray-200 bg-[var(--bg-surface)]">
+          <div className="flex items-center text-xs font-medium text-white/50 uppercase tracking-wide">
             <span className="flex-1">Student</span>
             <span className="w-40 hidden sm:block">Class</span>
             <span className="w-32 hidden md:block">Joined</span>
@@ -107,14 +107,14 @@ export default function StudentsPage() {
 
         {filtered.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <p className="text-sm text-gray-400">{students.length === 0 ? 'No students have joined your classes yet.' : 'No students match your filters.'}</p>
+            <p className="text-sm text-white/40">{students.length === 0 ? 'No students have joined your classes yet.' : 'No students match your filters.'}</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
             {filtered.map((s, i) => (
-              <div key={`${s.studentId}-${s.classId}-${i}`} className="px-6 py-3 flex items-center hover:bg-gray-50 transition-colors">
+              <div key={`${s.studentId}-${s.classId}-${i}`} className="px-6 py-3 flex items-center hover:bg-[var(--bg-surface)] transition-colors">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{s.email}</p>
+                  <p className="text-sm font-medium text-white truncate">{s.email}</p>
                   <p className="text-xs sm:hidden" style={{ color: s.classColor || '#3B82F6' }}>{s.className}</p>
                 </div>
                 <div className="w-40 hidden sm:block">
@@ -126,7 +126,7 @@ export default function StudentsPage() {
                   </span>
                 </div>
                 <div className="w-32 hidden md:block">
-                  <span className="text-xs text-gray-400">{s.joinedAt ? new Date(s.joinedAt).toLocaleDateString() : '—'}</span>
+                  <span className="text-xs text-white/40">{s.joinedAt ? new Date(s.joinedAt).toLocaleDateString() : '—'}</span>
                 </div>
               </div>
             ))}

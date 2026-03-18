@@ -55,12 +55,12 @@ export default function MyClassesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">My Classes</h1>
-          <p className="text-sm text-gray-500 mt-1">{classes.length} class{classes.length !== 1 ? 'es' : ''} total</p>
+          <h1 className="text-2xl font-semibold text-white">My Classes</h1>
+          <p className="text-sm text-white/50 mt-1">{classes.length} class{classes.length !== 1 ? 'es' : ''} total</p>
         </div>
         <Link
           href="/teacher/create-class"
-          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-[#0071E3] hover:bg-[#0058B3] text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
           Create Class
@@ -72,17 +72,17 @@ export default function MyClassesPage() {
         <div className="flex gap-6">
           <button
             onClick={() => setFilter('active')}
-            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'active' ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'active' ? 'text-[#0071E3]' : 'text-white/40 hover:text-white/60'}`}
           >
             Active
-            {filter === 'active' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600 rounded-full" />}
+            {filter === 'active' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0071E3] rounded-full" />}
           </button>
           <button
             onClick={() => setFilter('archived')}
-            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'archived' ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'archived' ? 'text-[#0071E3]' : 'text-white/40 hover:text-white/60'}`}
           >
             Archived
-            {filter === 'archived' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600 rounded-full" />}
+            {filter === 'archived' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0071E3] rounded-full" />}
           </button>
         </div>
       </div>
@@ -91,16 +91,16 @@ export default function MyClassesPage() {
       {filtered.length === 0 ? (
         <div className="text-center py-20">
           <div className="flex justify-center mb-4">
-            <ClassIcon name="book" size={48} className="text-gray-300" />
+            <ClassIcon name="book" size={48} className="text-white/30" />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">
+          <h2 className="text-lg font-semibold text-white mb-1">
             {filter === 'active' ? 'No active classes' : 'No archived classes'}
           </h2>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-white/50 mb-6">
             {filter === 'active' ? 'Create your first class to get started.' : 'Archived classes will appear here.'}
           </p>
           {filter === 'active' && (
-            <Link href="/teacher/create-class" className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-colors inline-block">
+            <Link href="/teacher/create-class" className="px-4 py-2 bg-[#0071E3] hover:bg-[#0058B3] text-white text-sm font-medium rounded-md transition-colors inline-block">
               Create Class
             </Link>
           )}
@@ -108,15 +108,15 @@ export default function MyClassesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(cls => (
-            <div key={cls.id} className="bg-white rounded-xl hover:shadow-md transition-all [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]">
+            <div key={cls.id} className="bg-[var(--c-card)] rounded-xl hover:shadow-md transition-all [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]">
               <Link href={`/teacher/class/${cls.id}`} className="block p-5 pb-3">
                 <div className="flex items-start gap-3">
                   <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: (cls.color || '#3B82F6') + '20', color: cls.color || '#3B82F6' }}>
                     <ClassIcon name={cls.icon || 'book'} size={22} />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-gray-900 truncate">{cls.name}</h3>
-                    <p className="text-xs text-gray-500 mt-0.5">{cls.subject} · {cls.year_group?.replace('year', 'Year ')}</p>
+                    <h3 className="text-sm font-semibold text-white truncate">{cls.name}</h3>
+                    <p className="text-xs text-white/50 mt-0.5">{cls.subject} · {cls.year_group?.replace('year', 'Year ')}</p>
                   </div>
                 </div>
               </Link>
@@ -124,17 +124,17 @@ export default function MyClassesPage() {
               <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--c-border)]">
                 <button
                   onClick={(e) => { e.stopPropagation(); copyCode(cls.class_code, cls.id); }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-xs font-mono text-gray-500 transition-colors"
+                  className="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 hover:bg-white/8 rounded-md text-xs font-mono text-white/50 transition-colors"
                   title="Click to copy class code"
                 >
                   <span>{cls.class_code}</span>
                   {copiedId === cls.id ? (
                     <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                   ) : (
-                    <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    <svg className="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                   )}
                 </button>
-                <span className="text-xs text-gray-400">{cls.student_count || 0} student{(cls.student_count || 0) !== 1 ? 's' : ''}</span>
+                <span className="text-xs text-white/40">{cls.student_count || 0} student{(cls.student_count || 0) !== 1 ? 's' : ''}</span>
               </div>
             </div>
           ))}

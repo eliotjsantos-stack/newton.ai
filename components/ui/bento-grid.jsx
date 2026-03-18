@@ -1,34 +1,45 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ArrowRightIcon } from "lucide-react";
+'use client';
 
-const BentoGrid = ({ children, className }) => (
-  <div className={cn("grid w-full auto-rows-[22rem] grid-cols-3 gap-4", className)}>
-    {children}
-  </div>
-);
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
-const BentoCard = ({ name, className, background, Icon, description, href, cta }) => (
-  <div key={name} className={cn(
-    "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
-    "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
+export function BentoGrid({ className, children }) {
+  return (
+    <div className={cn('grid auto-rows-[185px] grid-cols-3 gap-3', className)}>
+      {children}
+    </div>
+  );
+}
+
+export function BentoCard({ className, href, cta, children }) {
+  const hasCta = !!(href && cta);
+
+  const inner = (
+    <>
+      <div className={cn('h-full', hasCta && 'transition-all duration-300 ease-out group-hover:-translate-y-4')}>
+        {children}
+      </div>
+      {hasCta && (
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex translate-y-6 items-center justify-between px-5 py-4 opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+          <span className="text-xs font-semibold text-[#0071E3]">{cta}</span>
+          <svg className="w-3.5 h-3.5 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </div>
+      )}
+    </>
+  );
+
+  const base = cn(
+    'group relative col-span-3 overflow-hidden rounded-xl',
+    'bg-[var(--c-card)] border border-[var(--c-border)]',
+    'transition-[border-color] duration-200 hover:border-[var(--c-border-strong)]',
     className,
-  )}>
-    <div>{background}</div>
-    <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6 transition-all duration-300 group-hover:-translate-y-10">
-      <Icon className="h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75" />
-      <h3 className="text-xl font-semibold text-neutral-700">{name}</h3>
-      <p className="max-w-lg text-neutral-400">{description}</p>
-    </div>
-    <div className={cn(
-      "pointer-events-none absolute bottom-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100",
-    )}>
-      <Button variant="ghost" asChild size="sm" className="pointer-events-auto">
-        <a href={href}>{cta}<ArrowRightIcon className="ml-2 h-4 w-4" /></a>
-      </Button>
-    </div>
-    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03]" />
-  </div>
-);
+  );
 
-export { BentoCard, BentoGrid };
+  if (href) return <Link href={href} className={base}>{inner}</Link>;
+  return <div className={base}>{inner}</div>;
+}
+
+// legacy named exports for any existing imports
+export { BentoGrid as BentoGrid_legacy, BentoCard as BentoCard_legacy };

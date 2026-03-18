@@ -1,4 +1,4 @@
-import { Inter, DM_Serif_Display, Geist_Mono } from "next/font/google";
+import { Inter, DM_Serif_Display, Playfair_Display, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -12,6 +12,13 @@ const dmSerifDisplay = DM_Serif_Display({
   variable: "--font-dm-serif",
   subsets: ["latin"],
   weight: ["400"],
+  display: "swap",
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -42,7 +49,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body
-        className={`${inter.variable} ${dmSerifDisplay.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
+        className={`${inter.variable} ${dmSerifDisplay.variable} ${playfairDisplay.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
         {children}
       </body>

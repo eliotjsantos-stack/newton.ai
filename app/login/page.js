@@ -77,7 +77,7 @@ export default function LoginPage() {
         <div className="bg-[var(--c-card)] rounded-xl card-shadow p-7">
 
           {error && (
-            <div className="mb-5 px-3.5 py-3 bg-red-50 border border-red-100 rounded-lg">
+            <div className="mb-5 px-3.5 py-3 bg-red-500/10 border border-red-500/20 rounded-lg">
               <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
