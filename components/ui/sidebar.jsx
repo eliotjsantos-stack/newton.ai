@@ -1,124 +1,135 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-  Settings, LogOut, ChevronLeft, Search,
-} from "lucide-react";
+import Link from "next/link";
+import React, { useState, createContext, useContext } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 
-export function Sidebar({ user, navItems, onLogout }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [search, setSearch] = useState("");
-  const pathname = usePathname();
+const SidebarContext = createContext(undefined);
 
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) throw new Error("useSidebar must be used within a SidebarProvider");
+  return context;
+};
+
+export const SidebarProvider = ({
+  children,
+  open: openProp,
+  setOpen: setOpenProp,
+  animate = true,
+}) => {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp !== undefined ? openProp : openState;
+  const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
   return (
-    <aside className={cn(
-      "flex flex-col h-screen bg-white border-r border-neutral-100 transition-all duration-300 ease-in-out shrink-0",
-      collapsed ? "w-16" : "w-64"
-    )}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-neutral-100">
-        {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-amber-500 flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">N</span>
-            </div>
-            <span className="font-semibold text-neutral-900 text-sm">Newton</span>
-          </div>
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-md hover:bg-neutral-100 transition-colors ml-auto"
-        >
-          <ChevronLeft className={cn(
-            "h-4 w-4 text-neutral-500 transition-transform duration-300",
-            collapsed && "rotate-180"
-          )} />
-        </button>
-      </div>
+    <SidebarContext.Provider value={{ open, setOpen, animate }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
 
-      {/* Search */}
-      {!collapsed && (
-        <div className="p-3 border-b border-neutral-100">
-          <div className="flex items-center gap-2 px-3 py-2 bg-neutral-50 rounded-md border border-neutral-200">
-            <Search className="h-3.5 w-3.5 text-neutral-400 shrink-0" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search..."
-              className="bg-transparent text-sm text-neutral-600 placeholder:text-neutral-400 outline-none w-full"
-            />
-          </div>
-        </div>
+export const Sidebar = ({ children, open, setOpen, animate }) => {
+  return (
+    <SidebarProvider open={open} setOpen={setOpen} animate={animate}>
+      {children}
+    </SidebarProvider>
+  );
+};
+
+export const SidebarBody = (props) => {
+  return (
+    <>
+      <DesktopSidebar {...props} />
+      <MobileSidebar {...props} />
+    </>
+  );
+};
+
+export const DesktopSidebar = ({ className, children, ...props }) => {
+  const { open, setOpen, animate } = useSidebar();
+  return (
+    <motion.div
+      className={cn(
+        "h-full px-2 py-4 hidden md:flex md:flex-col bg-[#222222] border-r border-white/[0.07] flex-shrink-0 overflow-hidden",
+        className
       )}
+      animate={{
+        width: animate ? (open ? "240px" : "56px") : "240px",
+      }}
+      transition={{ duration: 0.28, ease: [0.25, 1.1, 0.4, 1] }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
-      {/* Nav Items */}
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={collapsed ? item.label : ""}
+export const MobileSidebar = ({ className, children, ...props }) => {
+  const { open, setOpen } = useSidebar();
+  return (
+    <>
+      <div
+        className="h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-[#222222] w-full"
+        {...props}
+      >
+        <div className="flex justify-end z-20 w-full">
+          <Menu
+            className="text-white/60 cursor-pointer"
+            onClick={() => setOpen(!open)}
+          />
+        </div>
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ x: "-100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "-100%", opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150",
-                isActive
-                  ? "bg-amber-50 text-amber-700 font-medium"
-                  : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900",
-                collapsed && "justify-center px-2"
+                "fixed h-full w-full inset-0 bg-[#222222] p-10 z-[100] flex flex-col justify-between",
+                className
               )}
             >
-              <item.icon className={cn(
-                "h-4 w-4 shrink-0",
-                isActive ? "text-amber-600" : "text-neutral-400"
-              )} />
-              {!collapsed && <span>{item.label}</span>}
-              {!collapsed && item.badge && (
-                <span className="ml-auto text-xs bg-neutral-100 text-neutral-600 px-1.5 py-0.5 rounded-full">
-                  {item.badge}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Footer */}
-      <div className="p-3 border-t border-neutral-100 space-y-0.5">
-        <Link href="/settings" className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-md text-sm text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-colors",
-          collapsed && "justify-center px-2"
-        )}>
-          <Settings className="h-4 w-4 shrink-0 text-neutral-400" />
-          {!collapsed && <span>Settings</span>}
-        </Link>
-        {onLogout && (
-          <button onClick={onLogout} className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-red-500 hover:bg-red-50 transition-colors",
-            collapsed && "justify-center px-2"
-          )}>
-            <LogOut className="h-4 w-4 shrink-0" />
-            {!collapsed && <span>Logout</span>}
-          </button>
-        )}
-        {!collapsed && user && (
-          <div className="flex items-center gap-3 px-3 py-2 mt-1 rounded-md bg-neutral-50 border border-neutral-100">
-            <div className="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-              <span className="text-xs font-medium text-amber-700">
-                {user.name?.charAt(0)?.toUpperCase() ?? "?"}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-neutral-900 truncate">{user.name}</p>
-              <p className="text-xs text-neutral-400 truncate">{user.role}</p>
-            </div>
-            <div className="w-2 h-2 rounded-full bg-green-400 shrink-0" />
-          </div>
-        )}
+              <div
+                className="absolute right-10 top-10 z-50 text-white/60 cursor-pointer"
+                onClick={() => setOpen(!open)}
+              >
+                <X />
+              </div>
+              {children}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </aside>
+    </>
   );
-}
+};
+
+export const SidebarLink = ({ link, className, ...props }) => {
+  const { open, animate } = useSidebar();
+  return (
+    <Link
+      href={link.href}
+      className={cn(
+        "flex items-center justify-start gap-3 group/sidebar py-2 px-2 rounded-lg hover:bg-white/5 transition-colors",
+        className
+      )}
+      {...props}
+    >
+      {link.icon}
+      <motion.span
+        animate={{
+          display: animate ? (open ? "inline-block" : "none") : "inline-block",
+          opacity: animate ? (open ? 1 : 0) : 1,
+        }}
+        className="text-white/70 text-sm whitespace-pre inline-block !p-0 !m-0"
+      >
+        {link.label}
+      </motion.span>
+    </Link>
+  );
+};

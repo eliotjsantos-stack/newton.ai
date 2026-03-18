@@ -15,6 +15,7 @@ import ChartDiagram from '@/components/ChartDiagram';
 import { useTheme } from '@/components/ThemeProvider';
 import QualificationSelector from '@/components/QualificationSelector';
 import SubjectSidebar from '@/components/SubjectSidebar';
+import NewtonSidebar from '@/components/NewtonSidebar';
 import NewtonMascot from '@/components/NewtonMascot';
 import UnderstandingRatingModal from '@/components/UnderstandingRatingModal';
 
@@ -113,24 +114,24 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
   const linkCount = (linksContent.match(/\[.*?\]\(.*?\)/g) || []).length;
 
   return (
-    <div className="mt-4 border border-amber-200 bg-amber-50 rounded-xl overflow-hidden">
+    <div className="mt-4 border border-[#0071E3]/20 bg-[#0071E3]/10 rounded-xl overflow-hidden">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-amber-100/70 transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#0071E3]/10 transition-colors"
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-[#0071E3]/12 rounded-lg flex items-center justify-center">
             <svg className="w-4 h-4 text-[var(--c-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
           </div>
           <div className="text-left">
-            <p className="text-sm font-semibold text-amber-700">Helpful Resources</p>
-            <p className="text-xs text-amber-600">{linkCount} link{linkCount !== 1 ? 's' : ''} to learn more</p>
+            <p className="text-sm font-semibold text-[#0071E3]">Helpful Resources</p>
+            <p className="text-xs text-[#0071E3]">{linkCount} link{linkCount !== 1 ? 's' : ''} to learn more</p>
           </div>
         </div>
         <svg
-          className={`w-5 h-5 text-amber-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-[#0071E3] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -140,7 +141,7 @@ const LinksCard = memo(function LinksCard({ linksContent, markdownComponents }) 
       </button>
 
       {isExpanded && (
-        <div className="px-4 pb-4 pt-1 border-t border-amber-200">
+        <div className="px-4 pb-4 pt-1 border-t border-[#0071E3]/20">
           <div className="prose prose-sm max-w-none">
             <ReactMarkdown
               remarkPlugins={remarkPlugins}
@@ -217,7 +218,7 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
         {message.files && message.files.length > 0 && (
           <div className="mt-3 space-y-2">
             {message.files.map((file, fileIndex) => (
-              <div key={fileIndex} className="bg-white border border-[var(--c-border)] rounded-xl p-3">
+              <div key={fileIndex} className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-xl p-3">
                 {file.type === 'image' ? (
                   <div>
                     <img
@@ -241,7 +242,7 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
         )}
       </div>
       {isUser && (
-        <div className="w-9 h-9 bg-amber-600 rounded-xl flex items-center justify-center flex-shrink-0">
+        <div className="w-9 h-9 bg-[#0071E3] rounded-xl flex items-center justify-center flex-shrink-0">
           <span className="text-[10px] font-semibold text-white">You</span>
         </div>
       )}
@@ -335,6 +336,7 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   const [currentQanCode, setCurrentQanCode] = useState(null);
   const [userSubjects, setUserSubjects] = useState([]);
   const [activeSubjectId, setActiveSubjectId] = useState(GENERAL_SUBJECT_ID);
+  const [expandedSubjects, setExpandedSubjects] = useState(new Set([GENERAL_SUBJECT_ID]));
 const [isLoadingData, setIsLoadingData] = useState(true);
 const [showReportIssue, setShowReportIssue] = useState(false);
 const [reportIssueText, setReportIssueText] = useState('');
@@ -818,14 +820,14 @@ useChatStorage(chatsBySubject, ['General'], currentSubject, currentChatId);
 
         if (code.includes('xychart') || code.includes('x-axis') || code.includes('y-axis')) {
           return (
-            <div className="my-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <div className="my-4 p-4 bg-[#0071E3]/10 border border-[#0071E3]/20 rounded-xl">
               <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#0071E3] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div>
                   <p className="text-sm font-medium text-amber-800">Graph format not supported</p>
-                  <p className="text-xs text-amber-700 mt-1">
+                  <p className="text-xs text-[#0071E3] mt-1">
                     Newton tried to create a graph using an unsupported format. Please ask Newton to &quot;draw the graph using chart format&quot; instead.
                   </p>
                 </div>
@@ -843,11 +845,11 @@ useChatStorage(chatsBySubject, ['General'], currentSubject, currentChatId);
       }
 
       return inline ? (
-        <code {...props} className="bg-white border border-[var(--c-border)] text-pink-600 px-2 py-0.5 rounded font-mono text-sm">
+        <code {...props} className="bg-[var(--c-card)] border border-[var(--c-border)] text-pink-600 px-2 py-0.5 rounded font-mono text-sm">
           {children}
         </code>
       ) : (
-        <pre className="bg-white border border-[var(--c-border)] p-4 rounded-xl my-3 overflow-x-auto">
+        <pre className="bg-[var(--c-card)] border border-[var(--c-border)] p-4 rounded-xl my-3 overflow-x-auto">
           <code {...props} className={`text-sm font-mono text-[var(--c-text)] block whitespace-pre-wrap leading-relaxed ${className || ''}`}>
             {children}
           </code>
@@ -1158,9 +1160,23 @@ useEffect(() => {
     }
   };
 
+  const toggleSubject = (subject) => {
+    setExpandedSubjects(prev => {
+      const next = new Set(prev);
+      if (next.has(subject.id)) {
+        next.delete(subject.id);
+      } else {
+        next.add(subject.id);
+      }
+      return next;
+    });
+    handleSubjectSelect(subject);
+  };
+
   const handleSubjectSelect = async (subject) => {
     if (currentChatId) triggerBackgroundAnalysis(currentChatId);
     setActiveSubjectId(subject.id);
+    setExpandedSubjects(prev => new Set([...prev, subject.id]));
     setCurrentSubject(subject.name);
 
     // Load history from DB for this subject
@@ -1518,7 +1534,10 @@ const sendMessage = async (e) => {
       abortControllerRef.current = new AbortController();
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('newton-auth-token') || ''}`
+        },
         body: JSON.stringify({
           messages: [...messages, userMessage],
           yearGroup: yearGroup || 'year9',
@@ -1832,7 +1851,7 @@ if (isLoadingData) {
   return (
     <div className="flex h-screen bg-[var(--c-canvas)] items-center justify-center">
       <div className="text-center">
-        <div className="w-16 h-16 bg-amber-600 rounded-2xl flex items-center justify-center mb-4 mx-auto animate-pulse">
+        <div className="w-16 h-16 bg-[#0071E3] rounded-2xl flex items-center justify-center mb-4 mx-auto animate-pulse">
           <span className="text-2xl font-bold text-white">N</span>
         </div>
         <p className="text-[var(--c-text-muted)] font-medium">Loading your chats...</p>
@@ -1853,236 +1872,34 @@ if (isLoadingData) {
 
   return (
    <div className="flex h-screen overflow-hidden bg-[var(--c-canvas)]">
-      {/* Sidebar */}
-      <div
-  className={`${
-    sidebarOpen ? 'w-72' : 'w-0'
-  } flex flex-col transition-all duration-200 overflow-hidden md:relative fixed inset-y-0 left-0 z-50 border-r border-[var(--c-border)] bg-white`}
->
-        {/* Sidebar Header */}
-        <div className="px-5 py-5 border-b border-[var(--c-border)]">
-          <Link
-            href="/chat"
-            className="flex items-center space-x-2.5 mb-5"
-          >
-            <div className="w-8 h-8 bg-amber-600 rounded-xl flex items-center justify-center">
-              <span className="text-sm font-bold text-white">N</span>
-            </div>
-            <span className="text-[15px] font-semibold text-[var(--c-text)] tracking-tight">Newton</span>
-          </Link>
-
-          {currentUserEmail && (
-            <p className="text-[11px] text-[var(--c-text-muted)] truncate mb-3">{currentUserEmail}</p>
-          )}
-
-          <button
-            onClick={startNewChat}
-            className="w-full px-4 py-2.5 bg-[var(--c-accent)] hover:bg-[var(--c-accent-hover)] text-white text-sm font-medium rounded-md transition-colors duration-200"
-          >
-            New conversation
-          </button>
-        </div>
-
-        {/* Subject Sidebar */}
-        <div className="px-3 py-3 border-b border-[var(--c-border)] overflow-y-auto max-h-48">
-          <SubjectSidebar
-            subjects={userSubjects}
-            activeSubjectId={activeSubjectId}
-            onSelect={handleSubjectSelect}
-          />
-        </div>
-
-        {/* Chat List for Current Subject */}
-        <div className="flex-1 overflow-y-auto px-3 py-3">
-          {(() => {
-            let chats = chatsBySubject[currentSubject] || [];
-
-            // Filter chats by search query
-            if (chatSearch.trim()) {
-              chats = chats.filter(chat => {
-                const title = generateChatTitle(chat.messages, chat.title).toLowerCase();
-                const content = chat.messages.map(m => m.content).join(' ').toLowerCase();
-                const query = chatSearch.toLowerCase();
-                return title.includes(query) || content.includes(query);
-              });
-            }
-
-            // Sort: pinned first, then by date
-            chats = [...chats].sort((a, b) => {
-              if (a.pinned && !b.pinned) return -1;
-              if (!a.pinned && b.pinned) return 1;
-              return new Date(b.date) - new Date(a.date);
-            });
-
-            const chatsWithMessages = chats.filter(c => c.messages.length > 0);
-
-            if (chatsWithMessages.length === 0) {
-              return (
-                <div className="text-center py-8 text-[var(--c-text-muted)] text-sm">
-                  No conversations yet
-                </div>
-              );
-            }
-
-            return chatsWithMessages.map((chat, chatIndex) => (
-              <div
-                key={chat.id}
-                className={`relative group animate-fadeIn mb-2 ${menuOpen === `chat-${chat.id}` ? 'z-50' : ''}`}
-                style={{ animationDelay: `${chatIndex * 40}ms` }}
-              >
-                <button
-                  onClick={() => switchChat(chat.id)}
-                  className={`
-                    w-full px-3.5 py-2.5 text-left rounded-xl transition-colors duration-200
-                    ${currentChatId === chat.id
-                      ? 'bg-amber-50 text-amber-700'
-                      : 'hover:bg-[var(--c-canvas)] text-[var(--c-text-muted)]'
-                    }
-                  `}
-                >
-                  <div className="flex items-center gap-2">
-                    {chat.pinned && (
-                      <svg className="w-3 h-3 text-amber-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5v6l1 1 1-1v-6h5v-2l-2-2z"/>
-                      </svg>
-                    )}
-                    <span className="text-sm font-medium text-[var(--c-text)] truncate pr-6">
-                      {generateChatTitle(chat.messages, chat.title)}
-                    </span>
-                  </div>
-                  <div className="text-xs text-[var(--c-text-muted)] mt-1.5">
-                    {new Date(chat.date).toLocaleDateString('en-GB', {
-                      day: 'numeric',
-                      month: 'short'
-                    })}
-                  </div>
-                </button>
-
-                {/* Chat Menu Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setMenuOpen(menuOpen === `chat-${chat.id}` ? null : `chat-${chat.id}`);
-                  }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-[var(--c-canvas)] rounded-lg transition-all duration-250"
-                >
-                  <svg className="w-4 h-4 text-[var(--c-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                  </svg>
-                </button>
-
-                {/* Chat Context Menu */}
-                {menuOpen === `chat-${chat.id}` && (
-                  <div
-                    className="absolute right-2 top-full mt-1 bg-white border border-[var(--c-border)] rounded-xl shadow-lg z-50 min-w-[140px] overflow-hidden animate-scaleIn"
-                  >
-                    <button
-                      onClick={(e) => pinChat(currentSubject, chat.id, e)}
-                      className="w-full text-left px-4 py-2.5 hover:bg-[var(--c-canvas)] text-[var(--c-text)] text-sm font-medium transition-colors flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4 text-amber-500" fill={chat.pinned ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5v6l1 1 1-1v-6h5v-2l-2-2z"/>
-                      </svg>
-                      {chat.pinned ? 'Unpin' : 'Pin'}
-                    </button>
-                    <button
-                      onClick={(e) => archiveChat(currentSubject, chat.id, e)}
-                      className="w-full text-left px-4 py-2.5 hover:bg-[var(--c-canvas)] text-[var(--c-text)] text-sm font-medium transition-colors flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                      </svg>
-                      Archive
-                    </button>
-                    <div className="h-px bg-gray-100"></div>
-                    <button
-                      onClick={(e) => deleteChat(currentSubject, chat.id, e)}
-                      className="w-full text-left px-4 py-2.5 hover:bg-red-50 text-red-500 text-sm font-medium transition-colors flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-            ));
-          })()}
-        </div>
-
-        {/* Sidebar Footer */}
-        <div className="p-4 border-t border-[var(--c-border)] bg-white space-y-2">
-          {/* Navigation Links */}
-          <div className="flex gap-2">
-            <Link
-              href="/dashboard"
-              className="flex-1 px-3 py-2.5 text-[var(--c-text-muted)] hover:text-[var(--c-text)] hover:bg-[var(--c-canvas)] rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-              </svg>
-              Dashboard
-            </Link>
-            <Link
-              href="/quiz"
-              className="flex-1 px-3 py-2.5 text-[var(--c-text-muted)] hover:text-[var(--c-text)] hover:bg-[var(--c-canvas)] rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
-              </svg>
-              Quizzes
-            </Link>
-          </div>
-          {/* Archive & Settings */}
-          <div className="flex gap-2">
-            <Link
-              href="/chat/archive"
-              className="flex-1 px-4 py-3 bg-white border border-[var(--c-border)] text-[var(--c-text-muted)] rounded-md text-sm font-medium hover:bg-[var(--c-canvas)] transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-              <span>Archive</span>
-              {Object.values(archivedChats).flat().length > 0 && (
-                <span className="bg-[var(--c-canvas)] text-[var(--c-text-muted)] text-xs px-1.5 py-0.5 rounded-full">
-                  {Object.values(archivedChats).flat().length}
-                </span>
-              )}
-            </Link>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="px-4 py-3 bg-white border border-[var(--c-border)] text-[var(--c-text-muted)] rounded-md text-sm font-medium hover:bg-[var(--c-canvas)] transition-all duration-300"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <NewtonSidebar
+        currentSubject={currentSubject}
+        currentChatId={currentChatId}
+        chatsBySubject={chatsBySubject}
+        userSubjects={userSubjects}
+        currentUserEmail={currentUserEmail}
+        yearGroup={yearGroup}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        onNewChat={startNewChat}
+        onSwitchChat={switchChat}
+        onSwitchSubject={handleSubjectSelect}
+        onShowSettings={() => setShowSettings(true)}
+        archivedChats={archivedChats}
+        showLinkRecommendations={showLinkRecommendations}
+        setShowLinkRecommendations={setShowLinkRecommendations}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        onPinChat={pinChat}
+        onArchiveChat={archiveChat}
+        onDeleteChat={deleteChat}
+      />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative">
         {/* Header */}
-        <div className="h-12 border-b border-[var(--c-border)] flex items-center justify-between px-4 sm:px-6 bg-white">
+        <div className="h-12 border-b border-[var(--c-border)] flex items-center justify-between px-4 sm:px-6 bg-[var(--c-card)]">
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-[var(--c-canvas)] rounded-xl transition-colors duration-200"
-            >
-              <svg className="w-5 h-5 text-[var(--c-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
             <div>
               <h1 className="text-sm font-semibold text-[var(--c-text)]">{currentSubject}</h1>
             </div>
@@ -2236,11 +2053,11 @@ if (isLoadingData) {
               {isTyping && (
                 <div ref={typingIndicatorRef} className="flex gap-4 justify-start animate-fadeIn">
                   <div className="w-[52px] h-[52px] flex-shrink-0" />
-                  <div className="bg-white border border-[var(--c-border)] rounded-2xl px-5 py-4 shadow-sm">
+                  <div className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-2xl px-5 py-4 shadow-sm">
                     <div className="flex gap-1.5">
-                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1.4s' }} />
-                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1.4s' }} />
-                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1.4s' }} />
+                      <div className="w-2 h-2 bg-[#0071E3] rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1.4s' }} />
+                      <div className="w-2 h-2 bg-[#0071E3] rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1.4s' }} />
+                      <div className="w-2 h-2 bg-[#0071E3] rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1.4s' }} />
                     </div>
                   </div>
                 </div>
@@ -2251,25 +2068,23 @@ if (isLoadingData) {
           )}
         </div>
 
-      </div>
-
-      {/* ── Input Area (fixed bottom, centered) ── */}
-      <div className={`fixed bottom-0 ${sidebarOpen ? 'md:left-72' : 'left-0'} right-0 ${sidebarOpen ? 'z-[30] md:z-[100]' : 'z-[100]'} flex flex-col items-center pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 pointer-events-none`} style={{ background: 'linear-gradient(to top, var(--c-canvas) 50%, transparent)' }}>
+      {/* ── Input Area ── */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 pointer-events-none" style={{ background: 'linear-gradient(to top, var(--c-canvas) 50%, transparent)' }}>
         <div className="w-full max-w-3xl px-4 pointer-events-auto">
           <form onSubmit={sendMessage}>
             {/* File Upload Preview */}
             {uploadedFiles.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-2">
                 {uploadedFiles.map((file, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
-                    <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div key={index} className="flex items-center gap-2 bg-[#0071E3]/100/10 border border-amber-500/20 rounded-xl px-3 py-2">
+                    <svg className="w-4 h-4 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       {file.type.startsWith('image/') ? (
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       ) : (
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                       )}
                     </svg>
-                    <span className="text-sm font-semibold text-amber-700">{file.name}</span>
+                    <span className="text-sm font-semibold text-[#0071E3]">{file.name}</span>
                     <button
                       type="button"
                       onClick={() => removeFile(index)}
@@ -2285,19 +2100,19 @@ if (isLoadingData) {
             )}
 
             <div
-              className="relative flex flex-col rounded-md border border-[var(--c-border)] focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/25 transition-colors duration-200 shadow-sm bg-white"
+              className="relative flex flex-col rounded-md border border-[var(--c-border)] focus-within:border-[#0071E3] focus-within:ring-2 focus-within:ring-[#0071E3]/25 transition-colors duration-200 shadow-sm bg-[var(--c-card)]"
               onDragOver={handleFileDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
               {isDragging && (
-                <div className="absolute inset-0 bg-amber-500/10 border-4 border-dashed border-amber-400/50 flex items-center justify-center z-10">
+                <div className="absolute inset-0 bg-[#0071E3]/100/10 border-4 border-dashed border-amber-400/50 flex items-center justify-center z-10">
                   <div className="text-center">
-                    <svg className="w-12 h-12 mx-auto mb-2 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-12 h-12 mx-auto mb-2 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
-                    <p className="text-amber-600 font-bold">Drop files here</p>
-                    <p className="text-amber-500 text-sm">Images (max 10MB)</p>
+                    <p className="text-[#0071E3] font-bold">Drop files here</p>
+                    <p className="text-[#0071E3] text-sm">Images (max 10MB)</p>
                   </div>
                 </div>
               )}
@@ -2368,7 +2183,7 @@ if (isLoadingData) {
                   <button
                     type="submit"
                     disabled={!input.trim()}
-                    className="p-2 bg-amber-600 hover:bg-amber-700 text-white rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
+                    className="p-2 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -2381,13 +2196,14 @@ if (isLoadingData) {
         </div>
 
       </div>
+      </div>
 
       {/* Premium Year Group Modal */}
       {showYearModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[150] p-6 animate-fadeIn">
-          <div className="bg-white border border-[var(--c-border)] rounded-3xl shadow-xl max-w-lg w-full overflow-hidden animate-scaleIn">
+          <div className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-3xl shadow-xl max-w-lg w-full overflow-hidden animate-scaleIn">
             <div className="p-10 text-center">
-              <div className="w-20 h-20 mx-auto bg-amber-600 rounded-3xl flex items-center justify-center mb-8">
+              <div className="w-20 h-20 mx-auto bg-[#0071E3] rounded-3xl flex items-center justify-center mb-8">
                 <span className="text-3xl font-bold text-white">N</span>
               </div>
               <h2 className="text-3xl font-extrabold text-[var(--c-text)] mb-4 tracking-tight">Welcome to Newton!</h2>
@@ -2399,7 +2215,7 @@ if (isLoadingData) {
                   <button
                     key={option.value}
                     onClick={() => saveYearGroup(option.value)}
-                    className="px-6 py-4 bg-[var(--c-canvas)] hover:bg-amber-50 hover:border-amber-300 border border-[var(--c-border)] rounded-2xl text-left text-[var(--c-text)] font-semibold transition-all duration-200 hover:scale-105 active:scale-95 animate-slideUp"
+                    className="px-6 py-4 bg-[var(--c-canvas)] hover:bg-[#0071E3]/10 hover:border-[#0071E3]/25 border border-[var(--c-border)] rounded-2xl text-left text-[var(--c-text)] font-semibold transition-all duration-200 hover:scale-105 active:scale-95 animate-slideUp"
                     style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'both' }}
                   >
                     {option.label}
@@ -2414,9 +2230,9 @@ if (isLoadingData) {
       {/* Course Selection Modal (onboarding step 2) */}
       {showCourseModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[150] p-6 animate-fadeIn">
-          <div className="bg-white border border-[var(--c-border)] rounded-3xl shadow-xl max-w-lg w-full overflow-hidden animate-scaleIn">
+          <div className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-3xl shadow-xl max-w-lg w-full overflow-hidden animate-scaleIn">
             <div className="p-10 text-center">
-              <div className="w-20 h-20 mx-auto bg-amber-600 rounded-3xl flex items-center justify-center mb-8">
+              <div className="w-20 h-20 mx-auto bg-[#0071E3] rounded-3xl flex items-center justify-center mb-8">
                 <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
@@ -2435,7 +2251,7 @@ if (isLoadingData) {
               </div>
               <button
                 onClick={() => setShowCourseModal(false)}
-                className="mt-6 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
+                className="mt-6 text-sm font-medium text-white/40 hover:text-white/60 transition-colors"
               >
                 I&apos;ll set this later
               </button>
@@ -2451,7 +2267,7 @@ if (isLoadingData) {
           onClick={() => { setShowSettings(false); setShowDeleteConfirm(false); }}
         >
           <div
-            className="bg-white border border-[var(--c-border)] rounded-3xl shadow-xl w-full max-w-[95vw] md:max-w-2xl overflow-hidden animate-scaleIn"
+            className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-3xl shadow-xl w-full max-w-[95vw] md:max-w-2xl overflow-hidden animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -2486,8 +2302,8 @@ if (isLoadingData) {
                         }}
                         className={`px-3 py-3 rounded-xl text-left text-sm font-semibold transition-all active:scale-95 ${
                           yearGroup === option.value
-                            ? 'bg-amber-600 text-white'
-                            : 'bg-[var(--c-canvas)] text-[var(--c-text)] hover:bg-amber-50 border border-[var(--c-border)]'
+                            ? 'bg-[#0071E3] text-white'
+                            : 'bg-[var(--c-canvas)] text-[var(--c-text)] hover:bg-[#0071E3]/10 border border-[var(--c-border)]'
                         }`}
                       >
                         {option.label}
@@ -2520,7 +2336,7 @@ if (isLoadingData) {
                           <button
                             onClick={() => setShowDeleteConfirm(false)}
                             disabled={deletingAccount}
-                            className="flex-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
+                            className="flex-1 px-3 py-2 bg-white/5 hover:bg-white/8 text-white/70 rounded-lg text-sm font-semibold transition-colors"
                           >
                             Cancel
                           </button>
@@ -2551,15 +2367,15 @@ if (isLoadingData) {
                 <div>
                   <label className="text-xs font-bold text-[var(--c-text-muted)] uppercase tracking-wider block mb-3">Preferences</label>
                   <div
-                    className="flex items-center justify-between p-3 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-xl cursor-pointer hover:bg-amber-50 transition-colors"
+                    className="flex items-center justify-between p-3 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-xl cursor-pointer hover:bg-[#0071E3]/10 transition-colors"
                     onClick={() => setShowLinkRecommendations(!showLinkRecommendations)}
                   >
                     <div>
                       <p className="text-sm font-semibold text-[var(--c-text)]">Link Recommendations</p>
                       <p className="text-xs text-[var(--c-text-muted)]">Show resources after each response</p>
                     </div>
-                    <div className={`w-10 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-3 ${showLinkRecommendations ? 'bg-amber-600' : 'bg-gray-300'}`}>
-                      <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${showLinkRecommendations ? 'translate-x-5' : 'translate-x-1'}`} />
+                    <div className={`w-10 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-3 ${showLinkRecommendations ? 'bg-[#0071E3]' : 'bg-white/20'}`}>
+                      <div className={`w-4 h-4 bg-[var(--c-card)] rounded-full shadow-md transform transition-transform duration-200 mt-1 ${showLinkRecommendations ? 'translate-x-5' : 'translate-x-1'}`} />
                     </div>
                   </div>
                 </div>
@@ -2570,7 +2386,7 @@ if (isLoadingData) {
                       setShowSettings(false);
                       startTutorial();
                     }}
-                    className="w-full px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -2629,7 +2445,7 @@ if (isLoadingData) {
           {/* Animated spotlight borders */}
           {tutorialStep === 1 && sidebarOpen && buttonPositions.newConv && (
   <div
-    className="absolute border-4 border-amber-500 rounded-2xl animate-pulse-slow pointer-events-none"
+    className="absolute border-4 border-[#0071E3]/40 rounded-2xl animate-pulse-slow pointer-events-none"
     style={{
       top: `${buttonPositions.newConv.top}px`,
       left: `${buttonPositions.newConv.left}px`,
@@ -2642,7 +2458,7 @@ if (isLoadingData) {
 
 {tutorialStep === 2 && sidebarOpen && buttonPositions.general && (
   <div
-    className="absolute border-4 border-amber-500 rounded-xl animate-pulse-slow pointer-events-none"
+    className="absolute border-4 border-[#0071E3]/40 rounded-xl animate-pulse-slow pointer-events-none"
     style={{
       top: `${buttonPositions.general.top}px`,
       left: `${buttonPositions.general.left}px`,
@@ -2668,7 +2484,7 @@ if (isLoadingData) {
 
 {tutorialStep === 5 && sidebarOpen && currentUserEmail && buttonPositions.dashboard && (
   <div
-    className="absolute border-4 border-amber-500 rounded-xl animate-pulse-slow pointer-events-none"
+    className="absolute border-4 border-[#0071E3]/40 rounded-xl animate-pulse-slow pointer-events-none"
     style={{
       top: `${buttonPositions.dashboard.top}px`,
       left: `${buttonPositions.dashboard.left}px`,
@@ -2683,8 +2499,8 @@ if (isLoadingData) {
           {/* Tutorial content cards */}
           {tutorialStep === 0 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-white border border-[var(--c-border)] rounded-3xl shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-12 text-center animate-scaleIn">
-                <div className="w-24 h-24 mx-auto bg-amber-600 rounded-3xl flex items-center justify-center mb-8">
+              <div className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-3xl shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-12 text-center animate-scaleIn">
+                <div className="w-24 h-24 mx-auto bg-[#0071E3] rounded-3xl flex items-center justify-center mb-8">
                   <span className="text-4xl font-bold text-white">N</span>
                 </div>
                 <h2 className="text-2xl sm:text-4xl font-extrabold text-[var(--c-text)] mb-4">Welcome to Newton!</h2>
@@ -2694,13 +2510,13 @@ if (isLoadingData) {
                 <div className="flex gap-4 justify-center">
                   <button
                     onClick={skipTutorial}
-                    className="px-6 py-3 bg-[var(--c-canvas)] text-[var(--c-text)] rounded-xl font-semibold hover:bg-amber-50 transition-all"
+                    className="px-6 py-3 bg-[var(--c-canvas)] text-[var(--c-text)] rounded-xl font-semibold hover:bg-[#0071E3]/10 transition-all"
                   >
                     Skip Tour
                   </button>
                   <button
                     onClick={nextTutorialStep}
-                    className="px-8 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold transition-colors duration-200"
+                    className="px-8 py-3 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-xl font-semibold transition-colors duration-200"
                   >
                     Start Tour →
                   </button>
@@ -2711,14 +2527,14 @@ if (isLoadingData) {
 
           {tutorialStep === 1 && (
   <div
-    className="absolute bg-white border border-[var(--c-border)] rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
+    className="absolute bg-[var(--c-card)] border border-[var(--c-border)] rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '285px',
       left: sidebarOpen ? '300px' : '50px',
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-[#0071E3] rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 1
               </div>
               <h3 className="text-xl font-bold text-[var(--c-text)] mb-2">New Conversations</h3>
@@ -2731,7 +2547,7 @@ if (isLoadingData) {
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Next →
                 </button>
@@ -2741,14 +2557,14 @@ if (isLoadingData) {
 
           {tutorialStep === 2 && (
   <div
-    className="absolute bg-white border border-[var(--c-border)] rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
+    className="absolute bg-[var(--c-card)] border border-[var(--c-border)] rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '315px',
       left: sidebarOpen ? '265px' : '50px',
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-[#0071E3] rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 2
               </div>
               <h3 className="text-xl font-bold text-[var(--c-text)] mb-2">Organize by Subject</h3>
@@ -2761,7 +2577,7 @@ if (isLoadingData) {
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Next →
                 </button>
@@ -2771,29 +2587,29 @@ if (isLoadingData) {
 
           {tutorialStep === 3 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-white border border-[var(--c-border)] rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-3xl w-full p-5 sm:p-10 animate-scaleIn">
-                <div className="absolute -top-3 -left-3 w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-3xl shadow-2xl max-w-[calc(100vw-3rem)] sm:max-w-3xl w-full p-5 sm:p-10 animate-scaleIn">
+                <div className="absolute -top-3 -left-3 w-8 h-8 bg-[#0071E3] rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                   3
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-[var(--c-text)] mb-6">How Newton Helps You Learn</h3>
 
                 <div className="bg-[var(--c-canvas)] rounded-2xl p-6 mb-6">
                   <div className="flex gap-4 mb-4">
-                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-      <span className="text-xs font-bold text-amber-700">You</span>
+                    <div className="w-10 h-10 bg-[#0071E3]/12 rounded-xl flex items-center justify-center flex-shrink-0">
+      <span className="text-xs font-bold text-[#0071E3]">You</span>
     </div>
-                    <div className="flex-1 bg-white border border-[var(--c-border)] rounded-xl p-4 shadow-sm">
+                    <div className="flex-1 bg-[var(--c-card)] border border-[var(--c-border)] rounded-xl p-4 shadow-sm">
                       <p className="text-[var(--c-text)]">What's the answer to 2x + 5 = 15?</p>
                     </div>
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-amber-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-[#0071E3] rounded-xl flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-white">N</span>
                     </div>
-                    <div className="flex-1 bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
+                    <div className="flex-1 bg-[#0071E3]/10 rounded-xl p-4 border-2 border-[#0071E3]/20">
                       <p className="text-[var(--c-text)] mb-3">Great question! Let's work through this together. First, what do you think we should do to get x by itself?</p>
-                      <p className="text-sm text-amber-700 font-semibold">Newton guides you to discover answers yourself!</p>
+                      <p className="text-sm text-[#0071E3] font-semibold">Newton guides you to discover answers yourself!</p>
                     </div>
                   </div>
                 </div>
@@ -2805,8 +2621,8 @@ if (isLoadingData) {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
       </svg>
     </div>
-    <p className="font-semibold text-gray-900 mb-1">Newton Will:</p>
-    <ul className="text-sm text-gray-600 space-y-1">
+    <p className="font-semibold text-white mb-1">Newton Will:</p>
+    <ul className="text-sm text-white/60 space-y-1">
       <li>• Ask guiding questions</li>
       <li>• Explain step-by-step</li>
       <li>• Help you understand deeply</li>
@@ -2819,8 +2635,8 @@ if (isLoadingData) {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
       </svg>
     </div>
-    <p className="font-semibold text-gray-900 mb-1">Newton Won't:</p>
-    <ul className="text-sm text-gray-600 space-y-1">
+    <p className="font-semibold text-white mb-1">Newton Won't:</p>
+    <ul className="text-sm text-white/60 space-y-1">
       <li>• Do your homework</li>
       <li>• Give direct answers</li>
       <li>• Write your essays</li>
@@ -2834,7 +2650,7 @@ if (isLoadingData) {
                   </button>
                   <button
                     onClick={nextTutorialStep}
-                    className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold transition-colors duration-200"
+                    className="px-6 py-3 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-xl font-semibold transition-colors duration-200"
                   >
                     Next →
                   </button>
@@ -2845,7 +2661,7 @@ if (isLoadingData) {
 
           {tutorialStep === 4 && (
             <div
-              className="absolute bg-white border border-[var(--c-border)] rounded-2xl p-6 shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-sm animate-slideIn pointer-events-auto left-1/2 -translate-x-1/2 bottom-24 sm:bottom-auto sm:left-auto sm:translate-x-0 sm:top-[80px] sm:right-[50px]"
+              className="absolute bg-[var(--c-card)] border border-[var(--c-border)] rounded-2xl p-6 shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-sm animate-slideIn pointer-events-auto left-1/2 -translate-x-1/2 bottom-24 sm:bottom-auto sm:left-auto sm:translate-x-0 sm:top-[80px] sm:right-[50px]"
               style={{
                 zIndex: 102
               }}
@@ -2863,7 +2679,7 @@ if (isLoadingData) {
                 </button>
                 <button
                   onClick={nextTutorialStep}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   {currentUserEmail ? 'Next →' : 'Finish! 🚀'}
                 </button>
@@ -2873,14 +2689,14 @@ if (isLoadingData) {
 
           {tutorialStep === 5 && currentUserEmail && (
   <div
-    className="absolute bg-white border border-[var(--c-border)] rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
+    className="absolute bg-[var(--c-card)] border border-[var(--c-border)] rounded-2xl p-6 shadow-xl max-w-sm animate-slideIn pointer-events-auto"
     style={{
       top: '230px',
       left: sidebarOpen ? '300px' : '50px',
       zIndex: 102
     }}
             >
-              <div className="absolute -top-3 -left-3 w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-[#0071E3] rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                 5
               </div>
               <h3 className="text-xl font-bold text-[var(--c-text)] mb-2">Your Dashboard</h3>
@@ -2895,7 +2711,7 @@ if (isLoadingData) {
                   onClick={() => {
                     window.location.href = '/dashboard?tutorial=true';
                   }}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold transition-colors duration-200"
+                  className="px-4 py-2 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-lg font-semibold transition-colors duration-200"
                 >
                   Visit Dashboard →
                 </button>
@@ -2905,7 +2721,7 @@ if (isLoadingData) {
 
           {tutorialStep === 6 && (
             <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-auto" style={{ zIndex: 102 }}>
-              <div className="bg-white border border-[var(--c-border)] rounded-3xl shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-10 text-center animate-scaleIn">
+              <div className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-3xl shadow-xl max-w-[calc(100vw-3rem)] sm:max-w-2xl w-full p-6 sm:p-10 text-center animate-scaleIn">
                 <div className="w-20 h-20 mx-auto bg-emerald-500 rounded-3xl flex items-center justify-center mb-6">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -2934,7 +2750,7 @@ if (isLoadingData) {
           onClick={() => setShowReportIssue(false)}
         >
           <div
-            className="bg-white border border-[var(--c-border)] rounded-3xl shadow-xl max-w-2xl w-full overflow-hidden animate-scaleIn"
+            className="bg-[var(--c-card)] border border-[var(--c-border)] rounded-3xl shadow-xl max-w-2xl w-full overflow-hidden animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-10">
@@ -2963,17 +2779,17 @@ if (isLoadingData) {
                     onChange={(e) => setReportIssueText(e.target.value)}
                     placeholder="Please describe what happened, what you expected, and any steps to reproduce the issue..."
                     rows={6}
-                    className="w-full px-4 py-3 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/25 focus:border-amber-500 transition-all text-[var(--c-text)] placeholder:text-[var(--c-text-muted)]"
+                    className="w-full px-4 py-3 bg-[var(--c-canvas)] border border-[var(--c-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0071E3]/30/25 focus:border-[#0071E3]/40 transition-all text-[var(--c-text)] placeholder:text-[var(--c-text-muted)]"
                   />
                 </div>
 
-                <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <div className="flex items-center gap-3 p-4 bg-[#0071E3]/10 border border-[#0071E3]/20 rounded-xl">
                   <input
                     type="checkbox"
                     id="includeChat"
                     checked={includeChat}
                     onChange={(e) => setIncludeChat(e.target.checked)}
-                    className="w-5 h-5 text-amber-600 rounded focus:ring-2 focus:ring-amber-500"
+                    className="w-5 h-5 text-[#0071E3] rounded focus:ring-2 focus:ring-[#0071E3]/30"
                   />
                   <label htmlFor="includeChat" className="text-sm font-semibold text-[var(--c-text)] cursor-pointer flex-1">
                     Include current chat conversation (helps us debug faster)
@@ -2989,7 +2805,7 @@ if (isLoadingData) {
                       <span className="text-sm font-semibold text-emerald-700">Screenshot attached</span>
                       <button
                         onClick={() => setScreenshot(null)}
-                        className="ml-auto text-xs text-gray-400 hover:text-red-500 font-semibold transition-colors"
+                        className="ml-auto text-xs text-white/40 hover:text-red-500 font-semibold transition-colors"
                       >
                         Remove
                       </button>
@@ -3003,7 +2819,7 @@ if (isLoadingData) {
                       setShowReportIssue(false);
                       setScreenshot(null);
                     }}
-                    className="flex-1 px-6 py-3 bg-[var(--c-canvas)] text-[var(--c-text)] rounded-xl font-semibold hover:bg-amber-50 transition-all duration-250"
+                    className="flex-1 px-6 py-3 bg-[var(--c-canvas)] text-[var(--c-text)] rounded-xl font-semibold hover:bg-[#0071E3]/10 transition-all duration-250"
                   >
                     Cancel
                   </button>
