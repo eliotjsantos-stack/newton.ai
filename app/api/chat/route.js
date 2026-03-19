@@ -613,11 +613,50 @@ export async function POST(req) {
       return { role: msg.role, content: msg.content };
     });
 
+    // Compress long conversations to cap token costs
+    let messagesForApi = processedMessages;
+    if (processedMessages.length >= 20) {
+      try {
+        const toCompress = processedMessages.slice(0, processedMessages.length - 6);
+        const recent = processedMessages.slice(processedMessages.length - 6);
+
+        const transcriptText = toCompress.map(m => {
+          const role = m.role === 'user' ? '[Student]' : '[Newton]';
+          const text = typeof m.content === 'string' ? m.content : m.content.find(c => c.type === 'text')?.text || '';
+          return `${role}: ${text}`;
+        }).join('\n');
+
+        const summaryResponse = await anthropic.messages.create({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 250,
+          system: 'You are summarising a tutoring conversation for context compression. Write a concise paragraph (max 200 words) covering: what subject and topic the student was working on, what concepts were covered, what the student struggled with, what they came to understand, any mistakes they made and corrections given, and any important context Newton should remember to avoid repeating itself. Write in third person. Be factual, dense, and brief.',
+          messages: [{ role: 'user', content: transcriptText }],
+        });
+
+        const summary = summaryResponse.content[0]?.text || '';
+        if (summary) {
+          messagesForApi = [
+            { role: 'user', content: `[Conversation summary — everything discussed before these recent messages: ${summary}]` },
+            ...recent,
+          ];
+        }
+      } catch {
+        // Compression failed — fall back to full messages, never break chat
+        messagesForApi = processedMessages;
+      }
+    }
+
     const anthropicStream = anthropic.messages.stream({
       model: CHAT_MODEL,
       max_tokens: 4096,
-      system: fullPrompt,
-      messages: processedMessages,
+      system: [
+        {
+          type: "text",
+          text: fullPrompt,
+          cache_control: { type: "ephemeral" }
+        }
+      ],
+      messages: messagesForApi,
     });
 
     const encoder = new TextEncoder();

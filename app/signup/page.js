@@ -17,6 +17,8 @@ export default function SignupPage() {
   const [devCode, setDevCode] = useState('');
   const [accountType, setAccountType] = useState('student');
   const [teacherCode, setTeacherCode] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [fullName, setFullName] = useState('');
   const [preferredTitle, setPreferredTitle] = useState('');
   const [customTitle, setCustomTitle] = useState('');
@@ -97,7 +99,7 @@ export default function SignupPage() {
       const response = await fetch('/api/auth/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code, password, yearGroup: accountType === 'teacher' ? null : yearGroup, accountType, teacherCode: accountType === 'teacher' ? teacherCode : undefined, fullName: accountType === 'teacher' ? fullName.trim() : undefined, preferredTitle: accountType === 'teacher' ? titleToSave : undefined })
+        body: JSON.stringify({ email, code, password, yearGroup: accountType === 'teacher' ? null : yearGroup, accountType, teacherCode: accountType === 'teacher' ? teacherCode : undefined, fullName: accountType === 'teacher' ? fullName.trim() : `${firstName.trim()} ${lastName.trim()}`.trim(), preferredTitle: accountType === 'teacher' ? titleToSave : undefined })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Failed to create account');
@@ -283,6 +285,19 @@ export default function SignupPage() {
                     )}
                   </div>
                 </>
+              )}
+
+              {accountType === 'student' && (
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">First name</label>
+                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Eliot" required className={inputClass} />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-[var(--c-text-soft)] mb-1.5 uppercase tracking-wide">Last name</label>
+                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Santos" required className={inputClass} />
+                  </div>
+                </div>
               )}
 
               {accountType === 'teacher' ? (

@@ -86,7 +86,7 @@ export async function POST(req) {
         year_group: accountType === 'teacher' ? 'teacher' : yearGroup,
         is_verified: true,
         account_type: accountType,
-        ...(accountType === 'teacher' && fullName ? { full_name: fullName } : {}),
+        ...(fullName ? { full_name: fullName } : {}),
         ...(accountType === 'teacher' && preferredTitle ? { preferred_title: preferredTitle } : {}),
       })
       .select()

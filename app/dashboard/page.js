@@ -200,7 +200,7 @@ export default function Dashboard() {
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const firstName = user?.name?.split(' ')[0] || 'there';
+  const firstName = user?.fullName?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--c-canvas)]">
