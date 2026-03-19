@@ -198,8 +198,10 @@ const MessageItem = memo(function MessageItem({ message, index, markdownComponen
         <div className="w-[52px] h-[52px] flex-shrink-0" />
       )}
       <div
-        className={`max-w-[75%] px-1 py-1 ${
-          isUser ? 'text-[var(--c-text)]' : 'text-[var(--c-text)]'
+        className={`max-w-[75%] ${
+          isUser
+            ? 'px-4 py-3 bg-white/[0.06] border border-white/[0.09] rounded-2xl rounded-tr-sm text-[var(--c-text)]'
+            : 'px-1 py-1 text-[var(--c-text)]'
         }`}
       >
         <ReactMarkdown
