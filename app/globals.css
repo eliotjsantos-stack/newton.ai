@@ -38,8 +38,8 @@
   /* Text */
   --c-text:         #F2F2F7;
   --c-text-soft:    #8B8B99;
-  --c-text-muted:   #5A5A68;
-  --c-text-faint:   #3A3A48;
+  --c-text-muted:   #8E8E9E;
+  --c-text-faint:   #6A6A7A;
 
   /* Accent — blue, CTAs only */
   --c-accent:       #0071E3;
