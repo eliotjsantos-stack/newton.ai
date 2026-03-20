@@ -296,6 +296,7 @@ const [chatsBySubject, setChatsBySubject] = useState(() => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [mascotExpression, setMascotExpression] = useState('idle');
   const [mascotDropping, setMascotDropping] = useState(false);
@@ -462,6 +463,9 @@ useChatStorage(chatsBySubject, ['General'], currentSubject, currentChatId);
       console.error('Background analysis error:', error);
     }
   };
+
+  // Reset rate limit notice when subject or chat changes
+  useEffect(() => { setRateLimited(false); }, [currentSubject, currentChatId]);
 
   // Trigger background analysis when leaving the page or switching tabs
   useEffect(() => {
@@ -1551,6 +1555,13 @@ const sendMessage = async (e) => {
         signal: abortControllerRef.current.signal,
       });
 
+      if (response.status === 429) {
+        setRateLimited(true);
+        setIsLoading(false);
+        setIsTyping(false);
+        return;
+      }
+
       if (!response.ok) throw new Error('Failed to get response');
 
       const reader = response.body.getReader();
@@ -2069,7 +2080,15 @@ if (isLoadingData) {
 
       {/* ── Input Area ── */}
       <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 pointer-events-none" style={{ background: 'linear-gradient(to top, var(--c-canvas) 50%, transparent)' }}>
-        <div className="w-full max-w-3xl px-4 pointer-events-auto">
+        <div className={`w-full max-w-3xl px-4 pointer-events-auto${rateLimited ? ' opacity-60 pointer-events-none' : ''}`}>
+          {rateLimited && (
+            <div className="mb-2 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[var(--c-card)] border border-[var(--c-border)] text-sm text-[var(--c-text-muted)]">
+              <svg className="w-4 h-4 shrink-0 text-[var(--c-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><span className="font-medium text-[var(--c-text)]">Daily limit reached</span> — You've used your 30 messages for today. Resets at midnight.</span>
+            </div>
+          )}
           <form onSubmit={sendMessage}>
             {/* File Upload Preview */}
             {uploadedFiles.length > 0 && (
@@ -2128,8 +2147,9 @@ if (isLoadingData) {
                       sendMessage(e);
                     }
                   }}
-                  placeholder={`Ask about ${currentSubject.toLowerCase()}...`}
-                  className="w-full px-4 pt-3 pb-2 bg-transparent resize-none focus:outline-none text-[var(--c-text)] placeholder-[var(--c-text-muted)] overflow-y-auto"
+                  placeholder={rateLimited ? 'Daily limit reached — resets at midnight' : `Ask about ${currentSubject.toLowerCase()}...`}
+                  disabled={rateLimited}
+                  className="w-full px-4 pt-3 pb-2 bg-transparent resize-none focus:outline-none text-[var(--c-text)] placeholder-[var(--c-text-muted)] overflow-y-auto disabled:cursor-not-allowed"
                   rows={1}
                   style={{
                     minHeight: '44px',
@@ -2181,7 +2201,7 @@ if (isLoadingData) {
                 ) : (
                   <button
                     type="submit"
-                    disabled={!input.trim()}
+                    disabled={!input.trim() || rateLimited}
                     className="p-2 bg-[#0071E3] hover:bg-[#0058B3] text-white rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
