@@ -28,7 +28,7 @@ export default function GradeCurveDemo() {
             <span className="text-[11px] text-gray-500">Passive</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-600" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#0071E3]" />
             <span className="text-[11px] text-gray-500">Active</span>
           </div>
         </div>
