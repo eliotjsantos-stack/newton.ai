@@ -446,6 +446,131 @@ function HowItWorksSection() {
   );
 }
 
+/* ─── Safeguarding Section ─── */
+const MOCK_FLAGS = [
+  { level: 5, label: 'URGENT', student: 'Student A', subject: 'English', summary: 'Expressed feelings of hopelessness and self-harm', time: 'just now', color: 'red' },
+  { level: 4, label: 'HIGH', student: 'Student B', subject: 'General', summary: 'Described a situation consistent with domestic distress', time: '2 min ago', color: 'orange' },
+  { level: 3, label: 'CONCERN', student: 'Student C', subject: 'History', summary: 'Showed signs of persistent anxiety and social isolation', time: '11 min ago', color: 'yellow' },
+  { level: 2, label: 'LOW', student: 'Student D', subject: 'Maths', summary: 'Mentioned stress around exams and parental pressure', time: '34 min ago', color: 'blue' },
+];
+
+const FLAG_COLORS = {
+  red:    { bar: 'bg-red-500',    badge: 'bg-red-500/15 text-red-400 border-red-500/30',    dot: 'bg-red-500' },
+  orange: { bar: 'bg-orange-500', badge: 'bg-orange-500/15 text-orange-400 border-orange-500/30', dot: 'bg-orange-500' },
+  yellow: { bar: 'bg-yellow-500', badge: 'bg-yellow-400/15 text-yellow-400 border-yellow-400/30', dot: 'bg-yellow-400' },
+  blue:   { bar: 'bg-blue-500',   badge: 'bg-blue-500/15 text-blue-400 border-blue-500/30',  dot: 'bg-blue-500' },
+};
+
+function SafeguardingSection() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-100px' });
+
+  return (
+    <section ref={ref} className="py-24 px-6 lg:px-12 border-t border-white/8">
+      <div className="max-w-6xl mx-auto">
+        <ScrollReveal className="text-center mb-10 md:mb-20">
+          <p className="text-sm font-semibold tracking-widest uppercase text-[var(--c-accent)] mb-4">Safeguarding</p>
+          <h2 className="font-display text-2xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter mb-6">
+            Every student. Always watched.
+          </h2>
+          <p className="hidden sm:block text-xl text-white max-w-2xl mx-auto font-medium">
+            Newton monitors every conversation for signs of distress, escalating to your safeguarding lead in real time.
+          </p>
+        </ScrollReveal>
+
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+          {/* Left: live mock alert feed */}
+          <div className="space-y-3">
+            {MOCK_FLAGS.map((flag, i) => {
+              const c = FLAG_COLORS[flag.color];
+              return (
+                <motion.div
+                  key={flag.student}
+                  initial={{ opacity: 0, x: -24 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ delay: 0.15 + i * 0.18, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative flex items-start gap-4 rounded-xl bg-[var(--bg-elevated)] border border-white/8 px-5 py-4 overflow-hidden"
+                >
+                  {/* left colour bar */}
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${c.bar} rounded-l-xl`} />
+
+                  {/* level badge */}
+                  <span className={`shrink-0 mt-0.5 inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-1 rounded-full border ${c.badge}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${c.dot} ${flag.level === 5 ? 'animate-pulse' : ''}`} />
+                    {flag.label}
+                  </span>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{flag.student} · {flag.subject}</p>
+                    <p className="text-xs text-white/50 mt-0.5 leading-relaxed">{flag.summary}</p>
+                  </div>
+
+                  <span className="shrink-0 text-[10px] text-white/30 mt-0.5 whitespace-nowrap">{flag.time}</span>
+                </motion.div>
+              );
+            })}
+
+            {/* reviewed indicator */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : {}}
+              transition={{ delay: 1.0, duration: 0.5 }}
+              className="flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20"
+            >
+              <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-xs text-emerald-400 font-medium">Safeguarding lead notified — 3 flagged for review</p>
+            </motion.div>
+          </div>
+
+          {/* Right: feature list */}
+          <ScrollReveal delay={0.2} className="space-y-8">
+            {[
+              {
+                icon: (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                ),
+                color: 'text-red-400 bg-red-500/10',
+                title: 'AI-Powered Detection',
+                desc: 'Every message is screened by a dedicated safety model trained on safeguarding indicators — running silently alongside learning.',
+              },
+              {
+                icon: (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zm6.75-5.25c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v12c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 019.75 19.875v-12zm6.75-3c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v15c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 0116.5 19.875v-15z" />
+                ),
+                color: 'text-orange-400 bg-orange-500/10',
+                title: 'Five-Level Triage',
+                desc: 'Flags are scored 1–5 by severity and confidence. Level 5 (urgent) alerts surface to the top and are marked for immediate review.',
+              },
+              {
+                icon: (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a3 3 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
+                ),
+                color: 'text-blue-400 bg-blue-500/10',
+                title: 'Full Audit Trail',
+                desc: 'Every flagged conversation is logged with a timestamp, AI reasoning, and reviewer notes — ready for DSL reporting.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="flex gap-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    {item.icon}
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white tracking-tight mb-1">{item.title}</h3>
+                  <p className="text-sm text-white/60 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </ScrollReveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── Subjects Section ─── */
 function SubjectsSection() {
   const ref = useRef(null);
@@ -962,6 +1087,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ─── Safeguarding ─── */}
+      <SafeguardingSection />
 
       {/* ─── Work-Refusal Comparison ─── */}
       <section className="py-24 px-6 lg:px-12 border-t border-white/8">
